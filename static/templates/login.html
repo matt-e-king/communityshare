@@ -1,0 +1,39 @@
+<div>
+  <form novalidate login-with-auto-fill
+        action="" role="form" name="form" class="form-horizontal">
+    <h4>Login</h4>
+      <div class="form-group">
+        <label for="email"
+               class="control-label">Email</label>
+        <div class="">
+          <input ng-model="email"
+                 name="email"
+                 id="email"
+                 class="form-control"
+                 type="text"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="password"
+               class="control-label">Password</label>
+        <div class="">
+          <input ng-model="password"
+                 type="password"
+                 name="password"
+                 id="password"
+                 class="form-control"/>
+        </div>
+      </div>
+      <button class="btn" ng-click="authenticate()">
+        Login
+      </button>
+      
+  </form>
+
+  <div>
+    <a ng-href="#account/resetpassword">
+      Forgotten your password
+    </a> 
+    <span> FIXME: Not yet implemented</span>
+  </div>
+</div>
