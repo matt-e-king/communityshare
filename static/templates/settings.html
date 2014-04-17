@@ -1,0 +1,35 @@
+<div cs-main-view has-permission="{{(!(Session.activeUser === undefined))}}">
+    <h4>Settings</h4>
+    <form novalidate
+          action="" role="form" name="form" class="form-horizontal">
+      <div class="form-group">
+        <label for="name"
+               class="control-label">Name</label>
+        <div class="">
+          <input ng-model="editedUser.name"
+                 type="text"
+                 name="name"
+                 id="name"
+                 class="form-control"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="email"
+               class="control-label">Email</label>
+        <div class="">
+          <input ng-model="editedUser.email"
+                 disabled
+                 name="email"
+                 id="email"
+                 class="form-control"
+                 type="text"/>
+        </div>
+      </div>
+      <button class="btn" ng-click="saveSettings()">
+        Save Changes
+      </button>
+      
+  </form>
+      
+    </div>
+</div>

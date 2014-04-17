@@ -1,0 +1,86 @@
+(function() {
+  'use strict';
+  
+  var module = angular.module(
+    'communityshare.services.item',
+    [
+      'ngResource'
+    ])
+
+  module.factory(
+    'ItemFactory',
+    function($q, $http, Session) {
+      var ItemFactory = function(resourceName) {
+        var Item = function(itemData) {
+          this.updateFromData(itemData);
+        };
+        Item.prototype.toData = function() {
+          var data = JSON.parse(JSON.stringify(this));          
+          return data;
+        }
+        Item.prototype.clone = function() {
+          var data = this.toData();
+          var item = new Item(data);
+          return item;
+        }
+        Item.makeUrl = function(id) {
+          var url = '/api/' + resourceName + '/';
+          if (id !== undefined) {
+            url += id;
+          }
+          return url;
+        };
+        Item.get = function(id) {
+          var deferred = $q.defer();
+          var dataPromise = $http({
+            method: 'GET',
+            url: Item.makeUrl(id) 
+          });
+          dataPromise.then(
+            function(data) {
+              var item = new Item(data.data.data);
+              deferred.resolve(item);
+            },
+            function(response) {
+              deferred.reject(response.message);
+            }
+          );
+          return deferred.promise;
+        };
+        Item.prototype.updateFromData = function(itemData) {
+          for (var key in itemData) {
+            this[key] = itemData[key];
+          }
+        };
+        Item.prototype.save = function() {
+          var _this = this;
+          var deferred = $q.defer();
+          var method;
+          if (this.id === undefined) {
+            method = 'POST';
+          } else {
+            method = 'PATCH';
+          }
+          var dataPromise = $http({
+              method: method,
+              url: Item.makeUrl(this.id),
+              data: this.toData()
+            });
+          dataPromise.then(
+            function(response) {
+              _this.updateFromData(response.data.data)
+              deferred.resolve(_this);
+            },
+            function(response) {
+              deferred.reject(response.message);
+            }
+          );
+          return deferred.promise;
+          
+        };
+        return Item;
+      };
+      return ItemFactory;
+    });  
+
+})();

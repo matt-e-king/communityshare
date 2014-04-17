@@ -18,7 +18,7 @@
     <div class="container">
 
       <!-- Static navbar -->
-      <div class="navbar navbar-default" role="navigation">
+      <div class="navbar navbar-default" role="navigation" ng-controller="NavigationController">
         <div class="container-fluid">
           <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse"
@@ -31,28 +31,21 @@
             <a class="navbar-brand" href="#">Community Share</a>
           </div>
           <div class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">
-              <li class="active"><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-              <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
+            <ul class="nav navbar-nav navbar-right">
+              <li class="dropdown" ng-show="Session.activeUser">
+                <a class="dropdown-toggle">
+                  {{Session.activeUser.name}}
+                  <b class="caret"></b>
+                </a>
                 <ul class="dropdown-menu">
-                  <li><a href="#">Action</a></li>
-                  <li><a href="#">Another action</a></li>
-                  <li><a href="#">Something else here</a></li>
-                  <li class="divider"></li>
-                  <li class="dropdown-header">Nav header</li>
-                  <li><a href="#">Separated link</a></li>
-                  <li><a href="#">One more separated link</a></li>
+                  <li><a href="#/settings">Settings</a></li>
+                  <li><a href="#/logout">Logout</a></li>
                 </ul>
               </li>
+              <li><a href="#login" ng-show="!Session.activeUser">Login</a></li>
+
             </ul>
-            <ul class="nav navbar-nav navbar-right">
-              <li class="active"><a href="./">Default</a></li>
-              <li><a href="../navbar-static-top/">Static top</a></li>
-              <li><a href="../navbar-fixed-top/">Fixed top</a></li>
-            </ul>
+
           </div><!--/.nav-collapse -->
         </div><!--/.container-fluid -->
       </div>
@@ -65,9 +58,19 @@
 
     <script src="./static/js/lib/angular.min.js"></script>
     <script src="./static/js/lib/angular-route.min.js"></script>
+    <script src="./static/js/lib/angular-resource.min.js"></script>
     <script src="./static/js/main.js"></script>
+    <script src="./static/js/lib/ui-bootstrap-tpls.js"></script>
 
     <script src="./static/js/controllers/authentication_controllers.js"></script>
+    <script src="./static/js/controllers/home_controllers.js"></script>
+    <script src="./static/js/controllers/user_controllers.js"></script>
+
+    <script src="./static/js/services/authentication_services.js"></script>
+    <script src="./static/js/services/item_services.js"></script>
+
+    <script src="./static/js/directives/mainview_directives.js"></script>
+
   </body>
 
 </html>

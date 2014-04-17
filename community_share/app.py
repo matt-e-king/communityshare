@@ -1,21 +1,13 @@
 from flask import Flask, send_from_directory
-from flask.ext import login
+
+from community_share import settings
+from community_share.user_routes import register_user_routes
 
 def make_app():
     app = Flask(__name__)
-    login_manager = login.LoginManager()
-    login_manager.init_app(app)
+    app.config['SQLALCHEMY_DATABASE_URI'] = settings.DB_CONNECTION
 
-    @app.route("/login", methods=["GET", "POST"])
-    def logmein():
-        form = login.LoginForm()
-        if form.validate_on_submit():
-            login.login_user(user)
-            print("Logged in successfully.")
-            response = redirect(request.args.get("next") or url_for("index"))
-        else:
-            response = render_template("login.html", form=form)
-        return response
+    register_user_routes(app)
 
     @app.route('/static/js/<path:filename>')
     def js_static(filename):
@@ -37,4 +29,5 @@ def make_app():
     
 if __name__ == '__main__':
     app = make_app()
+    app.debug = True
     app.run()
