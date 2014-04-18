@@ -17,8 +17,6 @@ def get_requesting_user():
         if len(bits) == 3 and bits[0] == 'Basic':
             email = bits[1]
             password = bits[2]
-            print(email)
-            print(password)
             user = session.query(User).filter_by(email=email).first()
             if user is not None:
                 if user.is_password_correct(password):

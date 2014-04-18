@@ -33,6 +33,14 @@ def make_bad_request_response(message=None):
     response.status_code = StatusCodes.BAD_REQUEST
     return response
 
+def make_OK_response(message=None):
+    if message is None:
+        message = 'OK'
+    response_data = {'message': message}
+    response = jsonify(response_data)
+    response.status_code = StatusCodes.OK
+    return response
+
 def make_standard_many_response(items):
     serialized = [item.standard_serialize() for item in items]
     response_data = {'data': serialized}
@@ -102,7 +110,6 @@ def register_routes(Item, resourceName, app):
         
     @app.route(API_SINGLE_FORMAT.format(resourceName), methods=['PATCH', 'PUT'])
     def edit_item(id):
-        print('in edit')
         requester = get_requesting_user()
         if requester is None:
             response = make_not_authorized_response()
@@ -118,9 +125,7 @@ def register_routes(Item, resourceName, app):
                 if id is None:
                     item = None
                 else:
-                    print('getting item')
                     item = session.query(Item).filter_by(id=id).first()
-                print('item is {0}'.format(item))
                 if item is None:
                     response = make_not_found_response()
                 else:

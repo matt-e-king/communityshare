@@ -1,11 +1,16 @@
 import os
 import logging
 
-DB_CONNECTION = 'postgresql://ben@localhost/communityshare'
-
+DB_CONNECTION = os.environ.get('COMMUNITYSHARE_DB_CONNECTION',
+                               'postgresql://username@localhost/dbname')
 MAILER_TYPE = 'DUMMY'
 # MAILER_TYPE = 'MAILGUN'
-MAILGUN_API_KEY = os.environ('MAILERGUN_API_KEY')
+MAILGUN_API_KEY = os.environ.get('MAILERGUN_API_KEY', 'invalidapikey')
+
+DONOTREPLY_EMAIL_ADDRESS = os.environ.get('COMMUNITYSHARE_DONOTREPLY_EMAIL_ADDRESS',
+                                          'donotreply@invalid.email.address')
+
+BASEURL = os.environ.get('COMMUNITYSHARE_BASEURL', 'localhost:5000')
 
 def setup_logging(level):
     "Utility function for setting up logging."
@@ -14,7 +19,7 @@ def setup_logging(level):
     formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     ch.setFormatter(formatter)
     # Which packages do we want to log from.
-    packages = ('__main__', 'communityshare',)
+    packages = ('__main__', 'community_share',)
     for package in packages:
         logger = logging.getLogger(package)
         logger.addHandler(ch)

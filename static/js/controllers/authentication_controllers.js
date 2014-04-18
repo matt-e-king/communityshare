@@ -8,6 +8,46 @@
     ]);
   
   module.controller(
+    'ResetPasswordController',
+    function($scope, Authenticator, $routeParams, $location) {
+      var key = $routeParams.key;
+      $location.search('key', null);
+      $scope.password = '';
+      $scope.passwordRepeat = '';
+      $scope.successfulReset = false;
+      $scope.failedReset = false;
+      $scope.resetPassword = function() {
+        var promise = Authenticator.resetPassword(key, $scope.password);
+        promise.then(
+          function() {
+            $location.path('/login');
+            $scope.successfulReset = true;
+          },
+          function() {
+            $scope.failedReset = true;
+          });
+      };
+    });
+
+  module.controller(
+    'RequestResetPasswordController',
+    function($scope, Authenticator) {
+      $scope.email = '';
+      $scope.successfulRequest = false;
+      $scope.failedRequest = false;
+      $scope.requestResetPassword = function() {
+        var promise = Authenticator.requestResetPassword($scope.email);
+        promise.then(
+          function() {
+            $scope.successfulRequest = true;
+          },
+          function() {
+            $scope.failedRequest = true;
+          });
+      };
+    });
+
+  module.controller(
     'LogoutController',
     function(Authenticator, Session) {
       Authenticator.clean();

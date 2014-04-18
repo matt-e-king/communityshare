@@ -37,6 +37,26 @@
           );
           return userPromise;
         };
+      Authenticator.requestResetPassword = function(email) {
+        var url = 'api/requestresetpassword/'+email;
+        var promise = $http({
+          url: url,
+          method: 'GET'
+        });
+        return promise;
+      };
+      Authenticator.resetPassword = function(key, password) {
+        var url = 'api/resetpassword';
+        var promise = $http({
+          url: url,
+          method: 'POST',
+          data: {
+            key: key,
+            password: password
+          }
+        });
+        return promise;
+      };
       return Authenticator;
     }
   );

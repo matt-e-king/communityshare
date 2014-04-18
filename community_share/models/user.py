@@ -1,16 +1,14 @@
-import datetime
+from datetime import datetime, timedelta
+import string, json, random
 
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import relationship, backref
 
 import passlib
 from passlib import context
 
 from community_share import settings
-
-Base = declarative_base()
-
+from community_share.store import Base
 
 class Serializable(object):
     """
@@ -64,6 +62,37 @@ class Serializable(object):
         return item
 
 
+class Secret(Base):
+    __tablename__ = 'secret'
+    KEY_LENGTH = 200
+    
+    key = Column(String(KEY_LENGTH), primary_key=True)
+    info = Column(String)
+    expiration = Column(DateTime, default=datetime.utcnow)
+    used = Column(Boolean, default=False)
+
+    @classmethod
+    def make_key(cls):
+        chars = string.ascii_uppercase + string.ascii_lowercase + string.digits
+        key = ''.join(random.choice(chars) for _ in range(cls.KEY_LENGTH))
+        return key
+
+    @classmethod
+    def make(cls, info, hours_duration):
+        info_as_json = json.dumps(info)
+        key = cls.make_key()
+        expiration = datetime.now() + timedelta(hours=hours_duration)
+        secret = Secret(key=key, info=info_as_json, expiration=expiration)
+        return secret
+
+    def get_info(self):
+        info = None
+        try:
+            info = json.loads(self.info)
+        except ValueError:
+            logger.error("Invalid JSON data in secret.info")
+        return info
+
 class AdministratorRole(Base, Serializable):
     __tablename__ = 'administrator_role'
     
@@ -82,7 +111,7 @@ class User(Base, Serializable):
     name = Column(String(50), nullable=False)
     email = Column(String(50), nullable=False)
     passwordhash = Column(String(120), nullable=False)
-    datecreated = Column(DateTime, nullable=False, default=datetime.datetime.utcnow)
+    datecreated = Column(DateTime, nullable=False, default=datetime.utcnow)
     administrator_role_id = Column(Integer, ForeignKey('administrator_role.id')) 
     lastactive = Column(DateTime)
 
@@ -99,6 +128,10 @@ class User(Base, Serializable):
     def is_password_correct(self, password):
         is_correct = self.pwd_context.verify(password, self.passwordhash)
         return is_correct
+
+    def set_password(self, password):
+        passwordhash = User.pwd_context.encrypt(password)
+        self.passwordhash = passwordhash
 
     def __repr__(self):
         output = "<User(email={email})>".format(email=self.email) 

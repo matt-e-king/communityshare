@@ -1,3 +1,5 @@
+import logging
+
 from flask import Flask, send_from_directory
 
 from community_share import settings

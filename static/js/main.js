@@ -27,6 +27,17 @@
       controller: 'LogoutController'
     });
 
+    $routeProvider.when('/requestresetpassword', {
+      templateUrl: './static/templates/request_reset_password.html',
+      controller: 'RequestResetPasswordController'
+    });
+
+    $routeProvider.when('/resetpassword', {
+      templateUrl: './static/templates/reset_password.html',
+      controller: 'ResetPasswordController',
+      reloadOnSearch: false
+    });
+
     $routeProvider.when('/home', {
       templateUrl: './static/templates/home.html',
       controller: 'HomeController'
