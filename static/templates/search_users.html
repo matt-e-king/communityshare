@@ -1,0 +1,41 @@
+<div cs-main-view has-permission="{{Session.activeUser.is_administrator}}">
+  <form novalidate login-with-auto-fill
+        action="" role="form" name="form" class="form-horizontal">
+    <h4>Search For Users</h4>
+    <div class="form-group">
+      <label for="searchText"
+             class="control-label">Email or Name</label>
+      <div class="">
+        <input ng-model="searchText"
+               name="searchText"
+               id="searchText"
+               class="form-control"
+               type="text"/>
+      </div>
+    </div>
+    <button class="btn" ng-click="newSearch()">
+      Search
+    </button>
+    
+  </form>
+  
+  <div>{{message}}</div>
+  
+  <div ng-show="(users !== undefined) && (users.length === 0)">
+    No matching users found.
+  </div>
+
+  <table class="table" ng-show="users">
+    <thead>
+      <tr><th>Name</th><th>Email</th><th>Is Administrator</th></tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat = "user in users">
+        <td><a href="#/user/{{user.id}}">{{user.name}}</a></td>
+        <td>{{user.email}}</td>
+        <td>{{user.is_administrator}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>

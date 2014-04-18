@@ -24,9 +24,9 @@
           return item;
         }
         Item.makeUrl = function(id) {
-          var url = '/api/' + resourceName + '/';
+          var url = '/api/' + resourceName;
           if (id !== undefined) {
-            url += id;
+            url += '/' + id;
           }
           return url;
         };
@@ -46,6 +46,28 @@
             }
           );
           return deferred.promise;
+        };
+        Item.get_many = function(searchParams) {
+          var deferred = $q.defer();
+          var dataPromise = $http({
+            method: 'GET',
+            url: Item.makeUrl(),
+            params: searchParams
+          });
+          dataPromise.then(
+            function(response) {
+              var items = []
+              for (var i=0; i<response.data.data.length; i++) {
+                var item = new Item(response.data.data[i]);
+                items.push(item);
+              }
+              deferred.resolve(items);
+            },
+            function(response) {
+              deferred.reject(response.message);
+            }
+          );
+          return deferred.promise;          
         };
         Item.prototype.updateFromData = function(itemData) {
           for (var key in itemData) {

@@ -14,7 +14,7 @@
   app.config(function($routeProvider) {
 
     $routeProvider.when('/', {
-      templateUrl: './static/templates/default.html',
+      templateUrl: './static/templates/default.html'
     });
 
     $routeProvider.when('/login', {
@@ -34,13 +34,17 @@
 
     $routeProvider.when('/resetpassword', {
       templateUrl: './static/templates/reset_password.html',
-      controller: 'ResetPasswordController',
-      reloadOnSearch: false
+      controller: 'ResetPasswordController'
     });
 
     $routeProvider.when('/home', {
       templateUrl: './static/templates/home.html',
       controller: 'HomeController'
+    });
+
+    $routeProvider.when('/searchusers', {
+      templateUrl: './static/templates/search_users.html',
+      controller: 'SearchUsersController'
     });
 
     $routeProvider.when('/settings', {

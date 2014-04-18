@@ -1,0 +1,21 @@
+<div>
+  <h5>Search for a User</h5>
+  <form novalidate login-with-auto-fill
+        action="" role="form" name="form" class="form-horizontal">
+    <div class="form-group">
+      <label for="searchText"
+             class="control-label">Email or Name</label>
+      <div class="">
+        <input ng-model="searchText"
+               name="searchText"
+               id="searchText"
+               class="form-control"
+               type="text"/>
+      </div>
+    </div>
+    <button class="btn" ng-click="searchForUsers()">
+      Search
+    </button>
+  </form>
+
+</div>

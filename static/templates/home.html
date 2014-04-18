@@ -1,6 +1,7 @@
-<div>
+<div cs-main-view has-permission="{{(!(Session.activeUser === undefined))}}">
     <h4>Home</h4>
-    <div>
-      My super home page.
+    
+    <div ng-show="Session.activeUser.is_administrator" cs-administrator-home>
     </div>
+
 </div>

@@ -20,7 +20,7 @@
         var promise = Authenticator.resetPassword(key, $scope.password);
         promise.then(
           function() {
-            $location.path('/login');
+            $location.path('/login').search({});
             $scope.successfulReset = true;
           },
           function() {

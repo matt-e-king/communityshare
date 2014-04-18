@@ -1,8 +1,12 @@
+import logging
+
 from flask import session, jsonify, request
 
 from community_share.store import session
 from community_share.utils import StatusCodes, is_integer
 from community_share.authorization import get_requesting_user
+
+logger = logging.getLogger(__name__)
 
 API_MANY_FORMAT = '/api/{0}'
 API_SINGLE_FORMAT = '/api/{0}/<id>'
@@ -73,7 +77,28 @@ def make_admin_single_response(item):
 
 
 def register_routes(Item, resourceName, app):
-    
+
+    def _args_to_filter_params():
+        filter_args = []
+        filter_kwargs = {}
+        for key in request.args.keys():
+            bits = key.split('.')
+            if hasattr(Item, bits[0]):
+                if len(bits) > 2:
+                    raise Exception('Unknown filter parameter')
+                elif len(bits) == 2:
+                    if bits[1] in ('like', 'ilike'):
+                        new_arg = getattr(getattr(Item, bits[0]), bits[1])(request.args[key])
+                        filter_args.append(new_arg)
+                    else:
+                        raise Exception('Unknown filter parameter')
+        return filter_args, filter_kwargs
+
+    def _get_raw_items():
+        filter_args, filter_kwargs = _args_to_filter_params()
+        items = session.query(Item).filter(*filter_args, **filter_kwargs)
+        return items
+
     @app.route(API_MANY_FORMAT.format(resourceName), methods=['GET'])
     def get_items():
         requester = get_requesting_user()
@@ -81,12 +106,12 @@ def register_routes(Item, resourceName, app):
             response = make_not_authorized_response()
         elif not requester.is_administrator:
             if Item.PERMISSIONS.standard_can_ready_many:
-                items = session.query(Item)
+                items = _get_raw_items()
                 response = make_standard_many_response(items)
             else:
                 response = make_forbidden_response()
         else:
-            items = session.query(Item)
+            items = _get_raw_items()
             response = make_admin_many_response(items)
         return response
 
