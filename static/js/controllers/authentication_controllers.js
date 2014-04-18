@@ -8,6 +8,13 @@
     ]);
   
   module.controller(
+    'LogoutController',
+    function(Authenticator, Session) {
+      Authenticator.clean();
+      Session.activeUser = undefined;
+    });
+
+  module.controller(
     'LoginController',
     function($scope, $location, Authenticator) {
       $scope.email = undefined;

@@ -13,6 +13,10 @@ def make_app():
     def js_static(filename):
         return send_from_directory(app.root_path + '/../static/js/', filename)
 
+    @app.route('/static/fonts/<path:filename>')
+    def fonts_static(filename):
+        return send_from_directory(app.root_path + '/../static/fonts/', filename)
+
     @app.route('/static/css/<path:filename>')
     def css_static(filename):
         return send_from_directory(app.root_path + '/../static/css/', filename)
@@ -28,6 +32,7 @@ def make_app():
     return app
     
 if __name__ == '__main__':
+    settings.setup_logging(logging.DEBUG)
     app = make_app()
     app.debug = True
     app.run()

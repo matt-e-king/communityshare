@@ -1,0 +1,19 @@
+<div cs-main-view has-permission="{{(!(Session.activeUser === undefined))}}">
+
+  <div ng-show="message">
+    {{message}}
+  </div>
+  
+  <div ng-show="user">
+
+    <div class="row">
+      <div class="col-lg-3 text-right">Name</div>
+      <div class="col-lg-3">{{user.name}}</div>
+    </div>
+    <div class="row" ng-show="Session.activeUser.is_administrator">
+      <div class="col-lg-3 text-right">Email</div>
+      <div class="col-lg-3">{{user.email}}</div>
+    </div>
+  </div>
+
+</div>
