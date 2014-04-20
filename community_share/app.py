@@ -32,9 +32,11 @@ def make_app():
         return send_from_directory(app.root_path + '/../static/', 'index.html')
         
     return app
+
+app = make_app()
     
 if __name__ == '__main__':
     settings.setup_logging(logging.DEBUG)
-    app = make_app()
+    # app = make_app()
     app.debug = True
     app.run()
