@@ -66,7 +66,6 @@
           $location.path("/home")
         });
       }
-      Authenticator.authenticateWithEmailAndPassword('ben@reynwar.net', 'viewable');
     });
 
   module.controller(
