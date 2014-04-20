@@ -2,7 +2,11 @@ import os
 import logging
 
 DB_CONNECTION = os.environ.get('COMMUNITYSHARE_DB_CONNECTION',
-                               'postgresql://username@localhost/dbname')
+                               '')
+if (DB_CONNECTION == ''):
+DB_CONNECTION = os.environ.get('DATABASE_URL', '')
+
+
 MAILER_TYPE = 'DUMMY'
 # MAILER_TYPE = 'MAILGUN'
 MAILGUN_API_KEY = os.environ.get('MAILERGUN_API_KEY', 'invalidapikey')
