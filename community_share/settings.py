@@ -4,7 +4,7 @@ import logging
 DB_CONNECTION = os.environ.get('COMMUNITYSHARE_DB_CONNECTION',
                                '')
 if (DB_CONNECTION == ''):
-DB_CONNECTION = os.environ.get('DATABASE_URL', '')
+    DB_CONNECTION = os.environ.get('DATABASE_URL', '')
 
 
 MAILER_TYPE = 'DUMMY'
