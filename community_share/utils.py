@@ -4,6 +4,7 @@ class StatusCodes(object):
     FORBIDDEN = 300
     NOT_FOUND = 404
     BAD_REQUEST = 400
+    SERVER_ERROR = 500
 
 def is_integer(s):
     try:

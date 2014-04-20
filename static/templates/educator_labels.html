@@ -1,0 +1,32 @@
+<div>
+  <h4>Grade Levels</h4>
+  <div class="row">
+    <div ng-repeat="label in labels.gradeLevels" ng-click="toggleLabel(label)"
+         ng-class="{true: 'labelbox-selected', false: ''}[activeLabels[label]]"
+         class="clickable labelbox col-md-3">
+      {{label}}
+    </div>
+  </div>
+</div>
+
+<div>
+  <h4>Subject Areas</h4>
+  <div class="row">
+    <div ng-repeat="label in labels.subjectAreas" ng-click="toggleLabel(label)"
+         ng-class="{true: 'labelbox-selected', false: ''}[activeLabels[label]]"
+         class="clickable labelbox col-md-3">
+      {{label}}
+    </div>
+  </div>
+</div>
+
+<div>
+  <h4>Engagement Levels</h4>
+  <div class="row">
+    <div ng-repeat="label in labels.engagementLevels" ng-click="toggleLabel(label)"
+         ng-class="{true: 'labelbox-selected', false: ''}[activeLabels[label]]"
+         class="clickable labelbox col-md-3">
+      {{label}}
+    </div>
+  </div>
+</div>

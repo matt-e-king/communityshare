@@ -94,7 +94,11 @@
               deferred.resolve(_this);
             },
             function(response) {
-              deferred.reject(response.message);
+              var message = ''
+              if (response.data.message) {
+                message = response.data.message;
+              }
+              deferred.reject(message);
             }
           );
           return deferred.promise;

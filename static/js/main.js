@@ -8,7 +8,9 @@
       'communityshare.directives.mainview',
       'communityshare.controllers.authentication',
       'communityshare.controllers.home',
-      'communityshare.controllers.user'
+      'communityshare.controllers.user',
+      'communityshare.controllers.search',
+      'communityshare.directives.labels'
     ]);
   
   app.config(function($routeProvider) {
@@ -25,6 +27,15 @@
     $routeProvider.when('/logout', {
       templateUrl: './static/templates/logout.html',
       controller: 'LogoutController'
+    });
+
+    $routeProvider.when('/signup/communitypartner', {
+      templateUrl: './static/templates/signup_community_partner.html'
+    });
+
+    $routeProvider.when('/signup/educator', {
+      templateUrl: './static/templates/signup_educator.html',
+      controller: 'SignupEducatorController'
     });
 
     $routeProvider.when('/requestresetpassword', {

@@ -2,7 +2,8 @@ import json
 import logging
 from datetime import datetime
 
-from community_share.models.user import User, Secret
+from community_share.models.user import User
+from community_share.models.base import Secret
 from community_share.store import session
 from community_share import mail, settings
 
@@ -59,7 +60,5 @@ def process_password_reset(secret_key, new_password):
                 session.add(user)
                 session.add(secret)
                 session.commit()
-                import pdb
-                pdb.set_trace()
     return user
         

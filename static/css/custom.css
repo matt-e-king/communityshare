@@ -1,0 +1,12 @@
+.clickable {
+    cursor: pointer;
+}
+
+.labelbox {
+    padding: 5px;
+    margin: 5px;
+}
+
+.labelbox-selected {
+    background-color: lightblue;
+}

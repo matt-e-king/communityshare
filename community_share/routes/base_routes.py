@@ -1,6 +1,8 @@
 import logging
 
-from flask import session, jsonify, request
+from flask import session, jsonify, request, Blueprint
+
+from sqlalchemy.exc import IntegrityError, InvalidRequestError
 
 from community_share.store import session
 from community_share.utils import StatusCodes, is_integer
@@ -45,6 +47,14 @@ def make_OK_response(message=None):
     response.status_code = StatusCodes.OK
     return response
 
+def make_server_error_response(message=None):
+    if message is None:
+        message = 'Server error'
+    response_data = {'message': message}
+    response = jsonify(response_data)
+    response.status_code = StatusCodes.SERVER_ERROR
+    return response
+
 def make_standard_many_response(items):
     serialized = [item.standard_serialize() for item in items]
     response_data = {'data': serialized}
@@ -76,7 +86,9 @@ def make_admin_single_response(item):
     return response
 
 
-def register_routes(Item, resourceName, app):
+def make_blueprint(Item, resourceName):
+
+    api = Blueprint(resourceName, __name__)
 
     def _args_to_filter_params():
         filter_args = []
@@ -99,7 +111,7 @@ def register_routes(Item, resourceName, app):
         items = session.query(Item).filter(*filter_args, **filter_kwargs)
         return items
 
-    @app.route(API_MANY_FORMAT.format(resourceName), methods=['GET'])
+    @api.route(API_MANY_FORMAT.format(resourceName), methods=['GET'])
     def get_items():
         requester = get_requesting_user()
         if requester is None:
@@ -115,7 +127,7 @@ def register_routes(Item, resourceName, app):
             response = make_admin_many_response(items)
         return response
 
-    @app.route(API_SINGLE_FORMAT.format(resourceName), methods=['GET'])
+    @api.route(API_SINGLE_FORMAT.format(resourceName), methods=['GET'])
     def get_item(id):
         requester = get_requesting_user()
         if requester is None:
@@ -132,8 +144,34 @@ def register_routes(Item, resourceName, app):
                 else:
                     response = make_standard_single_response(item)
         return response
+
+    @api.route(API_MANY_FORMAT.format(resourceName), methods=['POST'])
+    def add_item():
+        requester = get_requesting_user()
+        if not Item.has_add_rights(requester):
+            if requester is None:
+                response = make_not_authorized_response()
+            else:
+                response = make_forbidden_response()
+        else:
+            data = request.json
+            logger.debug('data send is {0}'.format(data))
+            item = Item.admin_deserialize_add(data)
+            session.add(item)
+            try:
+                session.commit()
+                if item.has_admin_rights(requester):
+                    response = make_admin_single_response(item)
+                else:
+                    response = make_standard_single_response(item)
+            except (IntegrityError, InvalidRequestError) as e:
+                logger.error(e)
+                import pdb
+                pdb.set_trace()
+                response = make_server_error_response()
+        return response
         
-    @app.route(API_SINGLE_FORMAT.format(resourceName), methods=['PATCH', 'PUT'])
+    @api.route(API_SINGLE_FORMAT.format(resourceName), methods=['PATCH', 'PUT'])
     def edit_item(id):
         requester = get_requesting_user()
         if requester is None:
@@ -162,4 +200,6 @@ def register_routes(Item, resourceName, app):
                     else:
                        response = make_forbidden_response()
         return response
+        
+    return api
 
