@@ -41,7 +41,7 @@ def make_admin_user(name, email, password):
 def setup():
     Base.metadata.create_all(engine);
     make_labels()
-    make_admin_user('Ben Reynwar', 'ben@reynwar.net', 'viewable')    
+    make_admin_user('Ben Reynwar', 'ben@reynwar.net', 'evaporatingfish')    
     
 if __name__ == '__main__':
     setup()
