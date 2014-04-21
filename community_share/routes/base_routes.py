@@ -77,16 +77,19 @@ def make_standard_single_response(item):
         response = jsonify(response_data)
     return response
 
-def make_admin_single_response(item):
+def make_admin_single_response(item, include_user=None):
     '''
-    When signing up and creating a new user we want to include an api key
-    since they don't have a password yet.
+    Sometimes we want to include the current user info in the response
+    since it might be changed by a request.
     '''
     if item is None:
         response = make_not_found_response()
     else:
         serialized = item.admin_serialize()
         response_data = {'data': serialized}
+        if include_user is not None:
+            serialized_user = include_user.admin_serialize()
+            response_data['user'] = serialized_user
         response = jsonify(response_data)
     return response
 
@@ -170,7 +173,8 @@ def make_blueprint(Item, resourceName):
                 session.add(item)
                 session.commit()
                 if item.has_admin_rights(requester):
-                    response = make_admin_single_response(item, include_api_key=False)
+                    response = make_admin_single_response(
+                        item, include_user=requester)
                 else:
                     response = make_standard_single_response(item)
             except ValidationException as e:

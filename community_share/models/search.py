@@ -26,7 +26,7 @@ class Search(Base, Serializable):
         'id', 'searcher_user_id', 'searcher_role', 'searching_for_role',
         'labels']
     ADMIN_READABLE_FIELDS = [
-        'id' 'searcher_user_id', 'searcher_role', 'searching_for_role', 'labels',
+        'id', 'searcher_user_id', 'searcher_role', 'searching_for_role', 'labels',
         'created', 'active_only']
 
     COMMUNITY_PARTNER_ROLE = 'partner'
@@ -45,6 +45,14 @@ class Search(Base, Serializable):
     def has_add_rights(cls, data, user):
         has_rights = False
         if int(data.get('searcher_user_id', -1)) == user.id:
+            has_rights = True
+        return has_rights
+
+    def has_admin_rights(self, user):
+        has_rights = False
+        if user.is_administrator:
+            has_rights = True
+        elif user.id == self.searcher_user_id:
             has_rights = True
         return has_rights
 

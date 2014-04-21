@@ -30,7 +30,8 @@
     });
 
     $routeProvider.when('/signup/communitypartner', {
-      templateUrl: './static/templates/signup_community_partner.html'
+      templateUrl: './static/templates/signup_community_partner.html',
+      controller: 'SignupCommunityPartnerController'
     });
 
     $routeProvider.when('/signup/educator', {

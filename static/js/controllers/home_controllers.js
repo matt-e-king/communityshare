@@ -14,6 +14,16 @@
     });
 
   module.controller(
+    'EducatorHomeController',
+    function() {
+    });
+
+  module.controller(
+    'CommunityPartnerHomeController',
+    function() {
+    });
+
+  module.controller(
     'AdministratorHomeController',
     function($scope, $location) {
       $scope.searchText = '';

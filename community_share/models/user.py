@@ -10,6 +10,7 @@ from passlib import context
 from community_share.store import Base, session
 from community_share.models.base import Serializable
 from community_share.models.secret import Secret
+from community_share.models.search import Search
 
 logger = logging.getLogger(__name__)
 
@@ -18,9 +19,10 @@ class User(Base, Serializable):
 
     MANDATORY_FIELDS = ['name', 'email']
     WRITEABLE_FIELDS = ['name', 'is_administrator']
-    STANDARD_READABLE_FIELDS = ['id', 'name', 'is_administrator', 'last_active']
+    STANDARD_READABLE_FIELDS = ['id', 'name', 'is_administrator', 'last_active', 'is_educator',
+                                'is_community_partner']
     ADMIN_READABLE_FIELDS = ['id', 'name', 'email' , 'date_created', 'last_active',
-                             'is_administrator']
+                             'is_administrator', 'is_educator', 'is_community_partner']
     
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False)
@@ -36,6 +38,21 @@ class User(Base, Serializable):
         all__vary_rounds = 0.1,
         sha512_crypt__vary_rounds = 8000,
     )
+    
+    def searches_as(self, role):
+        searches = session.query(Search).filter_by(
+            searcher_user_id=self.id, searcher_role=role).all()
+        return searches
+        
+    @property
+    def is_educator(self):
+        output = (len(self.searches_as('educator')) > 0)
+        return output
+
+    @property
+    def is_community_partner(self):
+        output = (len(self.searches_as('partner')) > 0)
+        return output
 
     def is_password_correct(self, password):
         if not self.password_hash:

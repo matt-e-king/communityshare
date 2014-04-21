@@ -91,6 +91,10 @@
           dataPromise.then(
             function(response) {
               _this.updateFromData(response.data.data)
+              // Properties of the current user can also be set.
+              if (response.data.user !== undefined) {
+                Session.activeUser.updateFromData(response.data.user);
+              }
               deferred.resolve(_this);
             },
             function(response) {
