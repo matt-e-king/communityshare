@@ -16,14 +16,15 @@
   module.factory(
     'signUp',
     function($q, $http, User, Authenticator, Session) {
-      var signUp = function(name, email) {
+      var signUp = function(name, email, password) {
         var deferred = $q.defer();
         var dataPromise = $http({
           method: 'POST',
           url: '/api/usersignup',
           data: {
             'name': name,
-            'email': email
+            'email': email,
+            'password': password
           }});
         dataPromise.then(
           function(response) {

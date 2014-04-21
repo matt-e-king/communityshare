@@ -19,13 +19,18 @@ def register_user_routes(app):
     def usersignup():
         data = request.json
         email = data.get('email', '')
+        password = data.get('password', None)
         # Check that the email isn't in use.
         existing_user = session.query(User).filter_by(email=email).first()
         if existing_user is not None:
             response = base_routes.make_bad_request_response(
                 'That email address is already associated with an account.')
+        elif password is None:
+            response = base_routes.make_bad_request_response(
+                'A password was not specified.');
         else:
             user = User.admin_deserialize_add(data)
+            user.set_password(password)
             session.add(user)
             session.commit()
             secret = user.make_api_key()

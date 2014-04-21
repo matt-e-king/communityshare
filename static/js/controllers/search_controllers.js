@@ -27,7 +27,8 @@
           return labels;
         };
         $scope.saveSettings = function() {
-          var userPromise = signUp($scope.newUser.name, $scope.newUser.email);
+          var userPromise = signUp($scope.newUser.name, $scope.newUser.email,
+                                   $scope.newUser.password);
           var searchPromise = userPromise.then(
             function(user) {
               var newSearch = new Search({
