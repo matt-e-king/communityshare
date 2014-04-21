@@ -45,6 +45,7 @@ def make_admin_user(name, email, password):
 
 
 def setup():
+    Base.metadata.drop_all(engine);
     Base.metadata.create_all(engine);
     make_labels()
     import os
