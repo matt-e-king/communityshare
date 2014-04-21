@@ -40,10 +40,11 @@ def make_app():
         
     return app
 
+settings.setup_logging(logging.DEBUG)
 app = make_app()
     
 if __name__ == '__main__':
-    settings.setup_logging(logging.DEBUG)
+    # settings.setup_logging(logging.DEBUG)
     # app = make_app()
     app.debug = True
     app.run()

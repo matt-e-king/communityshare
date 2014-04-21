@@ -1,8 +1,13 @@
+import logging
+
 from sqlalchemy.exc import IntegrityError, InvalidRequestError
 
 from community_share.models.search import Label
 from community_share.models.user import User
 from community_share.store import session, Base, engine
+from community_share import settings
+
+logger = logging.getLogger(__name__)
 
 def make_labels():
     labels = [
@@ -38,11 +43,20 @@ def make_admin_user(name, email, password):
     except (IntegrityError, InvalidRequestError):
         session.rollback()
 
+
 def setup():
     Base.metadata.create_all(engine);
     make_labels()
-    make_admin_user('Ben Reynwar', 'ben@reynwar.net', 'evaporatingfish')    
+    import os
+    from community_share.models.base import Secret
+    admin_emails = os.environ.get('COMMUNITYSHARE_ADMIN_EMAILS', '').split(',')
+    admin_emails = [x.strip() for x in admin_emails]
+    logger.info('admin_emails is {0}'.format(admin_emails))
+    for email in admin_emails:
+        if email:
+            make_admin_user(email, email, Secret.make_key(20))
     
 if __name__ == '__main__':
+    settings.setup_logging(logging.DEBUG)
     setup()
               

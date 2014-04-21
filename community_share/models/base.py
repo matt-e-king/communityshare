@@ -80,7 +80,7 @@ class Secret(Base):
     used = Column(Boolean, default=False)
 
     @classmethod
-    def make_key(cls):
+    def make_key(cls, key_length=KEY_LENGTH):
         chars = string.ascii_uppercase + string.ascii_lowercase + string.digits
         key = ''.join(random.choice(chars) for _ in range(cls.KEY_LENGTH))
         return key

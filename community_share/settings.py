@@ -1,15 +1,11 @@
 import os
 import logging
 
-DB_CONNECTION = os.environ.get('COMMUNITYSHARE_DB_CONNECTION',
-                               '')
-if (DB_CONNECTION == ''):
-    DB_CONNECTION = os.environ.get('DATABASE_URL', '')
+DB_CONNECTION = os.environ.get('DATABASE_URL', '')
 
-
-MAILER_TYPE = 'DUMMY'
-# MAILER_TYPE = 'MAILGUN'
-MAILGUN_API_KEY = os.environ.get('MAILERGUN_API_KEY', 'invalidapikey')
+# MAILER_TYPE = 'DUMMY'
+MAILER_TYPE = 'MAILGUN'
+MAILGUN_API_KEY = os.environ.get('MAILGUN_API_KEY', 'invalidapikey')
 
 DONOTREPLY_EMAIL_ADDRESS = os.environ.get('COMMUNITYSHARE_DONOTREPLY_EMAIL_ADDRESS',
                                           'donotreply@invalid.email.address')
