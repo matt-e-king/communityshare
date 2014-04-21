@@ -23,11 +23,15 @@
       Authenticator.clean = function() {
         $http.defaults.headers.common['Authorization'] = '';
       }
+      Authenticator.setApiKey = function(key) {
+          $http.defaults.headers.common['Authorization'] = 
+            'Basic:api:' + key;
+      }; 
       Authenticator.authenticateWithEmailAndPassword =
         function(email, password) {
           $http.defaults.headers.common['Authorization'] = 
-            'Basic:' + email + ':' + password;
-          var userPromise = User.getByEmail(email);
+            'Basic:' + email + ':' + password; 
+         var userPromise = User.getByEmail(email);
           userPromise.then(
             function(user) {
               Session.activeUser = user;

@@ -21,9 +21,13 @@ def get_requesting_user():
         if len(bits) == 3 and bits[0] == 'Basic':
             email = bits[1]
             password = bits[2]
-            user = session.query(User).filter_by(email=email).first()
-            if user is not None:
-                if user.is_password_correct(password):
-                    authorized_user = user
+            logger.debug('Authorizing with email={0}'.format(email))
+            if email == 'api':
+                authorized_user = User.from_api_key(password)
+            else:
+                user = session.query(User).filter_by(email=email).first()
+                if user is not None:
+                    if user.is_password_correct(password):
+                        authorized_user = user
     return authorized_user
 

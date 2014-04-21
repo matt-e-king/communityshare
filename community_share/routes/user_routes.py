@@ -1,6 +1,6 @@
 import logging
 
-from flask import request
+from flask import request, jsonify
 
 from community_share.store import session
 from community_share.models.user import User
@@ -14,6 +14,28 @@ def register_user_routes(app):
 
     user_blueprint = base_routes.make_blueprint(User, 'user')
     app.register_blueprint(user_blueprint)
+
+    @app.route('/api/usersignup', methods=['POST'])
+    def usersignup():
+        data = request.json
+        email = data.get('email', '')
+        # Check that the email isn't in use.
+        existing_user = session.query(User).filter_by(email=email).first()
+        if existing_user is not None:
+            response = base_routes.make_bad_request_response(
+                'That email address is already associated with an account.')
+        else:
+            user = User.admin_deserialize_add(data)
+            session.add(user)
+            session.commit()
+            secret = user.make_api_key()
+            serialized = user.admin_serialize()
+            response_data = {
+                'data': serialized,
+                'apiKey': secret.key
+            }
+            response = jsonify(response_data)
+        return response
 
     @app.route('/api/userbyemail/<string:email>', methods=['GET'])
     def userbyemail(email):

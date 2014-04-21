@@ -1,4 +1,5 @@
 from datetime import datetime
+import logging
 
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import relationship, backref
@@ -6,8 +7,11 @@ from sqlalchemy.orm import relationship, backref
 import passlib
 from passlib import context
 
-from community_share.store import Base
+from community_share.store import Base, session
 from community_share.models.base import Serializable
+from community_share.models.secret import Secret
+
+logger = logging.getLogger(__name__)
 
 class User(Base, Serializable):
     __tablename__ = 'user'
@@ -20,7 +24,7 @@ class User(Base, Serializable):
     
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False)
-    email = Column(String(50), nullable=False)
+    email = Column(String(50), nullable=False, unique=True)
     password_hash = Column(String(120), nullable=True)
     date_created = Column(DateTime, nullable=False, default=datetime.utcnow)
     is_administrator = Column(Boolean, nullable=False, default=False) 
@@ -49,8 +53,8 @@ class User(Base, Serializable):
         return output
 
     @classmethod
-    def has_add_rights(cls, user):
-        return True
+    def has_add_rights(cls, data, user):
+        return False
 
     def has_admin_rights(self, user):
         has_admin_rights = False
@@ -61,3 +65,25 @@ class User(Base, Serializable):
                 has_admin_rights = True
         return has_admin_rights
             
+    def make_api_key(self):
+        secret_data = {
+            'userId': self.id,
+            'action': 'api_key',
+        }
+        secret = Secret.create_secret(info=secret_data, hours_duration=24)
+        return secret
+        
+    @classmethod
+    def from_api_key(self, key):
+        secret = Secret.lookup_secret(key)
+        user_id = None
+        if secret is not None:
+            info = secret.get_info()
+            if info.get('action', None) == 'api_key':
+                user_id = info.get('userId', None)
+        if user_id is not None:
+            user = session.query(User).filter_by(id=user_id).first()
+        logger.debug('user from api_key is {0}'.format(user))
+        return user
+
+        

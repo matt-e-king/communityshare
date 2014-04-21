@@ -1,12 +1,13 @@
 import logging
-from datetime import datetime, timedelta
-import string, json, random
 
 from sqlalchemy import Column, String, DateTime, Boolean
 
 from community_share.store import Base
 
 logger = logging.getLogger(__name__)
+
+class ValidationException(Exception):
+    pass
 
 class Serializable(object):
     """
@@ -23,7 +24,7 @@ class Serializable(object):
     }
 
     @classmethod
-    def has_add_rights(cls, requester):
+    def has_add_rights(cls, data, requester):
         return (requester is not None and requester.is_administrator)
 
     def has_admin_rights(self, requester):
@@ -45,7 +46,7 @@ class Serializable(object):
     def admin_deserialize_add(cls, data):
         for fieldname in cls.MANDATORY_FIELDS:
             if not fieldname in data:
-                raise Exception('Missing necessary field: {0}'.format(fieldname))
+                raise ValidationException('Missing necessary field: {0}'.format(fieldname))
         item = cls()
         item.admin_deserialize_update(data, add=True)
         return item
@@ -69,35 +70,4 @@ class Serializable(object):
             item = self.admin_deserialize_add(data)
         return item
 
-
-class Secret(Base):
-    __tablename__ = 'secret'
-    KEY_LENGTH = 200
-    
-    key = Column(String(KEY_LENGTH), primary_key=True)
-    info = Column(String)
-    expiration = Column(DateTime, default=datetime.utcnow)
-    used = Column(Boolean, default=False)
-
-    @classmethod
-    def make_key(cls, key_length=KEY_LENGTH):
-        chars = string.ascii_uppercase + string.ascii_lowercase + string.digits
-        key = ''.join(random.choice(chars) for _ in range(cls.KEY_LENGTH))
-        return key
-
-    @classmethod
-    def make(cls, info, hours_duration):
-        info_as_json = json.dumps(info)
-        key = cls.make_key()
-        expiration = datetime.now() + timedelta(hours=hours_duration)
-        secret = Secret(key=key, info=info_as_json, expiration=expiration)
-        return secret
-
-    def get_info(self):
-        info = None
-        try:
-            info = json.loads(self.info)
-        except ValueError:
-            logger.error("Invalid JSON data in secret.info")
-        return info
 

@@ -49,7 +49,7 @@ def setup():
     Base.metadata.create_all(engine);
     make_labels()
     import os
-    from community_share.models.base import Secret
+    from community_share.models.secret import Secret
     admin_emails = os.environ.get('COMMUNITYSHARE_ADMIN_EMAILS', '').split(',')
     admin_emails = [x.strip() for x in admin_emails]
     logger.info('admin_emails is {0}'.format(admin_emails))

@@ -14,9 +14,38 @@
   };
 
   module.factory(
+    'signUp',
+    function($q, $http, User, Authenticator, Session) {
+      var signUp = function(name, email) {
+        var deferred = $q.defer();
+        var dataPromise = $http({
+          method: 'POST',
+          url: '/api/usersignup',
+          data: {
+            'name': name,
+            'email': email
+          }});
+        dataPromise.then(
+          function(response) {
+            var user = new User(response.data.data);
+            Authenticator.setApiKey(response.data.apiKey);
+            Session.activeUser = user;
+            deferred.resolve(user);
+          },
+          function(response) {
+            deferred.reject(response.data.message);
+          }
+        );
+        return deferred.promise;
+      };
+      return signUp;
+    });
+
+  module.factory(
     'User',
     function(ItemFactory, $q, $http) {
       var User = ItemFactory('user');
+
       User.getByEmail = function(email) {
         var deferred = $q.defer();
         var dataPromise = $http({

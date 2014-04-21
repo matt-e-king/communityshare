@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 
 from sqlalchemy import Table, ForeignKey, DateTime, Column, Integer, String, Boolean
@@ -5,6 +6,8 @@ from sqlalchemy.orm import relationship
 
 from community_share.store import Base, session
 from community_share.models.base import Serializable
+
+logger = logging.getLogger(__name__)
 
 search_label_table = Table('search_label', Base.metadata,
     Column('search_id', Integer, ForeignKey('search.id')),
@@ -38,6 +41,13 @@ class Search(Base, Serializable):
     
     labels = relationship("Label", secondary=search_label_table)
 
+    @classmethod
+    def has_add_rights(cls, data, user):
+        has_rights = False
+        if int(data.get('searcher_user_id', -1)) == user.id:
+            has_rights = True
+        return has_rights
+
     def standard_serialize(self):
         d = {}
         for fieldname in self.STANDARD_READABLE_FIELDS:
@@ -56,10 +66,11 @@ class Search(Base, Serializable):
                 d[fieldname] = getattr(self, fieldname)
         return d
                 
-    def admin_deserialize_update(self, data):
+    def admin_deserialize_update(self, data, add=False):
         for fieldname in data.keys():
             if fieldname == 'labels':
-                labelnames = data.labels
+                labelnames = data.get('labels', [])
+                logger.debug('labelnames is {0}'.format(labelnames))
                 self.labels = session.query(Label).filter(Label.name.in_(labelnames)).all()
             else:
                 setattr(self, fieldname, data[fieldname])

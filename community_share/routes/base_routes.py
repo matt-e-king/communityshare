@@ -7,6 +7,7 @@ from sqlalchemy.exc import IntegrityError, InvalidRequestError
 from community_share.store import session
 from community_share.utils import StatusCodes, is_integer
 from community_share.authorization import get_requesting_user
+from community_share.models.base import ValidationException
 
 logger = logging.getLogger(__name__)
 
@@ -77,6 +78,10 @@ def make_standard_single_response(item):
     return response
 
 def make_admin_single_response(item):
+    '''
+    When signing up and creating a new user we want to include an api key
+    since they don't have a password yet.
+    '''
     if item is None:
         response = make_not_found_response()
     else:
@@ -148,26 +153,29 @@ def make_blueprint(Item, resourceName):
     @api.route(API_MANY_FORMAT.format(resourceName), methods=['POST'])
     def add_item():
         requester = get_requesting_user()
-        if not Item.has_add_rights(requester):
+        logger.debug('add_item: requester = {0}'.format(requester))
+        data = request.json
+        if not Item.has_add_rights(data, requester):
             if requester is None:
+                logger.debug('not authorized')
                 response = make_not_authorized_response()
             else:
+                logger.debug('forbidden')
                 response = make_forbidden_response()
         else:
             data = request.json
             logger.debug('data send is {0}'.format(data))
-            item = Item.admin_deserialize_add(data)
-            session.add(item)
             try:
+                item = Item.admin_deserialize_add(data)
+                session.add(item)
                 session.commit()
                 if item.has_admin_rights(requester):
-                    response = make_admin_single_response(item)
+                    response = make_admin_single_response(item, include_api_key=False)
                 else:
                     response = make_standard_single_response(item)
+            except ValidationException as e:
+                response = make_bad_request_response(str(e))
             except (IntegrityError, InvalidRequestError) as e:
-                logger.error(e)
-                import pdb
-                pdb.set_trace()
                 response = make_server_error_response()
         return response
         

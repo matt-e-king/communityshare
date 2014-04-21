@@ -10,7 +10,7 @@
   
   module.controller(
     'SignupEducatorController',
-    function($scope, $location, $q, Session, User, Search) {
+    function($scope, $location, $q, Session, signUp, Search, User) {
       $scope.Session = Session;
       $scope.activeLabels = {};
       $scope.newUser = new User();
@@ -22,9 +22,10 @@
             labels.push(label);
           }
         }
+        return labels;
       };
       $scope.saveSettings = function() {
-        var userPromise = $scope.newUser.save();
+        var userPromise = signUp($scope.newUser.name, $scope.newUser.email);
         var searchPromise = userPromise.then(
           function(user) {
             var newSearch = new Search({
@@ -44,7 +45,7 @@
         searchPromise.then(
           function(search) {
             console.log('search is - ' + search);
-            $location.path('#/home');
+            $location.path('/home');
           },
           function(message) {
             $scope.message =
