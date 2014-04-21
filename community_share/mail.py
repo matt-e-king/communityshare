@@ -1,4 +1,5 @@
 import logging
+import requests
 
 from community_share import settings
 
@@ -28,7 +29,16 @@ class DummyMailer(object):
 
 class MailgunMailer(object):
     def send(email):
-        pass
+        payload = {
+            'from': email.from_address,
+            'to': email.to_address,
+            'subject': email.subject,
+            'text': email.content
+        }
+        r = requests.post(
+            'https://api.mailgun.net/v2/samples.mailgun.org/messages',
+            auth=('api', settings.MAILGUN_API_KEY),
+            data=payload)
 
 mailer_type_to_mail = {
     'DUMMY': DummyMailer,

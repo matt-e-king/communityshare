@@ -1,3 +1,5 @@
+import logging
+
 from flask import request
 
 from community_share.store import session
@@ -5,6 +7,8 @@ from community_share.models.user import User
 from community_share.authorization import get_requesting_user
 from community_share import mail_actions
 from community_share.routes import base_routes
+
+logger = logging.getLogger(__name__)
 
 def register_user_routes(app):
 

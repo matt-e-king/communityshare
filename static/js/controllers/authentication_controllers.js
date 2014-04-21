@@ -11,7 +11,6 @@
     'ResetPasswordController',
     function($scope, Authenticator, $routeParams, $location) {
       var key = $routeParams.key;
-      $location.search('key', null);
       $scope.password = '';
       $scope.passwordRepeat = '';
       $scope.successfulReset = false;
