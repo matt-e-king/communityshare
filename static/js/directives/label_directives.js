@@ -9,11 +9,12 @@
     gradeLevels: [
       'K-3', '4-5', '6-8', '9-12'],
     // Subject area
-    subjectAreas: [
-      'STEM', 'Arts',
-      'Science', 'Technology', 'Engineering', 'Math',
-      'Visual Arts', 'Digital Media', 'Film & Photography', 'Literature',
-      'Performing Arts'],
+    subjectAreas: {
+      STEM: ['Science', 'Technology', 'Engineering', 'Math'],
+      Arts: ['Visual Arts', 'Digital Media', 'Film & Photography', 'Literature',
+             'Performing Arts'],
+      Custom: []
+    },
     // Level of Engagement
     engagementLevels: [
       'Guest Speaker', 'Field Trip Host', 'Student Competition Judget',
@@ -66,8 +67,10 @@
            $scope.newLabelMethods = {
              onUpdate: function() {
                var newLabelName = $scope.newLabel.name;
-               $scope.labels.subjectAreas.push(newLabelName);
-               $scope.activeLabels[newLabelName] = true;
+               if (newLabelName) {
+                 $scope.labels.subjectAreas.Custom.push(newLabelName);
+                 $scope.activeLabels[newLabelName] = true;
+               }
                $scope.newLabel.name = '';
              }
            };
