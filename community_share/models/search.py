@@ -93,6 +93,13 @@ class Search(Base, Serializable):
                 labelnames = data.get('labels', [])
                 logger.debug('labelnames is {0}'.format(labelnames))
                 self.labels = session.query(Label).filter(Label.name.in_(labelnames)).all()
+                missing_labelnames = set(labelnames)
+                for label in self.labels:
+                    missing_labelnames.remove(label.name)
+                for labelname in missing_labelnames:
+                    new_label = Label(name=labelname)
+                    self.labels.append(new_label)
+                    session.add(new_label)
             else:
                 setattr(self, fieldname, data[fieldname])
 
