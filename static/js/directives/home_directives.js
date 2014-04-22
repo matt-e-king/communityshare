@@ -33,5 +33,17 @@
          controller: 'CommunityPartnerHomeController'
        };
      });
+
+  module.directive(
+    'csSearchesDisplay',
+    function() {
+      return {
+        scope: {
+          'searches': '='
+        },
+        templateUrl: './static/templates/searches_display.html',
+        controller: 'SearchesDisplayController'
+      }
+    });
   
 })();

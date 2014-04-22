@@ -29,6 +29,10 @@ class Search(Base, Serializable):
         'id', 'searcher_user_id', 'searcher_role', 'searching_for_role', 'labels',
         'created', 'active_only']
 
+    PERMISSIONS = {
+        'standard_can_read_many': True
+    }
+
     COMMUNITY_PARTNER_ROLE = 'partner'
     EDUCATOR_ROLE = 'educator'
 
@@ -46,6 +50,10 @@ class Search(Base, Serializable):
         has_rights = False
         if int(data.get('searcher_user_id', -1)) == user.id:
             has_rights = True
+        return has_rights
+
+    def has_standard_rights(self, requester):
+        has_rights = self.has_admin_rights(requester)
         return has_rights
 
     def has_admin_rights(self, user):

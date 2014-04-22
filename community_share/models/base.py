@@ -20,12 +20,15 @@ class Serializable(object):
     ADMIN_READABLE_FIELDS = ['id']
 
     PERMISSIONS = {
-        'standard_can_ready_many': False
+        'standard_can_read_many': False
     }
 
     @classmethod
     def has_add_rights(cls, data, requester):
         return (requester is not None and requester.is_administrator)
+
+    def has_standard_rights(self, requester):
+        return False
 
     def has_admin_rights(self, requester):
         return (requester is not None and requester.is_administrator)

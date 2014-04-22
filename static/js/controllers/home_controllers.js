@@ -15,7 +15,29 @@
 
   module.controller(
     'EducatorHomeController',
-    function() {
+    function($scope, Session, Search) {
+      if (Session.activeUser) {
+        var searchParams = {
+          'searcher_user_id': Session.activeUser.id
+        };
+        var searchesPromise = Search.get_many(searchParams);
+        searchesPromise.then(
+          function(searches) {
+            console.log('searches are');
+            console.log(searches);
+            $scope.activeSearches = [];
+            for (var i=0; i<searches.length; i++) {
+              var search = searches[i];
+              if (!search.active_only) {
+                $scope.activeSearches.push(search);
+              }
+            }
+            console.log($scope.activeSearches);
+          },
+          function() {
+          });
+      }
+      
     });
 
   module.controller(
@@ -33,6 +55,11 @@
         };
         $location.path('/searchusers').search(searchParams);
       };
+    });
+
+    module.controller(
+    'SearchesDisplayController',
+    function() {
     });
 
   module.controller(

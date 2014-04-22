@@ -68,6 +68,17 @@ def make_admin_many_response(items):
     response = jsonify(response_data)
     return response
 
+def make_mixed_many_response(items, requester):
+    serialized = []
+    for item in items:
+        if item.has_admin_rights(requester):
+            serialized.append(item.admin_serialize())
+        elif item.has_standard_rights(requester):
+            serialized.append(item.standard_serialize())
+    response_data = {'data': serialized}
+    response = jsonify(response_data)
+    return response
+
 def make_standard_single_response(item):
     if item is None:
         response = make_not_found_response()
@@ -121,13 +132,14 @@ def make_blueprint(Item, resourceName):
 
     @api.route(API_MANY_FORMAT.format(resourceName), methods=['GET'])
     def get_items():
+        logger.debug('get_items')
         requester = get_requesting_user()
         if requester is None:
             response = make_not_authorized_response()
         elif not requester.is_administrator:
-            if Item.PERMISSIONS.standard_can_ready_many:
+            if Item.PERMISSIONS.get('standard_can_read_many', False):
                 items = _get_raw_items()
-                response = make_standard_many_response(items)
+                response = make_mixed_many_response(items, requester)
             else:
                 response = make_forbidden_response()
         else:
