@@ -1,7 +1,8 @@
 import logging
 from datetime import datetime
 
-from sqlalchemy import Table, ForeignKey, DateTime, Column, Integer, String, Boolean
+from sqlalchemy import Table, ForeignKey, DateTime, Column
+from sqlalchemy import Integer, String, Boolean, Float
 from sqlalchemy.orm import relationship
 
 from community_share.store import Base, session
@@ -18,16 +19,17 @@ class Search(Base, Serializable):
     __tablename__ = 'search'
     
     MANDATORY_FIELDS = [
-        'searcher_user_id', 'searcher_role', 'searching_for_role', 'labels']
+        'searcher_user_id', 'searcher_role', 'searching_for_role', 'labels',
+        'latitude', 'longitude']
     WRITEABLE_FIELDS = [
         'searcher_user_id', 'searcher_role', 'searching_for_role', 'labels',
-        'active_only']
+        'active', 'latitude', 'longitude', 'distance']
     STANDARD_READABLE_FIELDS = [
         'id', 'searcher_user_id', 'searcher_role', 'searching_for_role',
-        'labels']
+        'labels', 'latitude', 'longitude', 'distance']
     ADMIN_READABLE_FIELDS = [
         'id', 'searcher_user_id', 'searcher_role', 'searching_for_role', 'labels',
-        'created', 'active_only']
+        'created', 'active', 'latitude', 'longitude', 'distance']
 
     PERMISSIONS = {
         'standard_can_read_many': True
@@ -41,7 +43,10 @@ class Search(Base, Serializable):
     searcher_role = Column(String(20), nullable=False)
     searching_for_role = Column(String(20), nullable=False)
     created = Column(DateTime, nullable=False, default=datetime.utcnow)
-    active_only = Column(Boolean, nullable=False, default=False)
+    active = Column(Boolean, nullable=False, default=True)
+    latitude = Column(Float, nullable=False)
+    longitude = Column(Float, nullable=False)
+    distance = Column(Float, nullable=True)
     
     labels = relationship("Label", secondary=search_label_table)
 
