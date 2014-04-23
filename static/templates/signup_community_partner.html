@@ -35,33 +35,12 @@
              type="text"/>
     </div>
   </div>
-  <div class="form-group">
-    <label for="location"
-           class="control-label">Location</label>
-    <div class="">
-      <input ng-model="newUser.location"
-             name="location"
-             id="location"
-             class="form-control"
-             type="text"/>
-    </div>
-    <button ng-click="codeAddress()">Lookup Address</button>
-    <div class="map-canvas" id="map-canvas"></div>
-  </div>
-  <div class="form-group">
-    <label for="distance"
-           class="control-label">Maximum Distance Away (miles)</label>
-    <div class="">
-      <input ng-model="newUser.distance"
-             name="distance"
-             id="distance"
-             class="form-control"
-             type="text"/>
-    </div>
-  </div>
+
 </form>
 
-<div cs-educator-labels active-labels="activeLabels"></div>
+<div cs-community-partner-settings
+     methods="communityPartnerSettingsMethods"
+     ></div>
 
 <div>{{message}}</div>
 

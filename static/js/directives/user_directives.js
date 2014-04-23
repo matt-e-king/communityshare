@@ -13,5 +13,18 @@
         controller: 'CommunityPartnerViewController'
       };
     });
+  
+  module.directive(
+    'csCommunityPartnerSettings',
+    function() {
+      return {
+        scope: {
+          methods: '=',
+          user: '='
+        },
+        templateUrl: './static/templates/community_partner_settings.html',
+        controller: 'CommunityPartnerSettingsController'
+      };
+    });
       
 })();

@@ -1,8 +1,8 @@
 <div>
   <h4>Grade Levels</h4>
   <div class="row">
-    <div ng-repeat="label in labels.gradeLevels" ng-click="toggleLabel(label)"
-         ng-class="{true: 'labelbox-selected', false: ''}[activeLabels[label]]"
+    <div ng-repeat="label in search.displayLabelsAll.gradeLevels" ng-click="toggleLabel(label)"
+         ng-class="{true: 'labelbox-selected', false: ''}[search.activeLabels[label]]"
          class="clickable labelbox col-md-3">
       {{label}}
     </div>
@@ -13,40 +13,40 @@
   <h4>Subject Areas</h4>
   <div class="row">
     <div ng-click="toggleLabel('STEM')"
-         ng-class="{true: 'labelbox-selected', false: ''}[activeLabels['STEM']]"
+         ng-class="{true: 'labelbox-selected', false: ''}[search.activeLabels['STEM']]"
          class="clickable labelbox col-md-3">
       <h5>STEM</h5>
     </div>
   </div>
   <div class="row">
-    <div ng-repeat="label in labels.subjectAreas.STEM" ng-click="toggleLabel(label)"
-         ng-class="{true: 'labelbox-selected', false: ''}[activeLabels[label]]"
+    <div ng-repeat="label in search.displayLabelsAll.subjectAreas.STEM" ng-click="toggleLabel(label)"
+         ng-class="{true: 'labelbox-selected', false: ''}[search.activeLabels[label]]"
          class="clickable labelbox col-md-3">
       {{label}}
     </div>
   </div>
   <div class="row">
     <div ng-click="toggleLabel('Arts')"
-         ng-class="{true: 'labelbox-selected', false: ''}[activeLabels['Arts']]"
+         ng-class="{true: 'labelbox-selected', false: ''}[search.activeLabels['Arts']]"
          class="clickable labelbox col-md-3">
       <h5>Arts</h5>
     </div>
   </div>
   <div class="row">
-    <div ng-repeat="label in labels.subjectAreas.Arts" ng-click="toggleLabel(label)"
-         ng-class="{true: 'labelbox-selected', false: ''}[activeLabels[label]]"
+    <div ng-repeat="label in search.displayLabelsAll.subjectAreas.Arts" ng-click="toggleLabel(label)"
+         ng-class="{true: 'labelbox-selected', false: ''}[search.activeLabels[label]]"
          class="clickable labelbox col-md-3">
       {{label}}
     </div>
   </div>
-  <div class="row" ng-show="labels.subjectAreas.Custom.length">
+  <div class="row" ng-show="search.displayLabelsAll.subjectAreas.Custom.length">
     <div class="col-md-3">
       <h5>Custom</h5>
     </div>
   </div>
   <div class="row">
-    <div ng-repeat="label in labels.subjectAreas.Custom" ng-click="toggleLabel(label)"
-         ng-class="{true: 'labelbox-selected', false: ''}[activeLabels[label]]"
+    <div ng-repeat="label in search.displayLabelsAll.subjectAreas.Custom" ng-click="toggleLabel(label)"
+         ng-class="{true: 'labelbox-selected', false: ''}[search.activeLabels[label]]"
          class="clickable labelbox col-md-3">
       {{label}}
     </div>
@@ -56,13 +56,14 @@
     <div class="col-lg-3">
       <input type="text" cs-new-label methods="newLabelMethods" ng-model="newLabel.name"/>
     </div>
+  </div>
 </div>
 
 <div>
   <h4>Engagement Levels</h4>
   <div class="row">
-    <div ng-repeat="label in labels.engagementLevels" ng-click="toggleLabel(label)"
-         ng-class="{true: 'labelbox-selected', false: ''}[activeLabels[label]]"
+    <div ng-repeat="label in search.displayLabelsAll.engagementLevels" ng-click="toggleLabel(label)"
+         ng-class="{true: 'labelbox-selected', false: ''}[search.activeLabels[label]]"
          class="clickable labelbox col-md-3">
       {{label}}
     </div>

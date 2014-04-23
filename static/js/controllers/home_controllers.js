@@ -17,7 +17,7 @@
   module.controller(
     'EducatorHomeController',
     function($scope, Session, Search) {
-      if (Session.activeUser) {
+      if ((Session.activeUser) && (Session.activeUser.is_educator)) {
         var searchParams = {
           'searcher_user_id': Session.activeUser.id
         };
@@ -40,24 +40,19 @@
 
   module.controller(
     'CommunityPartnerHomeController',
-    function($scope, sortLabels, Session, Search) {
+    function($scope, Session, Search, Messages, CommunityPartnerUtils) {
+      $scope.properties = {};
       if (Session.activeUser) {
-        var searchParams = {
-          'searcher_user_id': Session.activeUser.id
-        };
-        var searchesPromise = Search.get_many(searchParams);
-        searchesPromise.then(
-          function(searches) {
-            var labels = [];
-            for (var i=0; i<searches.length; i++) {
-              var search = searches[i];
-              if (search.active) {
-                labels = labels.concat(search.labels);
-              }
-            }
-            $scope.labels = sortLabels(labels);
-          },
-          function() {
+        var searchesPromise = Session.activeUser.getSearches();
+        var searchPromise = CommunityPartnerUtils.searchesPromiseToSearchPromise(
+          searchesPromise);
+        searchPromise.then(
+          function(search) {
+            $scope.search = search;
+            search.makeLabelDisplay();
+          }, 
+          function(message) {
+            Messages.error(message);
           });
       }
     });

@@ -94,6 +94,5 @@
   };
 
   makeSignUpController('SignupEducatorController', 'educator', 'partner')
-  makeSignUpController('SignupCommunityPartnerController', 'partner', 'educator')
 
 })();

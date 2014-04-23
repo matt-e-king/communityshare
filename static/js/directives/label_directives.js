@@ -10,7 +10,7 @@
      function(Session) {
        return {
          scope: {
-           methods: '=',
+           methods: '='
          },
          controller: function($scope) {
            $scope.update = function() {
@@ -36,10 +36,10 @@
 
   module.directive(
     'csEducatorLabels',
-     function(Session, labels) {
+     function(Session) {
        return {
          scope: {
-           activeLabels: '='
+           search: '=',
          },
          templateUrl: './static/templates/educator_labels.html',
          controller: function($scope) {
@@ -50,18 +50,17 @@
              onUpdate: function() {
                var newLabelName = $scope.newLabel.name;
                if (newLabelName) {
-                 $scope.labels.subjectAreas.Custom.push(newLabelName);
-                 $scope.activeLabels[newLabelName] = true;
+                 $scope.search.displayLabelsAll.subjectAreas.Custom.push(newLabelName);
+                 $scope.search.activeLabels[newLabelName] = true;
                }
                $scope.newLabel.name = '';
              }
            };
-           $scope.labels = labels
            $scope.toggleLabel = function(label) {
-             if ($scope.activeLabels[label]) {
-               $scope.activeLabels[label] = false;
+             if ($scope.search.activeLabels[label]) {
+               $scope.search.activeLabels[label] = false;
              } else {
-               $scope.activeLabels[label] = true;
+               $scope.search.activeLabels[label] = true;
              }
            }
          }

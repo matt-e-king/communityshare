@@ -5,15 +5,15 @@
 
   <p>The grade levels I am interested in working with are:</p>
   <p>
-    <div ng-repeat="label in labels.gradeLevels" class="labelbox">{{label}}</div>
+    <div ng-repeat="label in search.displayLabelsActive.gradeLevels" class="labelbox">{{label}}</div>
   </p>
   <p>The subjects I am interested in working with are:</p>
   <p>
-    <div ng-repeat="label in labels.subjectAreas" class="labelbox">{{label}}</div>
+    <div ng-repeat="label in search.displayLabelsActive.subjectAreas" class="labelbox">{{label}}</div>
   </p>
   <p>The roles I am interested in performing are:</p>
   <p>
-    <div ng-repeat="label in labels.engagementLevels" class="labelbox">{{label}}</div>
+    <div ng-repeat="label in search.displayLabelsActive.engagementLevels" class="labelbox">{{label}}</div>
   </p>
 
 </div>

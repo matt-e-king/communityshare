@@ -4,7 +4,8 @@
   var module = angular.module(
     'communityshare.services.user',
     [
-      'communityshare.services.item'
+      'communityshare.services.item',
+      'communityshare.services.message'
     ])
 
   var isEmail = function(email) {
@@ -44,7 +45,7 @@
 
   module.factory(
     'User',
-    function(ItemFactory, $q, $http) {
+    function(ItemFactory, $q, $http, Search) {
       var User = ItemFactory('user');
 
       User.getByEmail = function(email) {
@@ -64,7 +65,46 @@
         );
         return deferred.promise;
       };
+      
+      User.prototype.getSearches = function() {
+        var searchParams = {
+          'searcher_user_id': this.id,
+          'active': true
+        };
+        var searchesPromise = Search.get_many(searchParams);
+        return searchesPromise;
+      }
+
       return User;
     });
+
+  module.factory(
+    'CommunityPartnerUtils',
+    function(Messages, $q) {
+      var CommunityPartnerUtils = {};
+      CommunityPartnerUtils.searchesPromiseToSearchPromise = function(searchesPromise) {
+        var deferred = $q.defer();
+        searchesPromise.then(
+          function(searches) {
+            var search;
+            if (searches.length > 1) {
+              Messages.error('More than one search for a community partner.');
+              search = searches[0];
+            } else if (searches.length === 0) {
+              Messages.error('No searches for a community partner');
+              search = undefined;
+            } else {
+              search = searches[0];
+            }
+            deferred.resolve(search);
+          },
+          function(message) {
+            deferred.reject(message)
+          });
+        return deferred.promise;
+      };
+      return CommunityPartnerUtils;
+    });
+  
 
 })();
