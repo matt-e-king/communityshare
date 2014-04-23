@@ -1,7 +1,19 @@
 <div>
-  <h5>Community-Partner</h5>
+  <h5>I'm a Community Partner</h5>
   
-  <h6>Active Searches</h6>
-  <div cs-searches-display searches="activeSearches"></div>
+  <p>I'm looking to work which an educator</p>
+
+  <p>The grade levels I am interested in working with are:</p>
+  <p>
+    <div ng-repeat="label in labels.gradeLevels" class="labelbox">{{label}}</div>
+  </p>
+  <p>The subjects I am interested in working with are:</p>
+  <p>
+    <div ng-repeat="label in labels.subjectAreas" class="labelbox">{{label}}</div>
+  </p>
+  <p>The roles I am interested in performing are:</p>
+  <p>
+    <div ng-repeat="label in labels.engagementLevels" class="labelbox">{{label}}</div>
+  </p>
 
 </div>

@@ -4,7 +4,8 @@
   var module = angular.module(
     'communityshare.controllers.home',
     [
-      'communityshare.directives.home'
+      'communityshare.directives.home',
+      'communityshare.services.search'
     ]);
   
   module.controller(
@@ -23,16 +24,13 @@
         var searchesPromise = Search.get_many(searchParams);
         searchesPromise.then(
           function(searches) {
-            console.log('searches are');
-            console.log(searches);
             $scope.activeSearches = [];
             for (var i=0; i<searches.length; i++) {
               var search = searches[i];
-              if (!search.active_only) {
+              if (search.active) {
                 $scope.activeSearches.push(search);
               }
             }
-            console.log($scope.activeSearches);
           },
           function() {
           });
@@ -42,7 +40,26 @@
 
   module.controller(
     'CommunityPartnerHomeController',
-    function() {
+    function($scope, sortLabels, Session, Search) {
+      if (Session.activeUser) {
+        var searchParams = {
+          'searcher_user_id': Session.activeUser.id
+        };
+        var searchesPromise = Search.get_many(searchParams);
+        searchesPromise.then(
+          function(searches) {
+            var labels = [];
+            for (var i=0; i<searches.length; i++) {
+              var search = searches[i];
+              if (search.active) {
+                labels = labels.concat(search.labels);
+              }
+            }
+            $scope.labels = sortLabels(labels);
+          },
+          function() {
+          });
+      }
     });
 
   module.controller(

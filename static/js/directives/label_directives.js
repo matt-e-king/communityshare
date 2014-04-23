@@ -2,26 +2,8 @@
   'use strict';
   
   var module = angular.module('communityshare.directives.labels', [
+    'communityshare.services.search'
   ]);
-
-  var labels = {
-    // Grade levels
-    gradeLevels: [
-      'K-3', '4-5', '6-8', '9-12'],
-    // Subject area
-    subjectAreas: {
-      STEM: ['Science', 'Technology', 'Engineering', 'Math'],
-      Arts: ['Visual Arts', 'Digital Media', 'Film & Photography', 'Literature',
-             'Performing Arts'],
-      Custom: []
-    },
-    // Level of Engagement
-    engagementLevels: [
-      'Guest Speaker', 'Field Trip Host', 'Student Competition Judget',
-      'Individual Mentor', 'Small Group Mentor', 'Curriculuum Development',
-      'Career Day Participant', 'Classroom Materials Provider',
-      'Short-term', 'Long-term'
-    ]}
 
   module.directive(
     'csNewLabel',
@@ -54,7 +36,7 @@
 
   module.directive(
     'csEducatorLabels',
-     function(Session) {
+     function(Session, labels) {
        return {
          scope: {
            activeLabels: '='

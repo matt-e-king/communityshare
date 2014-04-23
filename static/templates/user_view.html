@@ -14,6 +14,11 @@
       <div class="col-lg-3 text-right">Email</div>
       <div class="col-lg-3">{{user.email}}</div>
     </div>
+
+    <div ng-show="user.is_community_partner" cs-community-partner-view
+         methods="communityPartnerViewMethods">
+    </div>
+
   </div>
 
 </div>

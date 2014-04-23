@@ -111,7 +111,6 @@ def make_blueprint(Item, resourceName):
 
     def _args_to_filter_params():
         filter_args = []
-        filter_kwargs = {}
         for key in request.args.keys():
             bits = key.split('.')
             if hasattr(Item, bits[0]):
@@ -123,11 +122,14 @@ def make_blueprint(Item, resourceName):
                         filter_args.append(new_arg)
                     else:
                         raise Exception('Unknown filter parameter')
-        return filter_args, filter_kwargs
+                elif len(bits) == 1:
+                    criterium = (getattr(Item, key) == request.args[key])
+                    filter_args.append(criterium)
+        return filter_args
 
     def _get_raw_items():
-        filter_args, filter_kwargs = _args_to_filter_params()
-        items = session.query(Item).filter(*filter_args, **filter_kwargs)
+        filter_args = _args_to_filter_params()
+        items = session.query(Item).filter(*filter_args)
         return items
 
     @api.route(API_MANY_FORMAT.format(resourceName), methods=['GET'])
