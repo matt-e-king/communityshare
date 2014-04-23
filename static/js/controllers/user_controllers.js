@@ -143,6 +143,8 @@
             if (search) {
               $scope.search = search;
               $scope.properties.search = search;
+              $scope.search.location = $scope.search.latitude + ', ' + $scope.search.longitude;
+              $scope.codeAddress();
               search.makeLabelDisplay();
             } else {
               // Apparently the user didn't have a search.
