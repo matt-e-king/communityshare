@@ -93,6 +93,8 @@ class User(Base, Serializable):
     @classmethod
     def from_api_key(self, key):
         secret = Secret.lookup_secret(key)
+        logger.debug('key is {0}'.format(key))
+        logger.debug('secret is {0}'.format(secret))
         user_id = None
         if secret is not None:
             info = secret.get_info()
@@ -100,7 +102,9 @@ class User(Base, Serializable):
                 user_id = info.get('userId', None)
         if user_id is not None:
             user = session.query(User).filter_by(id=user_id).first()
-        logger.debug('user from api_key is {0}'.format(user))
+            logger.debug('user from api_key is {0}'.format(user))
+        else:
+            user = None
         return user
 
         

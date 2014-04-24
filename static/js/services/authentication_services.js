@@ -9,38 +9,80 @@
     ])
 
   module.factory(
-    'Session',
+    'SessionBase',
     function() {
-      var Session = {};
-      Session.activeUser = undefined;
-      return Session;
+      var SessionBase = {};
+      SessionBase.activeUser = undefined;
+      return SessionBase;
+    });
+
+  module.factory(
+    'Session',
+    function(SessionBase, Authenticator) {
+      Authenticator.authenticateFromCookie();
+      return SessionBase;
     });
 
   module.factory(
     'Authenticator',
-    function($q, $http, User, Session) {
+    function($q, $http, User, SessionBase, $cookies) {
       var Authenticator = {};
       Authenticator.clean = function() {
         $http.defaults.headers.common['Authorization'] = '';
-      }
+      };
       Authenticator.setApiKey = function(key) {
-          $http.defaults.headers.common['Authorization'] = 
-            'Basic:api:' + key;
-      }; 
+        $http.defaults.headers.common['Authorization'] = 
+          'Basic:api:' + key;
+        $cookies.apiKey = key;
+      };
+      Authenticator.authenticateFromCookie =
+        function() {
+          var deferred = $q.defer();
+          var apiKey = $cookies.apiKey;
+          var email = $cookies.email;
+          if ((apiKey) && (email)){
+            Authenticator.setApiKey(apiKey)
+            var userPromise = User.getByEmail(email);
+            userPromise.then(
+              function(user) {
+                SessionBase.activeUser = user;
+              },
+              function(message) {
+                deferred.reject(message)
+              }
+            );
+          } else {
+            deferred.reject('No cookie found');
+          }
+        };
       Authenticator.authenticateWithEmailAndPassword =
         function(email, password) {
           $http.defaults.headers.common['Authorization'] = 
             'Basic:' + email + ':' + password; 
-         var userPromise = User.getByEmail(email);
+          var url = 'api/requestapikey'
+          var promiseApiKey = $http({
+            url: url,
+            method: 'GET'
+          });
+          promiseApiKey.then(
+            function(response) {
+              var apiKey = response.data.apiKey;
+              Authenticator.setApiKey(apiKey);
+              $cookies.email = email;
+            },
+            function(response) {
+            });
+          var userPromise = User.getByEmail(email);
           userPromise.then(
             function(user) {
-              Session.activeUser = user;
+              SessionBase.activeUser = user;
             },
             function(response) {
             }
           );
           return userPromise;
         };
+
       Authenticator.requestResetPassword = function(email) {
         var url = 'api/requestresetpassword/'+email;
         var promise = $http({

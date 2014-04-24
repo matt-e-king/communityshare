@@ -4,12 +4,13 @@
   var module = angular.module(
     'communityshare.services.item',
     [
-      'ngResource'
+      'ngResource',
+      'ngCookies'
     ])
 
   module.factory(
     'ItemFactory',
-    function($q, $http, Session) {
+    function($q, $http, SessionBase) {
       var ItemFactory = function(resourceName) {
         var Item = function(itemData) {
           this.updateFromData(itemData);
@@ -93,7 +94,7 @@
               _this.updateFromData(response.data.data)
               // Properties of the current user can also be set.
               if (response.data.user !== undefined) {
-                Session.activeUser.updateFromData(response.data.user);
+                SessionBase.activeUser.updateFromData(response.data.user);
               }
               deferred.resolve(_this);
             },

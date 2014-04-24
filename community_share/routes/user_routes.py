@@ -66,6 +66,19 @@ def register_user_routes(app):
             mail_actions.request_password_reset(user)
             response = base_routes.make_OK_response()
         return response
+        
+    @app.route('/api/requestapikey/', methods=['GET'])
+    def request_api_key():
+        requester = get_requesting_user()
+        if requester is None:
+            response = base_routes.make_not_authorized_response()
+        else:
+            secret = requester.make_api_key()
+            response_data = {
+                'apiKey': secret.key
+            }
+            response = jsonify(response_data)
+        return response
 
     @app.route('/api/resetpassword', methods=['POST'])
     def reset_password():
