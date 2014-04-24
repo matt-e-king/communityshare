@@ -1,7 +1,14 @@
 <div>
-  <h5>Educator</h5>
+  <h5>I'm an Educator</h5>
+  
+  <p>I'm looking to work which a community partner</p>
 
-  <h6>Active Searches</h6>
-  <div cs-searches-display searches="activeSearches"></div>
+  <p>I'm currently searching for {{activeSearches.length}} partners matching:</p>
+  <div class="row search-summary" ng-repeat="search in activeSearches">
+    <a class="col-lg-3" ng-href="search/{{search.id}}/edit">Edit</a>
+    <div ng-repeat="label in search.labels" class="labelbox col-lg-3">
+      {{label}}
+    </div>
+  </div>
 
 </div>

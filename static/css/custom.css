@@ -11,6 +11,10 @@
     background-color: lightblue;
 }
 
+.search-summary {
+    border: solid;
+}
+
 .map-canvas {
     height: 200px;
     width: 200px;
