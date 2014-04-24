@@ -1,0 +1,19 @@
+<form novalidate
+      action="" role="form" name="form" class="form-horizontal">
+  
+  <div class="form-group">
+    <label for="location"
+           class="control-label">Location</label>
+    <div class="">
+      <input ng-model="search.location"
+             name="location"
+             id="location"
+             class="form-control"
+             type="text"/>
+    </div>
+    <button ng-click="codeAddress()">Lookup Address</button>
+    <div class="map-canvas" id="map-canvas"></div>
+  </div>
+</form>
+
+<div cs-educator-labels search="properties.search"</div>

@@ -31,11 +31,11 @@
             if (_this.map) {
               _this.map.setCenter(results[0].geometry.location);
               _this.map.setZoom(13);
+              var marker = new google.maps.Marker({
+                map: _this.map,
+                position: results[0].geometry.location
+              });
             }
-            var marker = new google.maps.Marker({
-              map: _this.map,
-              position: results[0].geometry.location
-            });
             deferred.resolve(results[0].geometry.location);
           } else {
             deferred.reject('Geocode was not successful for the following reason: ' + status);

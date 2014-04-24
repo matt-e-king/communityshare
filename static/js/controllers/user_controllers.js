@@ -32,26 +32,6 @@
       $scope.communityPartnerViewMethods = {};
     });
 
-  module.controller(
-    'CommunityPartnerViewController',
-    function($scope, CommunityPartnerUtils, Search, Messages) {
-      $scope.methods.onUserUpdate = function(user) {
-        var searchesPromise = user.getSearches();
-        var searchPromise = CommunityPartnerUtils.searchesPromiseToSearchPromise(
-          searchesPromise);
-        searchPromise.then(
-          function(search) {
-            $scope.search.makeLabelDisplay()
-          },
-          function(message) {
-            Messages.error(message);
-          });
-      };
-      if ($scope.user) {
-        $scope.methods.onUserUpdate($scope.user);
-      }
-    });
-
   // User Signups
 
   module.controller(
@@ -69,6 +49,48 @@
             var methods = $scope.communityPartnerSettingsMethods;
             if ((methods.setUser) && (methods.saveSettings)) {
               methods.setUser(user);
+              var settingsPromise = methods.saveSettings();
+              settingsPromise.then(
+                function() {
+                  $location.path('/home');
+                },
+                function(message) {
+                  Messages.error(message);
+                });
+            }
+          },
+          function(message) {
+            Messages.error(message);
+          });
+      };
+    });
+
+  module.controller(
+    'SignupEducatorController',
+    function($scope, Session, Messages, User, signUp, $location, $q, Search) {
+      // This controller relies on a CommunityPartnerSettings directive.
+      $scope.Session = Session;
+      $scope.newUser = new User();
+      $scope.educatorSearchSettingsMethods = {}
+      $scope.search = new Search({
+        searcher_user_id: undefined,
+        searcher_role: 'educator',
+        searching_for_role: 'partner',
+        active: true,
+        labels: [],
+        latitude: undefined,
+        longitude: undefined,
+        distance: undefined
+      });
+      
+      $scope.saveSettings = function() {
+        var userPromise = signUp($scope.newUser.name, $scope.newUser.email,
+                                 $scope.newUser.password);
+        userPromise.then(
+          function(user) {
+            $scope.search.searcher_user_id = user.id;
+            var methods = $scope.educatorSearchSettingsMethods;
+            if (methods.saveSettings) {
               var settingsPromise = methods.saveSettings();
               settingsPromise.then(
                 function() {
@@ -115,85 +137,4 @@
       };
     });
 
-  module.controller(
-    'CommunityPartnerSettingsController',
-    function($scope, Search, Map, Messages, CommunityPartnerUtils) {
-      $scope.properties = {};
-      var makeNewSearch = function() {
-        var search = new Search({
-          searcher_user_id: undefined,
-          searcher_role: 'partner',
-          searching_for_role: 'educator',
-          active: true,
-          labels: [],
-          latitude: undefined,
-          longitude: undefined,
-          distance: undefined
-        });
-        return search;
-      };
-      $scope.search = undefined;
-      if ($scope.user) {
-        // User exists.  Load the search.
-        var searchesPromise = $scope.user.getSearches();
-        var searchPromise = CommunityPartnerUtils.searchesPromiseToSearchPromise(
-          searchesPromise);
-        searchPromise.then(
-          function(search) {
-            if (search) {
-              $scope.search = search;
-              $scope.properties.search = search;
-              $scope.search.location = $scope.search.latitude + ', ' + $scope.search.longitude;
-              $scope.codeAddress();
-              search.makeLabelDisplay();
-            } else {
-              // Apparently the user didn't have a search.
-              $scope.search = makeNewSearch();
-              $scope.properties.search = $scope.search;
-              $scope.search.makeLabelDisplay();
-            }
-          },
-          function(message) {
-            Messages.error(message);
-          });
-      } else {
-        // User does not exist.  Create a new search.
-        $scope.search = makeNewSearch();
-        $scope.properties.search = $scope.search;
-        $scope.search.makeLabelDisplay();
-      }
-      $scope.methods.setUser = function(user) {
-        $scope.search.searcher_user_id = user.id
-      }
-      $scope.methods.saveSettings = function() {
-        $scope.search.processLabelDisplay();
-        var searchPromise = $scope.search.save();
-        return searchPromise;
-      };
-      $scope.activeLabels = {};
-      $scope.getLabels = function() {
-        var labels = [];
-        for (var label in $scope.activeLabels) {
-          if ($scope.activeLabels[label]) {
-            labels.push(label);
-          }
-        }
-        return labels;
-      };
-      var map = new Map('map-canvas');
-      $scope.codeAddress = function() {
-        var address = $scope.search.location;
-        var promiseLatLng = map.codeAddress(address);
-        promiseLatLng.then(
-          function(latlng) {
-            $scope.search.latitude = latlng.k;
-            $scope.search.longitude = latlng.A;
-          },
-          function(message) {
-            Messages.error(message);
-          });
-      };
-      
-    });
-    
 })();
