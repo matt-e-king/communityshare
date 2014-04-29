@@ -109,6 +109,27 @@
           return deferred.promise;
           
         };
+        Item.prototype.destroy = function() {
+          var deferred = $q.defer();
+          var dataPromise = $http({
+              method: 'DELETE',
+              url: Item.makeUrl(this.id)
+            });
+          dataPromise.then(
+            function(response) {
+              deferred.resolve();
+            },
+            function(response) {
+              var message = ''
+              if (response.data.message) {
+                message = response.data.message;
+              }
+              deferred.reject(message);
+            }
+          );
+          return deferred.promise;
+        };
+
         return Item;
       };
       return ItemFactory;

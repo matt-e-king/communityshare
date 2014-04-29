@@ -19,7 +19,7 @@
           }
         },
         function(message) {
-          Messages.showError(message);
+          Messages.error(message);
         });
       var goToUserView = function(userId) {
         if (Session.activeUser.id === userId) {
@@ -36,7 +36,7 @@
                 goToUserView(search.searcher_user_id);
               },
               function(message) {
-                Messages.showError(message);
+                Messages.error(message);
               });
           }
         

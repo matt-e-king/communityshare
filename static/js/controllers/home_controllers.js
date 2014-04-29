@@ -5,7 +5,8 @@
     'communityshare.controllers.home',
     [
       'communityshare.directives.home',
-      'communityshare.services.search'
+      'communityshare.services.search',
+      'communityshare.services.modal'
     ]);
   
   module.controller(
@@ -16,21 +17,41 @@
 
   module.controller(
     'EducatorHomeController',
-    function($scope, Session, Search) {
+    function($scope, Session, Search, makeDialog, Messages) {
       if ((Session.activeUser) && (Session.activeUser.is_educator)) {
         var searchParams = {
-          'searcher_user_id': Session.activeUser.id
+          'searcher_user_id': Session.activeUser.id,
+          'active': true,
+          'searcher_role': 'educator'
+        };
+        $scope.deleteSearch = function(search) {
+          var title = 'Delete Search';
+          var msg = 'Do you really want to delete this search';
+          var btns = [{result:'yes', label: 'Yes', cssClass: 'btn-primary'},
+                       {result:'no', label: 'No'}];
+          var d = makeDialog(title, msg, btns);
+          console.log(d);
+          d.result.then(
+            function(result) {
+              if (result === 'yes') {
+                var deletePromise = search.destroy();
+                deletePromise.then(
+                  function() {
+                    var index = $scope.activeSearches.indexOf(search);
+                    if (index >= 0) {
+                      $scope.activeSearches.splice(index, 1);
+                    }
+                  },
+                  function(message) {
+                    Messages.error(message);
+                  });
+              }
+            })
         };
         var searchesPromise = Search.get_many(searchParams);
         searchesPromise.then(
           function(searches) {
-            $scope.activeSearches = [];
-            for (var i=0; i<searches.length; i++) {
-              var search = searches[i];
-              if (search.active) {
-                $scope.activeSearches.push(search);
-              }
-            }
+            $scope.activeSearches = searches;
           },
           function() {
           });

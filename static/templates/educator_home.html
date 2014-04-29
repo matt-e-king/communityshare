@@ -7,7 +7,7 @@
   <div class="row search-summary" ng-repeat="search in activeSearches">
     <div class="col-lg-3">
       <a ng-href="#/search/{{search.id}}/edit">Edit
-      <a ng-href="#/search/{{search.id}}/delete">Delete
+      <a ng-click="deleteSearch(search)" class="clickable">Delete
       <a ng-href="#/search/{{search.id}}/results">Results
     </div>
     <div ng-repeat="label in search.labels" class="labelbox col-lg-3">
