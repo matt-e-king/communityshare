@@ -34,15 +34,17 @@
           engagementLevels: []
         };
         this.activeLabels = {};
-        for (var i=0; i<this.labels.length; i++) {
-          var label = this.labels[i];
-          this.activeLabels[label] = true;
-          var key = labelMapping[label];
-          if (key === undefined) {
-            this.displayLabelsAll.subjectAreas.Custom.push(label);
-            key = 'subjectAreas'
+        if (this.labels) {
+          for (var i=0; i<this.labels.length; i++) {
+            var label = this.labels[i];
+            this.activeLabels[label] = true;
+            var key = labelMapping[label];
+            if (key === undefined) {
+              this.displayLabelsAll.subjectAreas.Custom.push(label);
+              key = 'subjectAreas'
+            }
+            this.displayLabelsActive[key].push(label);
           }
-          this.displayLabelsActive[key].push(label);
         }
       };
       Search.prototype.processLabelDisplay = function() {

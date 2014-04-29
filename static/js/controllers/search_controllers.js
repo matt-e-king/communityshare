@@ -9,18 +9,36 @@
   module.controller(
     'SearchEditController',
     function(Session, $location, $scope, $routeParams, Search, Messages) {
-      var searchId = $routeParams.searchId;
-      var searchPromise = Search.get(searchId);
       $scope.searchSettingsMethods = {};
-      searchPromise.then(
-        function(search) {
-          if ($scope.searchSettingsMethods.setSearch) {
-            $scope.searchSettingsMethods.setSearch(search);
-          }
-        },
-        function(message) {
-          Messages.error(message);
+      var searchId = $routeParams.searchId;
+      if (searchId !== undefined) {
+        var searchPromise = Search.get(searchId);
+        searchPromise.then(
+          function(search) {
+            if ($scope.searchSettingsMethods.setSearch) {
+              $scope.searchSettingsMethods.setSearch(search);
+            }
+          },
+          function(message) {
+            Messages.error(message);
+          });
+      } else {
+        var searcher_role;
+        var searching_for_role;
+        if (Session.activeUser.is_educator) {
+          searcher_role = 'educator';
+          searching_for_role = 'partner';
+        } else {
+          searcher_role = 'partner';
+          searching_for_role = 'educator';
+        }
+        var search = new Search({
+          searcher_user_id: Session.activeUser.id,
+          searcher_role: searcher_role,
+          searching_for_role: searching_for_role
         });
+        $scope.search = search;
+      }
       var goToUserView = function(userId) {
         if (Session.activeUser.id === userId) {
           $location.path('/home');
