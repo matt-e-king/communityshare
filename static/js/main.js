@@ -69,6 +69,11 @@
       controller: 'UserController'
     });
 
+    $routeProvider.when('/search/:searchId/edit', {
+      templateUrl: './static/templates/search_edit.html',
+      controller: 'SearchEditController'
+    });
+
     $routeProvider.otherwise({
       templateUrl: './static/templates/unknown.html'
     });

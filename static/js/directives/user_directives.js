@@ -54,7 +54,6 @@
                   }
                 }
                 $scope.searches = searchesAsEducator;
-                console.log($scope.searches);
               },
               function(message) {
                 Messages.error(message);
@@ -105,7 +104,7 @@
           }
           $scope.methods.saveSettings = function() {
             $scope.properties.search.processLabelDisplay();
-            var searchPromise = $scope.search.save();
+            var searchPromise = $scope.properties.search.save();
             return searchPromise;
           };
         }

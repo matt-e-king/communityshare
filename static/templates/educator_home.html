@@ -5,7 +5,11 @@
 
   <p>I'm currently searching for {{activeSearches.length}} partners matching:</p>
   <div class="row search-summary" ng-repeat="search in activeSearches">
-    <a class="col-lg-3" ng-href="search/{{search.id}}/edit">Edit</a>
+    <div class="col-lg-3">
+      <a ng-href="#/search/{{search.id}}/edit">Edit
+      <a ng-href="#/search/{{search.id}}/delete">Delete
+      <a ng-href="#/search/{{search.id}}/results">Results
+    </div>
     <div ng-repeat="label in search.labels" class="labelbox col-lg-3">
       {{label}}
     </div>
