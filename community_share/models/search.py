@@ -47,7 +47,8 @@ class Search(Base, Serializable):
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
     distance = Column(Float, nullable=True)
-    
+
+    searcher_user = relationship("User")
     labels = relationship("Label", secondary=search_label_table)
 
     @classmethod
@@ -92,14 +93,7 @@ class Search(Base, Serializable):
             if fieldname == 'labels':
                 labelnames = data.get('labels', [])
                 logger.debug('labelnames is {0}'.format(labelnames))
-                self.labels = session.query(Label).filter(Label.name.in_(labelnames)).all()
-                missing_labelnames = set(labelnames)
-                for label in self.labels:
-                    missing_labelnames.remove(label.name)
-                for labelname in missing_labelnames:
-                    new_label = Label(name=labelname)
-                    self.labels.append(new_label)
-                    session.add(new_label)
+                self.labels = Label.name_list_to_object(labelnames)
             else:
                 setattr(self, fieldname, data[fieldname])
 
@@ -111,5 +105,16 @@ class Label(Base, Serializable):
     name = Column(String(50), nullable=False, unique=True)
     description = Column(String)
 
+    @classmethod
+    def name_list_to_object_list(cls, names):
+        labels = session.query(Label).filter(Label.name.in_(names)).all()
+        missing_labelnames = set(names)
+        for label in labels:
+            missing_labelnames.remove(label.name)
+        for labelname in missing_labelnames:
+            new_label = Label(name=labelname)
+            labels.append(new_label)
+        return labels
+        
     
     
