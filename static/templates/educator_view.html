@@ -1,0 +1,13 @@
+<div>
+  <h5>I'm an Educator</h5>
+  
+  <p>I'm looking to work which a community partner</p>
+
+  <p>I'm currently searching for {{searches.length}} partners matching:</p>
+  <div class="row search-summary" ng-repeat="search in searches">
+    <div ng-repeat="label in search.labels" class="labelbox col-lg-3">
+      {{label}}
+    </div>
+  </div>
+
+</div>

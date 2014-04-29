@@ -25,11 +25,15 @@
           if ($scope.communityPartnerViewMethods.onUserUpdate) {
             $scope.communityPartnerViewMethods.onUserUpdate(user);
           }
+          if ($scope.educatorViewMethods.onUserUpdate) {
+            $scope.educatorViewMethods.onUserUpdate(user);
+          }
         },
         function(response) {
           $scope.message = 'Could not find user with id=' + userId;
         });
       $scope.communityPartnerViewMethods = {};
+      $scope.educatorViewMethods = {};
     });
 
   // User Signups

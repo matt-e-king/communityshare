@@ -32,6 +32,41 @@
         }
       };
     });
+
+  module.directive(
+    'csEducatorView',
+    function() {
+      return {
+        scope: {
+          methods: '=',
+          user: '='},
+        templateUrl: './static/templates/educator_view.html',
+        controller: function(Session, $scope, Search, Messages) {
+          $scope.methods.onUserUpdate = function(user) {
+            var searchesPromise = user.getSearches();
+            searchesPromise.then(
+              function(searches) {
+                var searchesAsEducator = [];
+                for (var i=0; i<searches.length; i++) {
+                  var search = searches[i];
+                  if (search.searcher_role === 'educator') {
+                    searchesAsEducator.push(search);
+                  }
+                }
+                $scope.searches = searchesAsEducator;
+                console.log($scope.searches);
+              },
+              function(message) {
+                Messages.error(message);
+              });
+          };
+          if ($scope.user) {
+            $scope.methods.onUserUpdate($scope.user);
+          }
+        }
+      };
+    });
+
   
   module.directive(
     'csEducatorSearchSettings',
