@@ -226,6 +226,28 @@ def make_blueprint(Item, resourceName):
                     else:
                        response = make_forbidden_response()
         return response
+
+    @api.route(API_SINGLE_FORMAT.format(resourceName), methods=['DELETE'])
+    def delete_item(id):
+        requester = get_requesting_user()
+        if requester is None:
+            response = make_not_authorized_response()
+        elif not is_integer(id):
+            response = make_bad_request_response()
+        else:
+            id = int(id)
+            item = session.query(Item).filter_by(id=id).first()
+            if item is None:
+                response = make_not_found_response()
+            else:
+                if item.has_admin_rights(requester):
+                    item.active = False
+                    session.add(item)
+                    session.commit()
+                    response = make_admin_single_response(item)
+                else:
+                    response = make_forbidden_response()
+        return response
         
     return api
 

@@ -102,6 +102,7 @@ class Label(Base, Serializable):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False, unique=True)
+    active = Column(Boolean, default=True)
     description = Column(String)
 
     @classmethod
