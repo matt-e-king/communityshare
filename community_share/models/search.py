@@ -4,6 +4,7 @@ from datetime import datetime
 from sqlalchemy import Table, ForeignKey, DateTime, Column
 from sqlalchemy import Integer, String, Boolean, Float
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql.expression import func
 
 from community_share.store import Base, session
 from community_share.models.base import Serializable
@@ -56,6 +57,17 @@ class Search(Base, Serializable):
         if int(data.get('searcher_user_id', -1)) == user.id:
             has_rights = True
         return has_rights
+
+    @classmethod
+    def get_many_ordered_by_label_matches(cls, labels):
+        labelnames = [label.name for label in labels]
+        query = session.query(Search, func.count(Label.id).label('matches'))
+        query = query.join(Search.labels)
+        query = query.filter(Label.name.in_(labelnames))
+        query = query.group_by(Search.id)
+        query = query.order_by('matches DESC')
+        searches = query.all()
+        return searches
 
     def has_standard_rights(self, requester):
         has_rights = self.has_admin_rights(requester)
