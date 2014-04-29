@@ -6,18 +6,21 @@
   
   module.directive(
     'csCommunityPartnerView',
-    function(Session, $scope, CommunityPartnerUtils, Search, Messages) {
+    function() {
       return {
-        scope: {methods: '='},
+        scope: {
+          methods: '=',
+          user: '='},
         templateUrl: './static/templates/community_partner_home.html',
-        controller: function() {
+        controller: function(Session, $scope, CommunityPartnerUtils, Search, Messages) {
           $scope.methods.onUserUpdate = function(user) {
             var searchesPromise = user.getSearches();
             var searchPromise = CommunityPartnerUtils.searchesPromiseToSearchPromise(
               searchesPromise);
             searchPromise.then(
               function(search) {
-                $scope.search.makeLabelDisplay()
+                search.makeLabelDisplay()
+                $scope.search = search;
               },
               function(message) {
                 Messages.error(message);
