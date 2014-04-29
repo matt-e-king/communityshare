@@ -12,7 +12,7 @@ from community_share import settings
 logger = logging.getLogger(__name__)
 
 def make_email(first_name, last_name):
-    email = '{0}.{1}@notarealemail.notreal'.format(first_name, last_name)
+    email = '{0}.{1}@notarealemail.com'.format(first_name, last_name)
     return email
 
 skills = ['cooking', 'meterology', 'paleontology', 'dinosaurs', 'biology', 'fish',

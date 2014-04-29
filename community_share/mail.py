@@ -29,16 +29,17 @@ class DummyMailer(object):
 
 class MailgunMailer(object):
     def send(email):
-        payload = {
-            'from': email.from_address,
-            'to': email.to_address,
-            'subject': email.subject,
-            'text': email.content
-        }
-        r = requests.post(
-            'https://api.mailgun.net/v2/samples.mailgun.org/messages',
-            auth=('api', settings.MAILGUN_API_KEY),
-            data=payload)
+        if not ('notarealemail' in email.to_address):
+            payload = {
+                'from': email.from_address,
+                'to': email.to_address,
+                'subject': email.subject,
+                'text': email.content
+            }
+            r = requests.post(
+                'https://api.mailgun.net/v2/samples.mailgun.org/messages',
+                auth=('api', settings.MAILGUN_API_KEY),
+                data=payload)
 
 mailer_type_to_mail = {
     'DUMMY': DummyMailer,
