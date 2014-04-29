@@ -10,6 +10,7 @@
       'communityshare.controllers.home',
       'communityshare.controllers.user',
       'communityshare.controllers.search',
+      'communityshare.controllers.message',
       'communityshare.directives.labels'
     ]);
   

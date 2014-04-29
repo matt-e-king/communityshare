@@ -8,15 +8,40 @@
 
   module.factory(
     'Messages',
-    function() {
-      var Messages = {};
-      Messages.info = function(text) {
-        alert(text);
+    function($log, $timeout) {
+      var MESSAGETIME = 5000; //milliseconds
+
+      var Message = function(text, type) {
+        this.text = text;
+        this.type = type;
       };
-      Messages.error = function(text) {
-        alert(text);
+
+      var MessageHolder = function() {
+        this.messages = [];
       };
-      return Messages;
+      MessageHolder.prototype.error = function(errorText) {
+        var _this = this;
+        var newMessage = new Message(errorText, 'danger');
+        this.messages.push(newMessage);
+        $log.error(errorText);
+        $timeout(function() {
+          _this.removeMessage(newMessage);
+        }, MESSAGETIME);
+      };
+      MessageHolder.prototype.info = function(messageText) {
+        var newMessage = new Message(messageText, 'info');
+        this.messages.push(newMessage);
+        $log.info(messageText);
+      };
+      MessageHolder.prototype.removeMessage = function(message) {
+        
+        var index = this.messages.indexOf(message);
+        if (index >= 0) {
+          this.messages.splice(index, 1);
+        }
+      };
+      
+      return new MessageHolder();
     });
 
 })();
