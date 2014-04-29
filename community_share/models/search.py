@@ -48,7 +48,6 @@ class Search(Base, Serializable):
     longitude = Column(Float, nullable=False)
     distance = Column(Float, nullable=True)
 
-    searcher_user = relationship("User")
     labels = relationship("Label", secondary=search_label_table)
 
     @classmethod
@@ -93,7 +92,7 @@ class Search(Base, Serializable):
             if fieldname == 'labels':
                 labelnames = data.get('labels', [])
                 logger.debug('labelnames is {0}'.format(labelnames))
-                self.labels = Label.name_list_to_object(labelnames)
+                self.labels = Label.name_list_to_object_list(labelnames)
             else:
                 setattr(self, fieldname, data[fieldname])
 
