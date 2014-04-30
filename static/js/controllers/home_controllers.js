@@ -101,7 +101,7 @@
     'SearchUsersController',
     function($scope, $location, $q, User, Session) {
       $scope.Session = Session;
-      $scope.message = 'Searching for matching users...';
+      $scope.infoMessage = 'Searching for matching users...';
       $scope.users = undefined;
       $scope.searchText = $location.search().searchText;
       var searchForUsers = function() {
@@ -120,13 +120,16 @@
           function(results) {
             var users = results.byName.concat(results.byEmail);
             $scope.users = users;
-            $scope.message = '';
+            $scope.infoMessage = '';
+            $scope.errorMessage = '';
           },
           function(message) {
-            $scope.message = 'Failed to load users';
+            var msg = '';
             if (message) {
-              $scope.message + ': ' + message;
+              msg = ': ' + message;
             }
+            $scope.errorMessage = 'Failed to load users' + msg;
+            $scope.infoMessage = '';
           });
       }
       searchForUsers();

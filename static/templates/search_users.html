@@ -1,27 +1,42 @@
 <div cs-main-view has-permission="{{Session.activeUser.is_administrator}}">
+
+  <h4>Search For Users</h4>
+
   <form novalidate login-with-auto-fill
         action="" role="form" name="form" class="form-horizontal">
-    <h4>Search For Users</h4>
-    <div class="form-group">
-      <label for="searchText"
-             class="control-label col-lg-2">Email or Name</label>
-      <div class="col-lg-3">
-        <input ng-model="searchText"
-               name="searchText"
-               id="searchText"
-               class="form-control"
-               type="text"/>
+    
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <div class="form-group">
+          <label for="searchText"
+                 class="control-label col-lg-2">Email or Name</label>
+          <div class="col-lg-3">
+            <input ng-model="searchText"
+                   name="searchText"
+                   id="searchText"
+                   class="form-control"
+                   type="text"/>
+          </div>
+        </div>
+        <button class="btn col-lg-offset-2" ng-click="newSearch()">
+          Search
+        </button>
       </div>
     </div>
-    <button class="btn col-lg-offset-2" ng-click="newSearch()">
-      Search
-    </button>
     
   </form>
   
-  <div>{{message}}</div>
+  <div ng-show="infoMessage" class="alert alert-info">
+    {{infoMessage}}
+  </div>
+
+  <div ng-show="errorMessage" class="alert alert-danger">
+    {{errorMessage}}
+  </div>
   
-  <div ng-show="(users !== undefined) && (users.length === 0)">
+  <div ng-show="(users !== undefined) && (users.length === 0)"
+       class="alert alert-warning"
+       >
     No matching users found.
   </div>
 
