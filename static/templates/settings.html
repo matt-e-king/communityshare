@@ -37,6 +37,7 @@
        cs-community-partner-settings
        user="Session.activeUser"
        methods="communityPartnerSettingsMethods"
+       form="properties.partnerSettingsForm"
        ></div>
   
   <div class="row">
@@ -47,10 +48,10 @@
       {{errorMessage}}
     </div>
   </div>
-
+  
   <div class="row">
     <button class="btn col-lg-offset-2"
-            ng-disabled="settingsForm.$invalid || settingsForm.$pristine"
+            ng-disabled="settingsForm.$invalid || properties.partnerSettingsForm.$invalid"
             ng-click="saveSettings()">
       Save Changes
     </button>

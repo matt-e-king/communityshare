@@ -1,29 +1,34 @@
+
 <form novalidate
-      action="" role="form" name="form" class="form-horizontal">
+      action="" role="form" name="partnerSettingsForm" class="form-horizontal">
 
   <div class="form-group">
     <label for="location"
-           class="control-label">Location</label>
-    <div class="">
-      <input ng-model="search.location"
-             name="location"
-             id="location"
+           class="control-label col-lg-2">ZIP Code</label>
+    <div class="col-lg-3">
+      <input ng-model="search.zipcode"
+             name="zipcode"
+             id="zipcode"
              class="form-control"
+             required
+             ng-pattern="/^\d{5}(-\d{4})?$/"
              type="text"/>
+      <p ng-show="partnerSettingsForm.zipcode.$invalid && !partnerSettingsForm.zipcode.$pristine"
+         class="help-block">
+        Please enter a valid ZIP code.
+      </p>
     </div>
-    <button ng-click="codeAddress()">Lookup Address</button>
-    <div class="map-canvas" id="map-canvas"></div>
   </div>
-  <div class="form-group">
+  <!--<div class="form-group">
     <label for="distance"
-           class="control-label">Maximum Distance Away (miles)</label>
-    <div class="">
+           class="control-label col-lg-2">Maximum Distance Away (miles)</label>
+    <div class="col-lg-3">
       <input ng-model="search.distance"
              name="distance"
              id="distance"
              class="form-control"
              type="text"/>
-    </div>
+    </div>-->
   </div>
 </form>
 

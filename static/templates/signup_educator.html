@@ -1,38 +1,50 @@
 <h1>Educator SignUp</h1>
 
 <form novalidate
-      action="" role="form" name="form" class="form-horizontal">
+      action="" role="form" name="signUpForm" class="form-horizontal">
   <div class="form-group">
     <label for="name"
-           class="control-label">Name</label>
-    <div class="">
+           class="control-label col-lg-2">Name</label>
+    <div class="col-lg-3">
       <input ng-model="newUser.name"
+             required
              type="text"
              name="name"
              id="name"
              class="form-control"/>
+      <p ng-show="signUpForm.name.$invalid && !signUpForm.name.$pristine" class="help-block">
+        A name is required.
+      </p>
     </div>
   </div>
   <div class="form-group">
     <label for="email"
-           class="control-label">Email</label>
-    <div class="">
+           class="control-label col-lg-2">Email</label>
+    <div class="col-lg-3">
       <input ng-model="newUser.email"
+             required
              name="email"
              id="email"
              class="form-control"
-             type="text"/>
+             type="email"/>
+      <p ng-show="signUpForm.email.$invalid && !signUpForm.email.$pristine" class="help-block">
+        Please enter a valid email.
+      </p>
     </div>
   </div>
   <div class="form-group">
     <label for="password"
-           class="control-label">Password</label>
-    <div class="">
+           class="control-label col-lg-2">Password</label>
+    <div class="col-lg-3">
       <input ng-model="newUser.password"
+             required
              name="password"
              id="password"
              class="form-control"
              type="password"/>
+      <p ng-show="signUpForm.password.$invalid && !signUpForm.password.$pristine" class="help-block">
+        A password is required.
+      </p>
     </div>
   </div>
 
@@ -41,8 +53,11 @@
 <div cs-educator-search-settings
      methods="educatorSearchSettingsMethods"
      search="search"
+     form="properties.educatorSearchSettingsForm"
      ></div>
 
-<button class="btn" ng-click="saveSettings()">
+<button class="btn"
+        ng-disabled="signUpForm.$invalid || properties.educatorSearchSettingsForm.$invalid"
+        ng-click="saveSettings()">
   Sign Up!
 </button>

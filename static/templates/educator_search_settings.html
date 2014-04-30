@@ -1,18 +1,21 @@
 <form novalidate
-      action="" role="form" name="form" class="form-horizontal">
+      action="" role="form" name="educatorSearchSettingsForm" class="form-horizontal">
   
   <div class="form-group">
     <label for="location"
-           class="control-label">Location</label>
-    <div class="">
-      <input ng-model="search.location"
-             name="location"
-             id="location"
+           class="control-label col-lg-2">ZIP Code</label>
+    <div class="col-lg-3">
+      <input ng-model="search.zipcode"
+             name="zipcode"
+             id="zipcode"
              class="form-control"
+             ng-pattern="/^\d{5}(-\d{4})?$/"
              type="text"/>
+      <p ng-show="educatorSearchSettingsForm.zipcode.$invalid && !educatorSearchSettingsForm.zipcode.$pristine"
+         class="help-block">
+        Please enter a valid ZIP code.
+      </p>
     </div>
-    <button ng-click="codeAddress()">Lookup Address</button>
-    <div class="map-canvas" id="map-canvas"></div>
   </div>
 </form>
 

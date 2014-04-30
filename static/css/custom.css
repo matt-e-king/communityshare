@@ -5,6 +5,10 @@
 .labelbox {
     padding: 5px;
     margin: 5px;
+    float: left;
+    border: solid;
+    border-width: 1px;
+    border-radius: 3px;
 }
 
 .labelbox-selected {

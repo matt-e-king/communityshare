@@ -5,7 +5,6 @@
     'communityshare.controllers.user',
     [
       'communityshare.services.user',
-      'communityshare.services.map',
       'communityshare.directives.user'
     ]);
 
@@ -45,6 +44,7 @@
       $scope.Session = Session;
       $scope.newUser = new User();
       $scope.communityPartnerSettingsMethods = {}
+      $scope.properties = {};
       $scope.saveSettings = function() {
         var userPromise = signUp($scope.newUser.name, $scope.newUser.email,
                                  $scope.newUser.password);
@@ -75,6 +75,7 @@
       // This controller relies on a CommunityPartnerSettings directive.
       $scope.Session = Session;
       $scope.newUser = new User();
+      $scope.properties = {};
       $scope.educatorSearchSettingsMethods = {}
       $scope.search = new Search({
         searcher_user_id: undefined,
@@ -118,6 +119,7 @@
     function($scope, Session, Messages) {
       $scope.Session = Session;
       $scope.user = Session.activeUser;
+      $scope.properties = {};
       // Methods of 'setUser' and 'saveSettings' will be created by
       // the directive.
       $scope.communityPartnerSettingsMethods = {};
@@ -144,7 +146,7 @@
           });
         var methods = $scope.communityPartnerSettingsMethods;
         if (methods.saveSettings) {
-          saveCPSettingsPromise = methods.saveSettings();
+          var saveCPSettingsPromise = methods.saveSettings();
         }
       };
     });

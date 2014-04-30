@@ -20,17 +20,16 @@ class Search(Base, Serializable):
     __tablename__ = 'search'
     
     MANDATORY_FIELDS = [
-        'searcher_user_id', 'searcher_role', 'searching_for_role', 'labels',
-        'latitude', 'longitude']
+        'searcher_user_id', 'searcher_role', 'searching_for_role', 'labels', 'zipcode']
     WRITEABLE_FIELDS = [
         'searcher_user_id', 'searcher_role', 'searching_for_role', 'labels',
-        'active', 'latitude', 'longitude', 'distance']
+        'active', 'latitude', 'longitude', 'address', 'distance', 'zipcode']
     STANDARD_READABLE_FIELDS = [
         'id', 'searcher_user_id', 'searcher_role', 'searching_for_role',
-        'labels', 'latitude', 'longitude', 'distance']
+        'labels', 'longitude', 'latitude', 'address', 'zipcode', 'distance']
     ADMIN_READABLE_FIELDS = [
         'id', 'searcher_user_id', 'searcher_role', 'searching_for_role', 'labels',
-        'created', 'active', 'latitude', 'longitude', 'distance']
+        'created', 'active', 'longitude', 'latitude', 'address', 'zipcode', 'distance']
 
     PERMISSIONS = {
         'standard_can_read_many': True
@@ -45,8 +44,10 @@ class Search(Base, Serializable):
     searching_for_role = Column(String(20), nullable=False)
     created = Column(DateTime, nullable=False, default=datetime.utcnow)
     active = Column(Boolean, nullable=False, default=True)
-    latitude = Column(Float, nullable=False)
-    longitude = Column(Float, nullable=False)
+    address = Column(String(200))
+    zipcode = Column(String(20))
+    latitude = Column(Float)
+    longitude = Column(Float)
     distance = Column(Float, nullable=True)
 
     labels = relationship("Label", secondary=search_label_table)

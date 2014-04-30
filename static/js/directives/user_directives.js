@@ -73,30 +73,20 @@
       return {
         scope: {
           methods: '=',
-          search: '='
+          search: '=',
+          form: '='
         },
         templateUrl: './static/templates/educator_search_settings.html',
-        controller: function($scope, Search, Map, Messages) {
-          var map = new Map('map-canvas');
-          $scope.codeAddress = function() {
-            var address = $scope.search.location;
-            var promiseLatLng = map.codeAddress(address);
-            promiseLatLng.then(
-              function(latlng) {
-                $scope.search.latitude = latlng.k;
-                $scope.search.longitude = latlng.A;
-              },
-              function(message) {
-                Messages.error(message);
-              });
-          };
+        controller: function($scope, Search, Messages) {
           $scope.properties = {};
+          var haveSetForm = false;
+          $scope.$watch('educatorSearchSettingsForm', function() {
+            if (!haveSetForm) {
+              $scope.form = $scope.educatorSearchSettingsForm;
+            }
+          });
           $scope.methods.setSearch = function(search) {
             $scope.properties.search = search;
-            if ((search.location !== undefined) && (search.longitude !== undefined)) {
-              search.location = search.latitude + ', ' + search.longitude;
-              $scope.codeAddress();
-            }
             search.makeLabelDisplay();
           };
           if ($scope.search) {
@@ -118,11 +108,18 @@
       return {
         scope: {
           methods: '=',
-          user: '='
+          user: '=',
+          form: '='
         },
         templateUrl: './static/templates/community_partner_settings.html',
-        controller: function($scope, Search, Map, Messages, CommunityPartnerUtils) {
+        controller: function($scope, Search, Messages, CommunityPartnerUtils) {
           $scope.properties = {};
+          var haveSetForm = false;
+          $scope.$watch('partnerSettingsForm', function() {
+            if (!haveSetForm) {
+              $scope.form = $scope.partnerSettingsForm;
+            }
+          });
           var makeNewSearch = function() {
             var search = new Search({
               searcher_user_id: undefined,
@@ -147,8 +144,6 @@
                 if (search) {
                   $scope.search = search;
                   $scope.properties.search = search;
-                  $scope.search.location = $scope.search.latitude + ', ' + $scope.search.longitude;
-                  $scope.codeAddress();
                   search.makeLabelDisplay();
                 } else {
                   // Apparently the user didn't have a search.
@@ -173,19 +168,6 @@
             $scope.search.processLabelDisplay();
             var searchPromise = $scope.search.save();
             return searchPromise;
-          };
-          var map = new Map('map-canvas');
-          $scope.codeAddress = function() {
-            var address = $scope.search.location;
-            var promiseLatLng = map.codeAddress(address);
-            promiseLatLng.then(
-              function(latlng) {
-                $scope.search.latitude = latlng.k;
-                $scope.search.longitude = latlng.A;
-              },
-              function(message) {
-                Messages.error(message);
-              });
           };
         }
       };
