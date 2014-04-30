@@ -59,14 +59,15 @@ class Search(Base, Serializable):
         return has_rights
 
     @classmethod
-    def get_many_ordered_by_label_matches(cls, labels):
+    def get_many_ordered_by_label_matches(cls, labels, max_number=10):
         labelnames = [label.name for label in labels]
         query = session.query(Search, func.count(Label.id).label('matches'))
         query = query.join(Search.labels)
         query = query.filter(Label.name.in_(labelnames))
         query = query.group_by(Search.id)
         query = query.order_by('matches DESC')
-        searches = query.all()
+        searches_and_count = query.limit(max_number)
+        searches = [sc[0] for sc in searches_and_count]
         return searches
 
     def has_standard_rights(self, requester):
@@ -81,8 +82,10 @@ class Search(Base, Serializable):
             has_rights = True
         return has_rights
 
-    def standard_serialize(self):
+    def standard_serialize(self, include_searcher_user=False):
         d = {}
+        if include_searcher_user:
+            d['searcher_user'] = self.searcher_user.standard_serialize()
         for fieldname in self.STANDARD_READABLE_FIELDS:
             if fieldname == 'labels':
                 d[fieldname] = [l.name for l in self.labels]
@@ -90,8 +93,10 @@ class Search(Base, Serializable):
                 d[fieldname] = getattr(self, fieldname)
         return d
 
-    def admin_serialize(self):
+    def admin_serialize(self, include_searcher_user=False):
         d = {}
+        if include_searcher_user:
+            d['searcher_user'] = self.searcher_user.standard_serialize()
         for fieldname in self.ADMIN_READABLE_FIELDS:
             if fieldname == 'labels':
                 d[fieldname] = [l.name for l in self.labels]

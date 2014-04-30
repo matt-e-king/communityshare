@@ -33,6 +33,8 @@ class User(Base, Serializable):
     is_administrator = Column(Boolean, nullable=False, default=False) 
     last_active = Column(DateTime)
 
+    searches = relationship("Search", backref="searcher_user")
+
     pwd_context = passlib.context.CryptContext(
         schemes=['sha512_crypt'],
         default='sha512_crypt',
