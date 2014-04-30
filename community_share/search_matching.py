@@ -8,7 +8,8 @@ def find_matching_community_partners(search):
         raise BadSearch()
     if search.searching_for_role != 'partner':
         raise BadSearch()
-    searches = Search.get_many_ordered_by_label_matches(search.labels)
+    searches = Search.get_many_ordered_by_label_matches(
+        search.labels, searcher_role='partner', searching_for_role='educator')
     return searches
     
 

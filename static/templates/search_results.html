@@ -1,3 +1,6 @@
 <div ng-repeat="search in searches">
-  {{search.searcher_user.name}}
+  <a ng-href="#/user/{{search.searcher_user_id}}">{{search.searcher_user.name}}</a>
+  <ul>
+    <li ng-repeat="label in search.matchingLabels">{{label}}</li>
+  </ul>
 </div>

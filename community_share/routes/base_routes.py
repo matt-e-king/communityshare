@@ -2,6 +2,7 @@ import logging
 
 from flask import session, jsonify, request, Blueprint
 
+from sqlalchemy import Boolean
 from sqlalchemy.exc import IntegrityError, InvalidRequestError
 
 from community_share.store import session
@@ -123,13 +124,20 @@ def make_blueprint(Item, resourceName):
                     else:
                         raise Exception('Unknown filter parameter')
                 elif len(bits) == 1:
-                    criterium = (getattr(Item, key) == request.args[key])
+                    typ = getattr(Item, key).property.columns[0].type
+                    value = request.args[key]
+                    if (isinstance(typ, Boolean)):
+                        if (value == 'true'):
+                            value = True
+                        elif (value == 'false'):
+                            value = False
+                    criterium = (getattr(Item, key) == value)
                     filter_args.append(criterium)
         return filter_args
 
     def _get_raw_items():
         filter_args = _args_to_filter_params()
-        items = session.query(Item).filter(*filter_args)
+        items = session.query(Item).filter(*filter_args).all()
         return items
 
     @api.route(API_MANY_FORMAT.format(resourceName), methods=['GET'])

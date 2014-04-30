@@ -59,11 +59,15 @@ class Search(Base, Serializable):
         return has_rights
 
     @classmethod
-    def get_many_ordered_by_label_matches(cls, labels, max_number=10):
+    def get_many_ordered_by_label_matches(
+            cls, labels, searcher_role, searching_for_role, max_number=10):
         labelnames = [label.name for label in labels]
         query = session.query(Search, func.count(Label.id).label('matches'))
         query = query.join(Search.labels)
         query = query.filter(Label.name.in_(labelnames))
+        query = query.filter(Search.active==True)
+        query = query.filter(Search.searcher_role==searcher_role)
+        query = query.filter(Search.searching_for_role==searching_for_role)
         query = query.group_by(Search.id)
         query = query.order_by('matches DESC')
         searches_and_count = query.limit(max_number)
@@ -71,7 +75,9 @@ class Search(Base, Serializable):
         return searches
 
     def has_standard_rights(self, requester):
-        has_rights = self.has_admin_rights(requester)
+        has_rights = False
+        if requester is not None:
+            has_rights = True
         return has_rights
 
     def has_admin_rights(self, user):

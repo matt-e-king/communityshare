@@ -25,6 +25,26 @@
           labelMapping[label] = key;
         }
       }
+
+      var compareLabels = function(targetLabels, retrievedLabels) {
+        var matchingLabels = [];
+        var missingLabels = [];
+        for (var i=0; i<targetLabels.length; i++) {
+          var targetLabel = targetLabels[i];
+          var index = retrievedLabels.indexOf(targetLabel);
+          if (index >= 0) {
+            matchingLabels.push(targetLabel);
+          } else {
+            missingLabels.push(targetLabel);
+          }
+        }
+        var comparison = {
+          'matching': matchingLabels,
+          'missing': missingLabels
+        };
+        return comparison;
+      }
+
       var Search = ItemFactory('search');
       Search.getResults = function(searchId) {
         var deferred = $q.defer();
@@ -33,22 +53,30 @@
           method: 'GET',
           url: url
         });
-        resultsPromise.then(
-            function(response) {
-              var searches = []
-              for (var i=0; i<response.data.data.length; i++) {
-                var search = new Search(response.data.data[i]);
-                searches.push(search);
-              }
-              deferred.resolve(searches);
-            },
-            function(response) {
-              var msg = '';
-              if (response.message) {
-                msg = response.message;
-              }
-              deferred.reject('Error loading search results: ' + msg);
-            });
+        var searchPromise = Search.get(searchId);
+        var searchAndResultsPromise = $q.all([searchPromise, resultsPromise]);
+        searchAndResultsPromise.then(
+          function(responses) {
+            console.log(responses);
+            var baseSearch = responses[0];
+            var resultsResponse = responses[1];
+            var searches = []
+            for (var i=0; i<resultsResponse.data.data.length; i++) {
+              var search = new Search(resultsResponse.data.data[i]);
+              var comparison = compareLabels(baseSearch.labels, search.labels);
+              search.matchingLabels = comparison.matching;
+              search.missingLabels = comparison.missing;
+              searches.push(search);
+            }
+            deferred.resolve(searches);
+          },
+          function(response) {
+            var msg = '';
+            if (response.message) {
+              msg = response.message;
+            }
+            deferred.reject('Error loading search results: ' + msg);
+          });
         return deferred.promise;
       };
       Search.prototype.makeLabelDisplay = function() {
