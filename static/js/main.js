@@ -75,6 +75,11 @@
       controller: 'SearchEditController'
     });
 
+    $routeProvider.when('/search/:searchId/results', {
+      templateUrl: './static/templates/search_results.html',
+      controller: 'SearchResultsController'
+    });
+
     $routeProvider.when('/search', {
       templateUrl: './static/templates/search_edit.html',
       controller: 'SearchEditController'

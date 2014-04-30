@@ -26,6 +26,31 @@
         }
       }
       var Search = ItemFactory('search');
+      Search.getResults = function(searchId) {
+        var deferred = $q.defer();
+        var url = '/api/search/' + searchId + '/results';
+        var resultsPromise = $http({
+          method: 'GET',
+          url: url
+        });
+        resultsPromise.then(
+            function(response) {
+              var searches = []
+              for (var i=0; i<response.data.data.length; i++) {
+                var search = new Search(response.data.data[i]);
+                searches.push(search);
+              }
+              deferred.resolve(searches);
+            },
+            function(response) {
+              var msg = '';
+              if (response.message) {
+                msg = response.message;
+              }
+              deferred.reject('Error loading search results: ' + msg);
+            });
+        return deferred.promise;
+      };
       Search.prototype.makeLabelDisplay = function() {
         this.displayLabelsAll = makeBaseLabels();
         this.displayLabelsActive = {

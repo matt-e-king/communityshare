@@ -7,6 +7,22 @@
     ]);
 
   module.controller(
+    'SearchResultsController',
+    function($scope, $routeParams, Search, Messages) {
+      var searchId = $routeParams.searchId;
+      if (searchId !== undefined) {
+        var searchesPromise = Search.getResults(searchId);
+        searchesPromise.then(
+          function(searches) {
+            $scope.searches = searches;
+          },
+          function(message) {
+            Messages.error(message);
+          });
+      }
+    });
+
+  module.controller(
     'SearchEditController',
     function(Session, $location, $scope, $routeParams, Search, Messages) {
       $scope.searchSettingsMethods = {};
