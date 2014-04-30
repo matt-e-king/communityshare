@@ -30,3 +30,7 @@
   left: 10px;
   z-index: 99;
 }
+
+.padded-link {
+    padding-top: 30px;
+}

@@ -58,12 +58,22 @@
     function($scope, $location, Authenticator) {
       $scope.email = undefined;
       $scope.password = undefined;
+      $scope.errorMessage = '';
       $scope.login = function() {
         var userPromise = Authenticator.authenticateWithEmailAndPassword(
           $scope.email, $scope.password);
-        userPromise.then(function(data) {
-          $location.path("/home")
-        });
+        userPromise.then(
+          function(user) {
+            $location.path("/home")
+          },
+          function(message) {
+            var msg = ''
+            if (message) {
+              msg = ': ' + message;
+            }
+            $scope.errorMessage = 'Authentication failed' + msg;
+          }
+        );
       }
     });
 
