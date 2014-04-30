@@ -137,7 +137,7 @@
             return search;
           };
           $scope.search = undefined;
-          if ($scope.user) {
+          if (($scope.user) && ($scope.user.is_community_partner)) {
             // User exists.  Load the search.
             var searchesPromise = $scope.user.getSearches();
             var searchPromise = CommunityPartnerUtils.searchesPromiseToSearchPromise(

@@ -1,31 +1,37 @@
 <div cs-main-view has-permission="{{(!(Session.activeUser === undefined))}}">
   <h4>Settings</h4>
-  <form novalidate
-        action="" role="form" name="form" class="form-horizontal">
-    <div class="form-group">
-      <label for="name"
-             class="control-label">Name</label>
-      <div class="">
-        <input ng-model="editedUser.name"
-               type="text"
-               name="name"
-               id="name"
-               class="form-control"/>
+  <div class="row">
+    <form novalidate
+          action="" role="form" name="settingsForm" class="form-horizontal">
+      <div class="form-group">
+        <label for="name"
+               class="control-label col-lg-2">Name</label>
+        <div class="col-lg-3">
+          <input ng-model="editedUser.name"
+                 type="text"
+                 required
+                 name="name"
+                 id="name"
+                 class="form-control"/>
+          <p ng-show="settingsForm.name.$invalid && !settingsForm.name.$pristine" class="help-block">
+            A name is required.
+          </p>
+        </div>
       </div>
-    </div>
-    <div class="form-group">
-      <label for="email"
-             class="control-label">Email</label>
-      <div class="">
-        <input ng-model="editedUser.email"
-               disabled
-               name="email"
-               id="email"
-               class="form-control"
-               type="text"/>
+      <div class="form-group">
+        <label for="email"
+               class="control-label col-lg-2">Email</label>
+        <div class="col-lg-3">
+          <input ng-model="editedUser.email"
+                 disabled
+                 name="email"
+                 id="email"
+                 class="form-control"
+                 type="text"/>
+        </div>
       </div>
-    </div>
-  </form>
+    </form>
+  </div>
 
   <div ng-show="Session.activeUser.is_community_partner"
        cs-community-partner-settings
@@ -33,9 +39,22 @@
        methods="communityPartnerSettingsMethods"
        ></div>
   
-  <button class="btn" ng-click="saveSettings()">
-    Save Changes
-  </button>
+  <div class="row">
+    <div class="alert alert-success col-lg-7" ng-show="successMessage">
+      {{successMessage}}
+    </div>
+    <div class="alert alert-danger col-lg-7" ng-show="errorMessage">
+      {{errorMessage}}
+    </div>
+  </div>
+
+  <div class="row">
+    <button class="btn col-lg-offset-2"
+            ng-disabled="settingsForm.$invalid || settingsForm.$pristine"
+            ng-click="saveSettings()">
+      Save Changes
+    </button>
+  </div>
   
   
 </div>

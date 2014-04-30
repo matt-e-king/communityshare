@@ -129,14 +129,22 @@
         saveUserPromise.then(
           function(user) {
             Session.activeUser.updateFromData(user.toData());
+            var msg = 'Successfully updated settings.'
+            $scope.successMessage = msg;
+            $scope.errorMessage = '';
           },
           function(message) {
-            var msg = 'Failed to save user: ' + message;
-            Messages.error(msg);
+            var msg = ''
+            if (message) {
+              msg = ': ' + message;
+            }
+            var msg = 'Failed to update settings' + msg;
+            $scope.errorMessage = msg;
+            $scope.successMessage = '';
           });
         var methods = $scope.communityPartnerSettingsMethods;
         if (methods.saveSettings) {
-          methods.saveSettings();
+          saveCPSettingsPromise = methods.saveSettings();
         }
       };
     });
