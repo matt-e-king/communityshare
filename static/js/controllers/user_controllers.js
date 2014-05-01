@@ -116,7 +116,7 @@
 
   module.controller(
     'SettingsController',
-    function($scope, Session, Messages) {
+    function($scope, $location, Session, Messages) {
       $scope.Session = Session;
       $scope.user = Session.activeUser;
       $scope.properties = {};
@@ -131,9 +131,7 @@
         saveUserPromise.then(
           function(user) {
             Session.activeUser.updateFromData(user.toData());
-            var msg = 'Successfully updated settings.'
-            $scope.successMessage = msg;
-            $scope.errorMessage = '';
+            $location.path('/home');
           },
           function(message) {
             var msg = ''

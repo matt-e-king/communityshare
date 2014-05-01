@@ -46,7 +46,9 @@
 
       var Search = ItemFactory('search');
       Search.prototype.initialize = function() {
-        sortLabels(this.labels);
+        if (this.labels) {
+          sortLabels(this.labels);
+        }
       };
       Search.getResults = function(searchId) {
         var deferred = $q.defer();
