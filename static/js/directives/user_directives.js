@@ -11,7 +11,7 @@
         scope: {
           methods: '=',
           user: '='},
-        templateUrl: './static/templates/community_partner_home.html',
+        templateUrl: './static/templates/community_partner_view.html',
         controller: function(Session, $scope, CommunityPartnerUtils, Search, Messages) {
           $scope.methods.onUserUpdate = function(user) {
             if (user.is_community_partner) {
