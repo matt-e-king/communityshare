@@ -10,17 +10,35 @@
     'SearchResultsController',
     function($scope, $routeParams, Search, Messages) {
       var searchId = $routeParams.searchId;
+      $scope.infoMessage = 'Searching for matches...';
+      $scope.errorMessage = '';
+      $scope.title = '';
       if (searchId !== undefined) {
         var searchesPromise = Search.getResults(searchId);
         searchesPromise.then(
           function(searches) {
             $scope.searches = searches;
+            if (searches.length === 0) {
+              $scope.infoMessage = 'No matches found.';
+            } else {
+              $scope.infoMessage = '';
+              if (searches[0].searcher_role='educator') {
+                $scope.title = 'Best Educator Matches';
+              } else {
+                $scope.title = 'Best Community Partner Matches';
+              }
+            }
+            $scope.errorMessage = '';
           },
           function(message) {
-            Messages.error(message);
+            var msg = '';
+            if (message) {
+              msg = ': ' + message;
+            }
+            $scope.errorMessage = 'Failed to find matches' + msg;
           });
       }
-    });
+    });      
 
   module.controller(
     'SearchEditController',

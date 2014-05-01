@@ -51,11 +51,10 @@
   
   <div class="row">
     <button class="btn cs-form-button"
-            ng-disabled="settingsForm.$invalid || properties.partnerSettingsForm.$invalid"
+            ng-disabled="settingsForm.$invalid || (Session.activeUser.is_community_partner && properties.partnerSettingsForm.$invalid)"
             ng-click="saveSettings()">
       Save Changes
     </button>
   </div>
-  
   
 </div>

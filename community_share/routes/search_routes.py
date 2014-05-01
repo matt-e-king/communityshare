@@ -25,7 +25,7 @@ def register_search_routes(app):
                 response = base_routes.make_not_found_response()
             else:
                 if search.has_admin_rights(requester):
-                    matching_searches = search_matching.find_matching_community_partners(search)
+                    matching_searches = search_matching.find_matching_searches(search)
 
                     serialized = [
                         search.standard_serialize(include_searcher_user=True)

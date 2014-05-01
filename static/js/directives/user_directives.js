@@ -14,17 +14,19 @@
         templateUrl: './static/templates/community_partner_home.html',
         controller: function(Session, $scope, CommunityPartnerUtils, Search, Messages) {
           $scope.methods.onUserUpdate = function(user) {
-            var searchesPromise = user.getSearches();
-            var searchPromise = CommunityPartnerUtils.searchesPromiseToSearchPromise(
-              searchesPromise);
-            searchPromise.then(
-              function(search) {
-                search.makeLabelDisplay()
-                $scope.search = search;
-              },
-              function(message) {
-                Messages.error(message);
-              });
+            if (user.is_community_partner) {
+              var searchesPromise = user.getSearches();
+              var searchPromise = CommunityPartnerUtils.searchesPromiseToSearchPromise(
+                searchesPromise);
+              searchPromise.then(
+                function(search) {
+                  search.makeLabelDisplay()
+                  $scope.search = search;
+                },
+                function(message) {
+                  Messages.error(message);
+                });
+            }
           };
           if ($scope.user) {
             $scope.methods.onUserUpdate($scope.user);
