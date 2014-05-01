@@ -1,19 +1,29 @@
-<div>
-  <h5>I'm an Educator</h5>
-  
-  <p>I'm looking to work which a community partner</p>
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h5 class="panel-title">I'm an Educator</h5>
+  </div>
+  <div class="panel-body">
+    <p><button ng-href="#/search" class="clickable btn">Start a New Search</button></p>
+    
+    <h5>Previous active searches</h5>
 
-  <p><a ng-href="#/search" class="clickable">New Search</a></p>
-
-  <p>I'm currently searching for {{activeSearches.length}} partners matching:</p>
-  <div class="row search-summary" ng-repeat="search in activeSearches">
-    <div class="col-lg-3">
-      <a ng-href="#/search/{{search.id}}/edit">Edit</a>
-      <a ng-click="deleteSearch(search)" class="clickable">Delete</a>
-      <a ng-href="#/search/{{search.id}}/results">Results</a>
-    </div>
-    <div ng-repeat="label in search.labels" class="labelbox col-lg-3">
-      {{label}}
+    <p>
+      Community partner may contact you if they match an earlier search you made.
+    </p>
+    <p>
+      Delete any searches below, for which you do not want this to happen.
+    </p>
+    
+    <div class="search-summary" ng-repeat="search in activeSearches">
+      <div>
+        <a ng-href="#/search/{{search.id}}/edit">Edit Search</a> - 
+        <a ng-click="deleteSearch(search)" class="clickable">Delete Search</a> - 
+        <a ng-href="#/search/{{search.id}}/results">Show Search Results</a>
+      </div>
+      <div ng-repeat="label in search.labels" class="labelbox">
+        {{label}}
+      </div>
+      <div class="clearfix"></div>
     </div>
   </div>
 
