@@ -14,6 +14,9 @@
       var ItemFactory = function(resourceName) {
         var Item = function(itemData) {
           this.updateFromData(itemData);
+          if (this.initialize) {
+            this.initialize();
+          }
         };
         Item.prototype.toData = function() {
           var data = JSON.parse(JSON.stringify(this));          

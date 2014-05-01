@@ -10,13 +10,13 @@
 
   module.factory(
     'Search',
-    function(ItemFactory, $q, $http, makeBaseLabels) {
+    function(ItemFactory, $q, $http, makeBaseLabels, sortLabels) {
       var baseLabels = makeBaseLabels();
       var labellists = {
-        gradeLevels: baseLabels.gradeLevels,
-        subjectAreas: baseLabels.subjectAreas.STEM.concat(
-          baseLabels.subjectAreas.Arts, baseLabels.subjectAreas.Custom),
-        engagementLevels: baseLabels.engagementLevels
+        gradeLevels: baseLabels.all.gradeLevels,
+        subjectAreas: baseLabels.all.subjectAreas.STEM.concat(
+          baseLabels.all.subjectAreas.Arts, baseLabels.all.subjectAreas.Custom),
+        engagementLevels: baseLabels.all.engagementLevels
       };
       var labelMapping = {};
       for (var key in labellists) {
@@ -45,6 +45,9 @@
       }
 
       var Search = ItemFactory('search');
+      Search.prototype.initialize = function() {
+        sortLabels(this.labels);
+      };
       Search.getResults = function(searchId) {
         var deferred = $q.defer();
         var url = '/api/search/' + searchId + '/results';
@@ -79,7 +82,7 @@
         return deferred.promise;
       };
       Search.prototype.makeLabelDisplay = function() {
-        this.displayLabelsAll = makeBaseLabels();
+        this.displayLabelsAll = makeBaseLabels()['suggested'];
         this.displayLabelsActive = {
           gradeLevels: [],
           subjectAreas: [],
@@ -111,29 +114,96 @@
     });
 
   module.factory(
+    'sortLabels',
+    function(makeBaseLabels) {
+      var baseLabels = makeBaseLabels()['all'];
+      var sortLabels = function(labels) {
+        var orderedLabels = baseLabels.gradeLevels.concat(
+          baseLabels.subjectAreas.STEM, baseLabels.subjectAreas.Arts,
+          baseLabels.subjectAreas.Custom, baseLabels.engagementLevels);
+        var labelPositions = {};
+        for (var i=0; i<orderedLabels.length; i++) {
+          labelPositions[orderedLabels[i]] = i;
+        }
+        var getPosition = function(label) {
+          var position = labelPositions[label];
+          if (position === undefined) {
+            position = orderedLabels.length;
+          }
+          return position;
+        }
+        var sortFn = function(labelA, labelB) {
+          var result = getPosition(labelA) - getPosition(labelB);
+          return result;
+        }
+        labels.sort(sortFn);
+      }
+      return sortLabels;
+    });
+
+  module.factory(
     'makeBaseLabels',
     function() {
       var makeBaseLabels = function() {
         var labels = {
           // Grade levels
-          gradeLevels: [
-            'K-3', '4-5', '6-8', '9-12'],
+          gradeLevels: {
+            suggested: ['K-5', '6-8', '9-12', 'College', 'Adult'] ,
+            other: ['K-3', '4-5', '6-8', '9-12', 'Preschool']
+          },
           // Subject area
           subjectAreas: {
-            STEM: ['Science', 'Technology', 'Engineering', 'Math'],
-            Arts: ['Visual Arts', 'Digital Media', 'Film & Photography', 'Literature',
-                   'Performing Arts'],
-            Custom: []
+            STEM: {
+              suggested: ['Science', 'Technology', 'Engineering', 'Math'],
+              other: []
+            },
+            Arts: {
+              suggested: ['Visual Arts', 'Digital Media', 'Film & Photography', 'Literature',
+                          'Performing Arts'],
+              other: []
+            },
+            Custom: {
+              suggested: [],
+              other: []
+            }
           },
           // Level of Engagement
-          engagementLevels: [
-            'Guest Speaker', 'Field Trip Host', 'Student Competition Judget',
-            'Individual Mentor', 'Small Group Mentor', 'Curriculuum Development',
-            'Career Day Participant', 'Classroom Materials Provider',
-            'Short-term', 'Long-term'
-          ]}
-        return labels;
+          engagementLevels: {
+            suggested: [
+              'Guest Speaker', 'Field Trip Host', 'Student Competition Judget',
+              'Individual Mentor', 'Small Group Mentor', 'Curriculuum Development',
+              'Career Day Participant', 'Classroom Materials Provider',
+              'Short-term', 'Long-term'],
+            other: []
+          }
+        };
+
+        var suggestedLabels = {};
+        suggestedLabels.gradeLevels = labels.gradeLevels.suggested;
+        suggestedLabels.subjectAreas = {};
+        suggestedLabels.subjectAreas.STEM = labels.subjectAreas.STEM.suggested;
+        suggestedLabels.subjectAreas.Arts = labels.subjectAreas.Arts.suggested;
+        suggestedLabels.subjectAreas.Custom = labels.subjectAreas.Custom.suggested;
+        suggestedLabels.engagementLevels = labels.engagementLevels.suggested;
+
+        var allLabels = {};
+        allLabels.gradeLevels = labels.gradeLevels.suggested.concat(labels.gradeLevels.other);
+        allLabels.subjectAreas = {};
+        allLabels.subjectAreas.STEM = labels.subjectAreas.STEM.suggested.concat(
+          labels.subjectAreas.STEM.other);
+        allLabels.subjectAreas.Arts = labels.subjectAreas.Arts.suggested.concat(
+          labels.subjectAreas.Arts.other);
+        allLabels.subjectAreas.Custom = labels.subjectAreas.Custom.suggested.concat(
+          labels.subjectAreas.Custom.other);
+        allLabels.engagementLevels = labels.engagementLevels.suggested.concat(
+          labels.engagementLevels.other);
+        
+        return {'suggested': suggestedLabels,
+                'all': allLabels}
       };
+
+
+      
       return makeBaseLabels;
     });
 
