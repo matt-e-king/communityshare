@@ -20,7 +20,7 @@
       };
       var labelMapping = {};
       for (var key in labellists) {
-        for (var i=0; i<labellists[key]; i++) {
+        for (var i=0; i<labellists[key].length; i++) {
           var label = labellists[key][i];
           labelMapping[label] = key;
         }
@@ -56,7 +56,6 @@
         var searchAndResultsPromise = $q.all([searchPromise, resultsPromise]);
         searchAndResultsPromise.then(
           function(responses) {
-            console.log(responses);
             var baseSearch = responses[0];
             var resultsResponse = responses[1];
             var searches = []
