@@ -22,7 +22,7 @@
               $scope.infoMessage = 'No matches found.';
             } else {
               $scope.infoMessage = '';
-              if (searches[0].searcher_role='educator') {
+              if (searches[0].searcher_role === 'educator') {
                 $scope.title = 'Best Educator Matches';
               } else {
                 $scope.title = 'Best Community Partner Matches';

@@ -35,6 +35,9 @@
           'Basic:api:' + key;
         $cookies.apiKey = key;
       };
+      Authenticator.setEmail = function(email) {
+        $cookies.email = email;
+      };
       Authenticator.authenticateFromCookie =
         function() {
           var deferred = $q.defer();

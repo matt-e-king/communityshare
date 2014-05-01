@@ -31,6 +31,7 @@
           function(response) {
             var user = new User(response.data.data);
             Authenticator.setApiKey(response.data.apiKey);
+            Authenticator.setEmail(user.email);
             Session.activeUser = user;
             deferred.resolve(user);
           },

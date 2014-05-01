@@ -98,8 +98,8 @@
             if (methods.saveSettings) {
               var settingsPromise = methods.saveSettings();
               settingsPromise.then(
-                function() {
-                  $location.path('/home');
+                function(search) {
+                  $location.path('/search/' + search.id + '/results');
                 },
                 function(message) {
                   Messages.error(message);
