@@ -4,15 +4,31 @@
   var module = angular.module(
     'communityshare.controllers.search',
     [
+      'communityshare.controllers.conversation',
     ]);
 
   module.controller(
     'SearchResultsController',
-    function($scope, $routeParams, Search, Messages) {
+    function($scope, $location, $routeParams, $modal, Search, Messages) {
       var searchId = $routeParams.searchId;
       $scope.infoMessage = 'Searching for matches...';
       $scope.errorMessage = '';
       $scope.title = '';
+      $scope.startConversation = function(userId) {
+        var opts = {
+          templateUrl: './static/templates/new_conversation.html',
+          controller: 'NewConversationController',
+          resolve: {
+            userId: function() {return userId;},
+            searchId: function() {return searchId;}
+          }
+        };
+        var m = $modal.open(opts);
+        m.result.then(
+          function(conversation) {
+            $location.path('/conversation/' + conversation.id);
+          });
+      }
       if (searchId !== undefined) {
         var searchesPromise = Search.getResults(searchId);
         searchesPromise.then(

@@ -5,6 +5,7 @@ from flask import Flask, send_from_directory
 from community_share import settings
 from community_share.routes.user_routes import register_user_routes
 from community_share.routes.search_routes import register_search_routes
+from community_share.routes.conversation_routes import register_conversation_routes
 from community_share.store import session
 
 def make_app():
@@ -13,6 +14,7 @@ def make_app():
 
     register_user_routes(app)
     register_search_routes(app)
+    register_conversation_routes(app)
 
     @app.teardown_appcontext
     def close_db_connection(exception):

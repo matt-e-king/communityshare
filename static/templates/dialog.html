@@ -1,6 +1,9 @@
 <div class="modal-content">
   <div class="modal-header">
-    <h3>{{title}}</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+            ng-click="cancel()">
+      &times;</button>
+    <h3 class="modal-title">{{title}}</h3>
   </div>
   <div class="modal-body">
     <p>{{msg}}</p>
