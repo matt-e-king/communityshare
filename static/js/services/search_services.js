@@ -27,16 +27,15 @@
       }
 
       var compareLabels = function(targetLabels, retrievedLabels) {
-        var matchingLabels = [];
+        var matchingLabels = {};
         var missingLabels = [];
         for (var i=0; i<targetLabels.length; i++) {
           var targetLabel = targetLabels[i];
           var index = retrievedLabels.indexOf(targetLabel);
-          if (index >= 0) {
-            matchingLabels.push(targetLabel);
-          } else {
+          if (index === -1) {
             missingLabels.push(targetLabel);
           }
+          matchingLabels[targetLabel] = (index >= 0);
         }
         var comparison = {
           'matching': matchingLabels,
@@ -66,6 +65,7 @@
               var comparison = compareLabels(baseSearch.labels, search.labels);
               search.matchingLabels = comparison.matching;
               search.missingLabels = comparison.missing;
+              search.targetLabels = baseSearch.labels;
               searches.push(search);
             }
             deferred.resolve(searches);

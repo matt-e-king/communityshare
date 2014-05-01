@@ -1,6 +1,18 @@
-<div ng-repeat="search in searches">
-  <a ng-href="#/user/{{search.searcher_user_id}}">{{search.searcher_user.name}}</a>
-  <ul>
-    <li ng-repeat="label in search.matchingLabels">{{label}}</li>
-  </ul>
+<h4>Search Results</h4>
+
+<div ng-repeat="label in baseSearch.labels" class="labelbox">{{label}}</div>
+<div class="clearfix"></div>
+
+<div ng-repeat="search in searches" class="search-result">
+  <a ng-href="#/user/{{search.searcher_user_id}}"><h5>{{search.searcher_user.name}}</h5></a>
+  <h5>We require</h5>
+  <div ng-repeat="label in search.targetLabels"
+       ng-class="{true: 'labelbox-selected', false: 'labelbox'}[search.matchingLabels[label]]"
+       class="labelbox">{{label}}</div>
+  <div class="clearfix"></div>
+  <h5>They offer</h5>
+  <div ng-repeat="label in search.labels"
+       ng-class="{true: 'labelbox-selected', false: 'labelbox'}[search.matchingLabels[label]]"
+       class="labelbox">{{label}}</div>
+  <div class="clearfix"></div>
 </div>
