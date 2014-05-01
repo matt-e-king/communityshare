@@ -26,6 +26,7 @@
     'SearchEditController',
     function(Session, $location, $scope, $routeParams, Search, Messages) {
       $scope.searchSettingsMethods = {};
+      $scope.properties = {};
       var searchId = $routeParams.searchId;
       if (searchId !== undefined) {
         var searchPromise = Search.get(searchId);
@@ -55,19 +56,13 @@
         });
         $scope.search = search;
       }
-      var goToUserView = function(userId) {
-        if (Session.activeUser.id === userId) {
-          $location.path('/home');
-        }else {
-          $location.path('/user/' + userId);
-        }
-      };
+
       $scope.saveSettings = function() {
           if ($scope.searchSettingsMethods.saveSettings) {
             var promise = $scope.searchSettingsMethods.saveSettings();
             promise.then(
               function(search) {
-                goToUserView(search.searcher_user_id);
+                $location.path('/search/' + search.id + '/results');
               },
               function(message) {
                 Messages.error(message);

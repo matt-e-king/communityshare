@@ -17,12 +17,15 @@
 
   module.controller(
     'EducatorHomeController',
-    function($scope, Session, Search, makeDialog, Messages) {
+    function($scope, $location, Session, Search, makeDialog, Messages) {
       if ((Session.activeUser) && (Session.activeUser.is_educator)) {
         var searchParams = {
           'searcher_user_id': Session.activeUser.id,
           'active': true,
           'searcher_role': 'educator'
+        };
+        $scope.newSearch = function() {
+          $location.path('/search');
         };
         $scope.deleteSearch = function(search) {
           var title = 'Delete Search';
