@@ -85,6 +85,11 @@
       controller: 'SearchEditController'
     });
 
+    $routeProvider.when('/conversation/:conversationId', {
+      templateUrl: './static/templates/conversation.html',
+      controller: 'ConversationController'
+    });
+
     $routeProvider.otherwise({
       templateUrl: './static/templates/unknown.html'
     });

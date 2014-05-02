@@ -1,0 +1,40 @@
+<h4>{{conversation.title}}</h4>
+
+<h5>Conversation with {{other_user.name}}</h5>
+
+<div ng-repeat="message in conversation.messages" class="conversation-block">
+  <div class="conversation-sender">{{message.sender_user.name}}</div>
+  <div class="conversation-message">{{message.content}}</div>
+</div>
+
+<form novalidate login-with-auto-fill
+      action="" role="form" name="newConversationForm" class="form-horizontal">
+
+  <div class="form-group">
+    <label for="content"
+           class="control-label">Message</label>
+    <div class="">
+      <textarea ng-model="newMessage.content"
+                required
+                name="content"
+                id="content"
+                class="form-control"
+                type="text">
+      </textarea>
+      <p ng-show="newConversationForm.content.$invalid && !newConversationForm.content.$pristine"
+         class="help-block">
+        A message is required.
+      </p>
+    </div>
+  </div>
+  
+  <div class="alert alert-danger" ng-show="errorMessage">
+    {{errorMessage}}
+  </div>
+      
+  <button class="btn" type="submit" ng-click="sendMessage()"
+          ng-disabled="newConversationForm.$invalid">
+    Send Message
+  </button>
+
+</form>

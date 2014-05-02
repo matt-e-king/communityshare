@@ -6,6 +6,57 @@
     [
       'communityshare.services.conversation'
     ]);
+
+  module.controller(
+    'ConversationController',
+    function($scope, $routeParams, Session, Conversation, Message, User) {
+      var conversationId = $routeParams.conversationId;
+      var conversationPromise = Conversation.get(conversationId);
+      $scope.other_user = undefined;
+      $scope.conversation = undefined;
+      $scope.newMessage = undefined;
+      var makeNewMessage = function() {
+        var newMessage = new Message({
+          conversation_id: conversationId,
+          sender_user_id: Session.activeUser.id,
+          content: ''
+        });
+        return newMessage;
+      };
+      conversationPromise.then(
+        function(conversation) {
+          if (conversation.userA.id === Session.activeUser.id) {
+            $scope.other_user = conversation.userB;
+          } else {
+            $scope.other_user = conversation.userA;
+          }
+          $scope.conversation = conversation;
+          $scope.newMessage = makeNewMessage();
+        },
+        function(message) {
+            var msg = '';
+            if (message) {
+              msg = ': ' + message;
+            }
+            $scope.errorMessage = 'Failed to load conversation' + msg;
+        });
+      $scope.sendMessage = function() {
+        var messagePromise = $scope.newMessage.save();
+        messagePromise.then(
+          function(message) {
+            message.sender_user = Session.activeUser;
+            $scope.conversation.messages.push(message);
+            $scope.newMessage = makeNewMessage();
+          },
+          function(message) {
+            var msg = '';
+            if (message) {
+              msg = ': ' + message;
+            }
+            $scope.errorMessage = 'Failed to send message' + msg;
+          });
+      }
+    });
   
   module.controller(
     'NewConversationController',
