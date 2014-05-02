@@ -51,6 +51,10 @@ class Conversation(Base, Serializable):
             has_rights = True
         return has_rights
 
+    def has_standard_rights(self, requester):
+        has_rights = self.has_admin_rights(requester)
+        return has_rights
+
     def has_admin_rights(self, requester):
         has_rights = False
         if requester is not None:

@@ -28,7 +28,10 @@ class Serializable(object):
         return (requester is not None and requester.is_administrator)
 
     def has_standard_rights(self, requester):
-        return False
+        has_rights = False
+        if requester is not None:
+            has_rights = True
+        return has_rights
 
     def has_admin_rights(self, requester):
         return (requester is not None and requester.is_administrator)

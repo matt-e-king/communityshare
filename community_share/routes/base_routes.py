@@ -171,8 +171,10 @@ def make_blueprint(Item, resourceName):
             else:
                 if item.has_admin_rights(requester):
                     response = make_admin_single_response(item)
-                else:
+                elif item.has_standard_rights(requester):
                     response = make_standard_single_response(item)
+                else:
+                    response = make_forbidden_response()
         return response
 
     @api.route(API_MANY_FORMAT.format(resourceName), methods=['POST'])
