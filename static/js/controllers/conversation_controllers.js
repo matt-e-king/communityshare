@@ -9,7 +9,7 @@
 
   module.controller(
     'ConversationController',
-    function($scope, $routeParams, Session, Conversation, Message, User) {
+    function($scope, $timeout, $routeParams, Session, Conversation, Message, User) {
       var conversationId = $routeParams.conversationId;
       var conversationPromise = Conversation.get(conversationId);
       $scope.other_user = undefined;
@@ -23,6 +23,24 @@
         });
         return newMessage;
       };
+      var showErrorMessage = function(message) {
+        var msg = '';
+        if (message) {
+          msg = ': ' + message;
+        }
+        $scope.errorMessage = 'Failed to load conversation' + msg;
+      };
+      var refreshConversation = function() {
+        var refreshedConversationPromise = Conversation.get(conversationId);
+        refreshedConversationPromise.then(
+          function(conversation) {
+            $scope.conversation = conversation;
+            $timeout(refreshConversation, 5000);
+            $scope.errorMessage = '';
+          },
+          showErrorMessage
+        );
+      }
       conversationPromise.then(
         function(conversation) {
           if (conversation.userA.id === Session.activeUser.id) {
@@ -32,14 +50,10 @@
           }
           $scope.conversation = conversation;
           $scope.newMessage = makeNewMessage();
+          $timeout(refreshConversation, 5000);
         },
-        function(message) {
-            var msg = '';
-            if (message) {
-              msg = ': ' + message;
-            }
-            $scope.errorMessage = 'Failed to load conversation' + msg;
-        });
+        showErrorMessage
+      );
       $scope.sendMessage = function() {
         var messagePromise = $scope.newMessage.save();
         messagePromise.then(
@@ -48,13 +62,8 @@
             $scope.conversation.messages.push(message);
             $scope.newMessage = makeNewMessage();
           },
-          function(message) {
-            var msg = '';
-            if (message) {
-              msg = ': ' + message;
-            }
-            $scope.errorMessage = 'Failed to send message' + msg;
-          });
+          showErrorMessage
+        );
       }
     });
   
