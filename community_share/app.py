@@ -1,6 +1,7 @@
 import logging
+import os
 
-from flask import Flask, send_from_directory
+from flask import Flask, send_from_directory, render_template
 
 from community_share import settings
 from community_share.routes.user_routes import register_user_routes
@@ -8,8 +9,13 @@ from community_share.routes.search_routes import register_search_routes
 from community_share.routes.conversation_routes import register_conversation_routes
 from community_share.store import session
 
+COMMIT_HASH = os.environ.get('COMMIT_HASH', 'dummy')
+
+logger = logging.getLogger(__name__)
+
 def make_app():
-    app = Flask(__name__)
+    logger.debug('COMMIT_HASH is {0}'.format(COMMIT_HASH))
+    app = Flask(__name__, template_folder='../static/')
     app.config['SQLALCHEMY_DATABASE_URI'] = settings.DB_CONNECTION
 
     register_user_routes(app)
@@ -38,7 +44,7 @@ def make_app():
 
     @app.route('/')
     def index():
-        return send_from_directory(app.root_path + '/../static/', 'index.html')
+        return render_template('index.html', COMMIT_HASH=COMMIT_HASH)
         
     return app
 

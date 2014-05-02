@@ -10,7 +10,7 @@
     <meta name="author" content="" />
 
     <link rel="stylesheet"
-          href="/static/css/styles.css"
+          href="/static/css/styles.css?q={{COMMIT_HASH}}"
           type="text/css" />
     <link rel="stylesheet"
           href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"
@@ -48,8 +48,8 @@
           <div class="navbar-collapse collapse" collapse="navCollapsed">
             <ul class="nav navbar-nav navbar-right">
               <li ng-show="Session.activeUser">
-                <a href="#/user/{{Session.activeUser.id}}">
-                  {{Session.activeUser.name}}
+                <a href="#/user/\{\{Session.activeUser.id\}\}">
+                  \{\{Session.activeUser.name\}\}
                 </a>
               </li>
               <li class="dropdown" ng-show="Session.activeUser">
@@ -72,7 +72,7 @@
              class="animated-alert"
              type="alert.type"
              close="messages.removeMessage(alert)">
-          {{alert.text}}</div>
+          \{\{alert.text\}\}</div>
       </div>
 
       <!-- Main component for a primary marketing message or call to action -->
@@ -91,30 +91,30 @@
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0/angular-route.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0/angular-resource.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0/angular-cookies.min.js"></script>
-    <script src="./static/js/main.js"></script>
+    <script src="./static/js/main.js?q={{COMMIT_HASH}}"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.10.0/ui-bootstrap-tpls.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
 
-    <script src="./static/js/controllers/authentication_controllers.js"></script>
-    <script src="./static/js/controllers/home_controllers.js"></script>
-    <script src="./static/js/controllers/user_controllers.js"></script>
-    <script src="./static/js/controllers/search_controllers.js"></script>
-    <script src="./static/js/controllers/message_controllers.js"></script>
-    <script src="./static/js/controllers/conversation_controllers.js"></script>
+    <script src="./static/js/controllers/authentication_controllers.js?q={{COMMIT_HASH}}"></script>
+    <script src="./static/js/controllers/home_controllers.js?q={{COMMIT_HASH}}"></script>
+    <script src="./static/js/controllers/user_controllers.js?q={{COMMIT_HASH}}"></script>
+    <script src="./static/js/controllers/search_controllers.js?q={{COMMIT_HASH}}"></script>
+    <script src="./static/js/controllers/message_controllers.js?q={{COMMIT_HASH}}"></script>
+    <script src="./static/js/controllers/conversation_controllers.js?q={{COMMIT_HASH}}"></script>
 
-    <script src="./static/js/services/authentication_services.js"></script>
-    <script src="./static/js/services/item_services.js"></script>
-    <script src="./static/js/services/user_services.js"></script>
-    <script src="./static/js/services/search_services.js"></script>
-    <script src="./static/js/services/map_services.js"></script>
-    <script src="./static/js/services/message_services.js"></script>
-    <script src="./static/js/services/modal_services.js"></script>
-    <script src="./static/js/services/conversation_services.js"></script>
+    <script src="./static/js/services/authentication_services.js?q={{COMMIT_HASH}}"></script>
+    <script src="./static/js/services/item_services.js?q={{COMMIT_HASH}}"></script>
+    <script src="./static/js/services/user_services.js?q={{COMMIT_HASH}}"></script>
+    <script src="./static/js/services/search_services.js?q={{COMMIT_HASH}}"></script>
+    <script src="./static/js/services/map_services.js?q={{COMMIT_HASH}}"></script>
+    <script src="./static/js/services/message_services.js?q={{COMMIT_HASH}}"></script>
+    <script src="./static/js/services/modal_services.js?q={{COMMIT_HASH}}"></script>
+    <script src="./static/js/services/conversation_services.js?q={{COMMIT_HASH}}"></script>
 
-    <script src="./static/js/directives/mainview_directives.js"></script>
-    <script src="./static/js/directives/home_directives.js"></script>
-    <script src="./static/js/directives/user_directives.js"></script>
-    <script src="./static/js/directives/label_directives.js"></script>
+    <script src="./static/js/directives/mainview_directives.js?q={{COMMIT_HASH}}"></script>
+    <script src="./static/js/directives/home_directives.js?q={{COMMIT_HASH}}"></script>
+    <script src="./static/js/directives/user_directives.js?q={{COMMIT_HASH}}"></script>
+    <script src="./static/js/directives/label_directives.js?q={{COMMIT_HASH}}"></script>
 
   </body>
 
