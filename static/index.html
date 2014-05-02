@@ -48,8 +48,8 @@
           <div class="navbar-collapse collapse" collapse="navCollapsed">
             <ul class="nav navbar-nav navbar-right">
               <li ng-show="Session.activeUser">
-                <a href="#/user/\{\{Session.activeUser.id\}\}">
-                  \{\{Session.activeUser.name\}\}
+                <a href="#/user/{{ "{{" }}Session.activeUser.id{{ "}}" }}">
+                  {{ "{{" }}Session.activeUser.name{{ "}}" }}
                 </a>
               </li>
               <li class="dropdown" ng-show="Session.activeUser">
@@ -72,7 +72,7 @@
              class="animated-alert"
              type="alert.type"
              close="messages.removeMessage(alert)">
-          \{\{alert.text\}\}</div>
+          {{ "{{" }}alert.text{{ "}}" }}</div>
       </div>
 
       <!-- Main component for a primary marketing message or call to action -->
