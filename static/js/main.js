@@ -11,6 +11,7 @@
       'communityshare.controllers.user',
       'communityshare.controllers.search',
       'communityshare.controllers.message',
+      'communityshare.controllers.share',
       'communityshare.directives.labels'
     ]);
   
@@ -93,6 +94,11 @@
     $routeProvider.when('/conversation/:conversationId', {
       templateUrl: './static/templates/conversation.html',
       controller: 'ConversationController'
+    });
+
+    $routeProvider.when('/share/new', {
+      templateUrl: './static/templates/share_edit.html',
+      controller: 'NewShareController'
     });
 
     $routeProvider.otherwise({

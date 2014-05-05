@@ -20,10 +20,11 @@
 
   module.controller(
     'ConversationController',
-    function($scope, $timeout, $routeParams, Session, Conversation, Message, User) {
+    function($scope, $location, $timeout, $routeParams, Session,
+             Conversation, Message, User) {
       var conversationId = $routeParams.conversationId;
       var conversationPromise = Conversation.get(conversationId);
-      $scope.other_user = undefined;
+      $scope.otherUser = undefined;
       $scope.conversation = undefined;
       $scope.newMessage = undefined;
       var makeNewMessage = function() {
@@ -54,9 +55,9 @@
         function(conversation) {
           conversation.markMessagesAsViewed();
           if (conversation.userA.id === Session.activeUser.id) {
-            $scope.other_user = conversation.userB;
+            $scope.otherUser = conversation.userB;
           } else {
-            $scope.other_user = conversation.userA;
+            $scope.otherUser = conversation.userA;
           }
           $scope.conversation = conversation;
           $scope.newMessage = makeNewMessage();
@@ -64,6 +65,10 @@
         },
         showErrorMessage
       );
+      $scope.createShare = function() {
+        $location.path('/share/new');
+        $location.search('conversationId', $scope.conversation.id);
+      }
       $scope.sendMessage = function() {
         var messagePromise = $scope.newMessage.save();
         messagePromise.then(

@@ -1,6 +1,6 @@
 <h4>{{conversation.title}}</h4>
 
-<h5>Conversation with {{other_user.name}}</h5>
+<h5>Conversation with {{otherUser.name}}</h5>
 
 <div ng-repeat="message in conversation.messages" class="conversation-block">
   <div class="conversation-sender">{{message.sender_user.name}}</div>
@@ -35,6 +35,11 @@
   <button class="btn" type="submit" ng-click="sendMessage()"
           ng-disabled="newConversationForm.$invalid">
     Send Message
+  </button>
+
+  <button class="btn" type="submit" ng-click="createShare()"
+          ng-disabled="newMessage.content">
+    Create a Share with {{otherUser.name}}!
   </button>
 
 </form>
