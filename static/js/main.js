@@ -85,6 +85,11 @@
       controller: 'SearchEditController'
     });
 
+    $routeProvider.when('/conversation/unviewed', {
+      templateUrl: './static/templates/unviewed_conversations.html',
+      controller: 'UnviewedConversationController'
+    });
+
     $routeProvider.when('/conversation/:conversationId', {
       templateUrl: './static/templates/conversation.html',
       controller: 'ConversationController'

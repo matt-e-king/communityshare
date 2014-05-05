@@ -5,7 +5,8 @@
     'communityshare.services.authentication',
     [
       'ngResource',
-      'communityshare.services.user'
+      'communityshare.services.user',
+      'communityshare.services.conversation'
     ])
 
   module.factory(
@@ -25,7 +26,7 @@
 
   module.factory(
     'Authenticator',
-    function($q, $http, User, SessionBase, $cookies) {
+    function($q, $http, User, SessionBase, $cookies, Conversation, Messages) {
       var Authenticator = {};
       Authenticator.clean = function() {
         $http.defaults.headers.common['Authorization'] = '';
@@ -38,6 +39,30 @@
       Authenticator.setEmail = function(email) {
         $cookies.email = email;
       };
+      Authenticator.getUnviewedConversations = 
+        function() {
+          if (SessionBase.activeUser.id) {
+            var conversationsPromise = Conversation.getUnviewedForUser(
+              SessionBase.activeUser.id);
+            conversationsPromise.then(
+              function(conversations) {
+                var nUnviewedMessages = 0;
+                for (var i=0; i<conversations.length; i++) {
+                  var conversation = conversations[i];
+                  var messages = conversation.getUnviewedMessages();
+                  nUnviewedMessages += messages.length;
+                }
+                SessionBase.activeUser.nUnviewedMessages = nUnviewedMessages;
+              },
+              function(message) {
+                var msg = '';
+                if (message) {
+                  msg = ': ' + message;
+                }
+                Messages.showError('Failed to get messages: ' + msg);
+              });
+          }
+        };
       Authenticator.authenticateFromCookie =
         function() {
           var deferred = $q.defer();
@@ -49,9 +74,10 @@
             userPromise.then(
               function(user) {
                 SessionBase.activeUser = user;
+                Authenticator.getUnviewedConversations();
               },
               function(message) {
-                deferred.reject(message)
+                deferred.reject(message);
               }
             );
           } else {
@@ -79,6 +105,7 @@
           userPromise.then(
             function(user) {
               SessionBase.activeUser = user;
+              Autheticator.getUnviewedConversations();
             },
             function(response) {
             }

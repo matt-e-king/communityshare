@@ -4,8 +4,19 @@
   var module = angular.module(
     'communityshare.controllers.conversation',
     [
+      'communityshare.services.authentication',
+      'communityshare.services.utility',
       'communityshare.services.conversation'
     ]);
+
+  var combineMessages = function(baseMessage, specificMessage) {
+    var msg = '';
+    if (specificMessage) {
+      msg = ': ' + specificMessage;
+    }
+    var message = baseMessage + msg;
+    return message;
+  };
 
   module.controller(
     'ConversationController',
@@ -24,11 +35,9 @@
         return newMessage;
       };
       var showErrorMessage = function(message) {
-        var msg = '';
-        if (message) {
-          msg = ': ' + message;
-        }
-        $scope.errorMessage = 'Failed to load conversation' + msg;
+        var baseMessage = 'Failed to load conversation';
+        var msg = combineMessages(baseMessage, message);
+        $scope.errorMessage = msg;
       };
       var refreshConversation = function() {
         var refreshedConversationPromise = Conversation.get(conversationId);
@@ -43,6 +52,7 @@
       }
       conversationPromise.then(
         function(conversation) {
+          conversation.markMessagesAsViewed();
           if (conversation.userA.id === Session.activeUser.id) {
             $scope.other_user = conversation.userB;
           } else {
@@ -103,20 +113,36 @@
                 $modalInstance.close(conversation);
               },
               function(message) {
-                var msg = '';
-                if (message) {
-                  msg = ': ' + message;
-                }
-                $scope.errorMessage = 'Failed to save message' + msg;
+                var baseMessage = 'Failed to save message';
+                $scope.errorMessage = combineMessages(baseMessage, message);
               });
           },
           function(message) {
-            var msg = '';
-            if (message) {
-              msg = ': ' + message;
-            }
-            $scope.errorMessage = 'Failed to save conversation' + msg;
+            var baseMessage = 'Failed to save conversation';
+            $scope.errorMessage = combineMessages(baseMessage, message);
           });
+      };
+    });
+
+  module.controller(
+    'UnviewedConversationController',
+    function($scope, $location, Session, Conversation) {
+      var conversationsPromise = Conversation.getUnviewedForUser(
+        Session.activeUser.id);
+      $scope.infoMessage = 'Loading conversations...';
+      conversationsPromise.then(
+        function(conversations) {
+          $scope.conversations = conversations;
+          
+          $scope.infoMessage = '';
+        },
+        function(message) {
+          var baseMessage = 'Failed to load conversations';
+          $scope.errorMessage = combineMessages(baseMessage, message);
+          $scope.infoMessage = '';
+        });
+      $scope.viewConversation = function(conversation_id) {
+        $location.path('/conversation/' + conversation_id);
       };
     });
 

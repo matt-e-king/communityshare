@@ -135,26 +135,26 @@ def make_blueprint(Item, resourceName):
                     filter_args.append(criterium)
         return filter_args
 
-    def _get_raw_items():
-        filter_args = _args_to_filter_params()
-        items = session.query(Item).filter(*filter_args).all()
-        return items
-
     @api.route(API_MANY_FORMAT.format(resourceName), methods=['GET'])
     def get_items():
         logger.debug('get_items')
         requester = get_requesting_user()
         if requester is None:
             response = make_not_authorized_response()
-        elif not requester.is_administrator:
-            if Item.PERMISSIONS.get('standard_can_read_many', False):
-                items = _get_raw_items()
-                response = make_mixed_many_response(items, requester)
-            else:
-                response = make_forbidden_response()
         else:
-            items = _get_raw_items()
-            response = make_admin_many_response(items)
+            if not requester.is_administrator:
+                if Item.PERMISSIONS.get('standard_can_read_many', False):
+                    query = Item.args_to_query(request.args, requester)
+                    if query is None:
+                        response = make_forbidden_response()
+                    else:                        
+                        items = query.all()
+                        response = make_mixed_many_response(items, requester)
+                else:
+                    response = make_forbidden_response()
+            else:
+                items = _get_raw_items()
+                response = make_admin_many_response(items)
         return response
 
     @api.route(API_SINGLE_FORMAT.format(resourceName), methods=['GET'])

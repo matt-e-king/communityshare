@@ -2,7 +2,7 @@ import logging
 
 from sqlalchemy import Column, String, DateTime, Boolean
 
-from community_share.store import Base
+from community_share.store import Base, session
 
 logger = logging.getLogger(__name__)
 
@@ -76,4 +76,34 @@ class Serializable(object):
             item = self.admin_deserialize_add(data)
         return item
 
+    @classmethod
+    def _args_to_filter_params(cls, args):
+        filter_args = []
+        for key in args.keys():
+            bits = key.split('.')
+            if hasattr(cls, bits[0]):
+                if len(bits) > 2:
+                    raise Exception('Unknown filter parameter')
+                elif len(bits) == 2:
+                    if bits[1] in ('like', 'ilike'):
+                        new_arg = getattr(getattr(cls, bits[0]), bits[1])(args[key])
+                        filter_args.append(new_arg)
+                    else:
+                        raise Exception('Unknown filter parameter')
+                elif len(bits) == 1:
+                    typ = getattr(cls, key).property.columns[0].type
+                    value = args[key]
+                    if (isinstance(typ, Boolean)):
+                        if (value == 'true'):
+                            value = True
+                        elif (value == 'false'):
+                            value = False
+                    criterium = (getattr(cls, key) == value)
+                    filter_args.append(criterium)
+        return filter_args
 
+    @classmethod
+    def args_to_query(cls, args, requester=None):
+        filter_args = cls._args_to_filter_params(args)
+        query = session.query(cls).filter(*filter_args)
+        return query
