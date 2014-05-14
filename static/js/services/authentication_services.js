@@ -41,19 +41,22 @@
       };
       Authenticator.getUnviewedConversations = 
         function() {
-          if (SessionBase.activeUser.id) {
+          if (SessionBase.activeUser) {
             var conversationsPromise = Conversation.getUnviewedForUser(
               SessionBase.activeUser.id);
             conversationsPromise.then(
-              function(conversations) {
-                var nUnviewedMessages = 0;
-                for (var i=0; i<conversations.length; i++) {
-                  var conversation = conversations[i];
-                  var messages = conversation.getUnviewedMessages();
-                  nUnviewedMessages += messages.length;
-                }
-                SessionBase.activeUser.nUnviewedMessages = nUnviewedMessages;
-              },
+                function(conversations) {
+                  // Check again since we might have logged out since.
+                  if (SessionBase.activeUser) {
+                    var nUnviewedMessages = 0;
+                    for (var i=0; i<conversations.length; i++) {
+                      var conversation = conversations[i];
+                      var messages = conversation.getUnviewedMessages();
+                      nUnviewedMessages += messages.length;
+                    }
+                    SessionBase.activeUser.nUnviewedMessages = nUnviewedMessages;
+                  }
+                },
               function(message) {
                 var msg = '';
                 if (message) {
@@ -105,7 +108,7 @@
           userPromise.then(
             function(user) {
               SessionBase.activeUser = user;
-              Autheticator.getUnviewedConversations();
+              Authenticator.getUnviewedConversations();
             },
             function(response) {
             }
