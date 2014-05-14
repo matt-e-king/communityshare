@@ -7,6 +7,7 @@ from community_share import settings
 from community_share.routes.user_routes import register_user_routes
 from community_share.routes.search_routes import register_search_routes
 from community_share.routes.conversation_routes import register_conversation_routes
+from community_share.routes.share_routes import register_share_routes
 from community_share.store import session
 
 COMMIT_HASH = os.environ.get('COMMIT_HASH', 'dummy')
@@ -21,6 +22,7 @@ def make_app():
     register_user_routes(app)
     register_search_routes(app)
     register_conversation_routes(app)
+    register_share_routes(app)
 
     @app.teardown_appcontext
     def close_db_connection(exception):
