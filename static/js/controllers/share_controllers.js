@@ -27,6 +27,28 @@
   };
 
   module.controller(
+    'ShareController',
+    function(Session, $scope, $routeParams, Share) {
+      var shareId = $routeParams.shareId;
+      var errorMessage = '';
+      if (shareId !== undefined) {
+        var sharePromise = Share.get(shareId);
+        sharePromise.then(
+          function(share) {
+            $scope.share = share;
+          },
+          function(message) {
+            msg = 'Failed to load share';
+            if (message) {
+              msg += ': ' + message;
+            }
+            $scope.errorMessage = msg;
+          });
+      }
+    });
+      
+
+  module.controller(
     'NewShareController',
     function(Session, $scope, $location, $routeParams, Conversation, Share, Evnt) {
       $scope.share = undefined;
@@ -47,6 +69,7 @@
                 var eventPromise = evnt.save();
                 eventPromise.then(
                   function(evnt) {
+                    $location.$$search = {};
                     $location.path('/share/' + share.id);
                   });
               }

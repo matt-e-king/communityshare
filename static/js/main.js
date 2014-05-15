@@ -101,6 +101,11 @@
       controller: 'NewShareController'
     });
 
+    $routeProvider.when('/share/:shareId', {
+      templateUrl: './static/templates/share.html',
+      controller: 'ShareController'
+    });
+
     $routeProvider.otherwise({
       templateUrl: './static/templates/unknown.html'
     });
