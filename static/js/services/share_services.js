@@ -16,4 +16,13 @@
       return Share;
     });
 
+  module.factory(
+    'Evnt',
+    function(ItemFactory, $q, $http, makeBaseLabels, sortLabels) {
+      var Evnt = ItemFactory('event');
+      Evnt.prototype.initialize = function() {
+      };
+      return Evnt;
+    });
+
 })();

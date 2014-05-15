@@ -17,6 +17,7 @@
           </p>
         </div>
       </div>
+
       <div class="form-group">
         <label for="description"
                class="control-label cs-form-label">Description</label>
@@ -26,20 +27,89 @@
                      type="text"
                      name="description"
                      id="description"
-                     class="form-control"/></textarea>
+                     class="form-control"></textarea>
           <p ng-show="shareForm.description.$invalid && !shareForm.description.$pristine" class="help-block">
             Enter a description.
           </p>
         </div>
       </div>
+
+      <div ng-repeat="event in share.events">
+
+      <div class="form-group">
+        <label for="location"
+               class="control-label cs-form-label">Location</label>
+        <div class="cs-form-control">
+          <textarea ng-model="event.location"
+                     required
+                     type="text"
+                     name="location"
+                     id="location"
+                     class="form-control"></textarea>
+          <p ng-show="shareForm.location.$invalid && !shareForm.location.$pristine" class="help-block">
+            Enter a Location.
+          </p>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="date"
+               class="control-label cs-form-label">Date</label>
+        <div class="cs-form-control">
+          <input ng-model="event.date"
+                 required
+                 type="date"
+                 name="date"
+                 id="date"
+                 class="form-control"/>
+          <p ng-show="shareForm.date.$invalid && !shareForm.date.$pristine" class="help-block">
+            Enter a date for the share.
+          </p>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="time_start"
+               class="control-label cs-form-label">Starting Time</label>
+        <div class="cs-form-control">
+          <input ng-model="event.time_start"
+                 required
+                 type="time"
+                 name="times_start"
+                 id="time_start"
+                 class="form-control"/>
+          <p ng-show="shareForm.time_start.$invalid && !shareForm.time_start.$pristine" class="help-block">
+            Enter a time for the share.
+          </p>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="time_stop"
+               class="control-label cs-form-label">Stopping Time</label>
+        <div class="cs-form-control">
+          <input ng-model="event.time_stop"
+                 required
+                 type="time"
+                 name="times_stop"
+                 id="time_stop"
+                 class="form-control"/>
+          <p ng-show="shareForm.time_stop.$invalid && !shareForm.time_stop.$pristine" class="help-block">
+            Enter a time for the share to end.
+          </p>
+        </div>
+      </div>
+
+      </div>
+
       <div class="row">
         <div class="alert alert-danger cs-form-message" ng-show="errorMessage">
           {{errorMessage}}</div>
       </div>
       <div class="row">
         <div class="cs-form-button">
-          <button class="btn" type="submit" ng-click="login()"
-                  ng-disabled="loginForm.$invalid">
+          <button class="btn" type="submit" ng-click="save()"
+                  ng-disabled="shareForm.$invalid">
             Create Share
           </button>
         </div>
