@@ -5,6 +5,7 @@ from sqlalchemy import Table, ForeignKey, DateTime, Column
 from sqlalchemy import Integer, String, Boolean, Float
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.expression import func
+from sqlalchemy import or_
 
 from community_share.store import Base, session
 from community_share.models.base import Serializable
@@ -21,13 +22,16 @@ class Share(Base, Serializable):
         'educator_approved', 'community_partner_approved', 'title', 'description']
     STANDARD_READABLE_FIELDS = [
         'id', 'educator_user_id', 'community_partner_user_id', 'title' ,
-        'description', 'events'
+        'description',
     ]
     ADMIN_READABLE_FIELDS = [
         'id', 'educator_user_id', 'community_partner_user_id', 'title' ,'description',
         'educator_approved', 'community_partner_approved', 'date_created',
-        'events'
     ]
+
+    PERMISSIONS = {
+        'standard_can_read_many': True
+    }
 
     id = Column(Integer, primary_key=True)
     educator_user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
@@ -68,27 +72,42 @@ class Share(Base, Serializable):
             has_rights = True
         return has_rights
 
-    def standard_serialize(self):
+    def standard_serialize(self, include_events=True):
         d = {}
         d['educator'] = self.educator.standard_serialize()
         d['community_partner'] = self.community_partner.standard_serialize()
+        if include_events:
+            d['events'] = [e.standard_serialize(include_share=False)
+                           for e in self.events]            
         for fieldname in self.STANDARD_READABLE_FIELDS:
-            if fieldname == 'events':
-                d[fieldname] = [e.standard_serialize() for e in self.events]
-            else:
-                d[fieldname] = getattr(self, fieldname)
+            d[fieldname] = getattr(self, fieldname)
         return d
 
-    def admin_serialize(self):
+    def admin_serialize(self, include_events=True):
         d = {}
         d['educator'] = self.educator.standard_serialize()
         d['community_partner'] = self.community_partner.standard_serialize()
+        if include_events:
+            d['events'] = [e.admin_serialize(include_share=False)
+                           for e in self.events]
         for fieldname in self.ADMIN_READABLE_FIELDS:
-            if fieldname == 'events':
-                d[fieldname] = [e.admin_serialize() for e in self.events]
-            else:
-                d[fieldname] = getattr(self, fieldname)
+            d[fieldname] = getattr(self, fieldname)
         return d
+
+    @classmethod
+    def args_to_query(cls, args, requester):
+        # user_id matches to educator_id or community_partner_id
+        user_id = args.get('user_id', None)
+        query = cls._args_to_query(args, requester)
+        if user_id is not None:
+            try:
+                user_id = int(user_id)
+                query = query.filter(
+                    or_(Share.educator_user_id==user_id,
+                        Share.community_partner_user_id==user_id))
+            except ValueError:
+                pass
+        return query
 
 
 class Event(Base, Serializable):
@@ -105,6 +124,10 @@ class Event(Base, Serializable):
         'id', 'share_id', 'datetime_start', 'datetime_stop', 'title',
         'description', 'location']
 
+    PERMISSIONS = {
+        'standard_can_read_many': True
+    }
+
     id = Column(Integer, primary_key=True)
     share_id = Column(Integer, ForeignKey('share.id'), nullable=False)
     active = Column(Boolean, default=True, nullable=False)
@@ -113,6 +136,8 @@ class Event(Base, Serializable):
     title = Column(String(100), nullable=True)
     description = Column(String, nullable=True)
     location = Column(String(100), nullable=False)
+
+    share = relationship('Share')
 
     @classmethod
     def has_add_rights(cls, data, user):
@@ -148,3 +173,35 @@ class Event(Base, Serializable):
                 elif user.id == share.community_partner_user_id:
                     has_rights = True
         return has_rights
+
+    def standard_serialize(self, include_share=True):
+        d = {}
+        if include_share:
+            d['share'] = self.share.standard_serialize(include_events=False)
+        for fieldname in self.STANDARD_READABLE_FIELDS:
+            d[fieldname] = getattr(self, fieldname)
+        return d
+
+    def admin_serialize(self, include_share=True):
+        d = {}
+        if include_share:
+            d['share'] = self.share.admin_serialize(include_events=False)
+        for fieldname in self.ADMIN_READABLE_FIELDS:
+            d[fieldname] = getattr(self, fieldname)
+        return d
+
+    @classmethod
+    def args_to_query(cls, args, requester):
+        # user_id matches to educator_id or community_partner_id of Share
+        user_id = args.get('user_id', None)
+        query = cls._args_to_query(args, requester)
+        if user_id is not None:
+            try:
+                user_id = int(user_id)
+                query = query.filter(
+                    or_(Share.educator_user_id==user_id,
+                        Share.community_partner_user_id==user_id))
+            except ValueError:
+                pass
+        
+        return query
