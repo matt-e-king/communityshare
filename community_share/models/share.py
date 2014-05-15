@@ -71,14 +71,14 @@ class Event(Base, Serializable):
     WRITEABLE_FIELDS = [
         'datetime_start', 'datetime_stop', 'title', 'description', 'location',]
     STANDARD_READABLE_FIELDS = [
-        'id', 'share_id' 'datetime_start', 'datetime_stop', 'title',
+        'id', 'share_id', 'datetime_start', 'datetime_stop', 'title',
         'description', 'location']
     ADMIN_READABLE_FIELDS = [
-        'id', 'share_id' 'datetime_start', 'datetime_stop', 'title',
+        'id', 'share_id', 'datetime_start', 'datetime_stop', 'title',
         'description', 'location']
 
     id = Column(Integer, primary_key=True)
-    share_id = Column(String(50), ForeignKey('share.id'), nullable=False)
+    share_id = Column(Integer, ForeignKey('share.id'), nullable=False)
     active = Column(Boolean, default=True, nullable=False)
     datetime_start = Column(DateTime, nullable=False)
     datetime_stop = Column(DateTime, nullable=False)
@@ -86,3 +86,37 @@ class Event(Base, Serializable):
     description = Column(String, nullable=True)
     location = Column(String(100), nullable=False)
 
+    @classmethod
+    def has_add_rights(cls, data, user):
+        has_rights = False
+        share_id = int(data.get('share_id', -1))
+        logger.debug('share id is {0}'.format(share_id))
+        if share_id >= 0:
+            query = session.query(Share).filter(Share.id==share_id)
+            share = query.first()
+            logger.debug('share is {0}'.format(share))
+            if share is not None:
+                if user.id == share.educator_user_id:
+                    has_rights = True
+                elif user.id == share.community_partner_user_id:
+                    has_rights = True
+        return has_rights
+
+    def has_standard_rights(self, requester):
+        has_rights = False
+        if requester is not None:
+            has_rights = True
+        return has_rights
+
+    def has_admin_rights(self, user):
+        has_rights = False
+        if user.is_administrator:
+            has_rights = True
+        else:
+            share = session.query(Share).filter(Share.id==self.share_id).first()
+            if share is not None:
+                if user.id == share.educator_user_id:
+                    has_rights = True
+                elif user.id == share.community_partner_user_id:
+                    has_rights = True
+        return has_rights
