@@ -20,11 +20,13 @@ class Share(Base, Serializable):
     WRITEABLE_FIELDS = [
         'educator_approved', 'community_partner_approved', 'title', 'description']
     STANDARD_READABLE_FIELDS = [
-        'id', 'educator_user_id', 'community_partner_user_id', 'title' ,'description',
+        'id', 'educator_user_id', 'community_partner_user_id', 'title' ,
+        'description', 'events'
     ]
     ADMIN_READABLE_FIELDS = [
         'id', 'educator_user_id', 'community_partner_user_id', 'title' ,'description',
-        'educator_approved', 'community_partner_approved', 'date_created'
+        'educator_approved', 'community_partner_approved', 'date_created',
+        'events'
     ]
 
     id = Column(Integer, primary_key=True)
@@ -36,6 +38,8 @@ class Share(Base, Serializable):
     active = Column(Boolean, default=True, nullable=False)
     description = Column(String, nullable=False)
     date_created = Column(DateTime, nullable=False, default=datetime.utcnow)
+
+    events = relationship("Event")
 
     @classmethod
     def has_add_rights(cls, data, user):
@@ -61,6 +65,23 @@ class Share(Base, Serializable):
         elif user.id == self.community_partner_user_id:
             has_rights = True
         return has_rights
+
+    def standard_serialize(self):
+        for fieldname in self.STANDARD_READABLE_FIELDS:
+            if fieldname == 'events':
+                d[fieldname] = [e.standard_serialize() for e in self.events]
+            else:
+                d[fieldname] = getattr(self, fieldname)
+        return d
+
+    def admin_serialize(self):
+        d = {}
+        for fieldname in self.ADMIN_READABLE_FIELDS:
+            if fieldname == 'events':
+                d[fieldname] = [e.admin_serialize() for e in self.events]
+            else:
+                d[fieldname] = getattr(self, fieldname)
+        return d
 
 
 class Event(Base, Serializable):
