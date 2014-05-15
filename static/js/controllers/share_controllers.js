@@ -29,6 +29,7 @@
   module.controller(
     'ShareController',
     function(Session, $scope, $routeParams, Share) {
+      $scope.Session = Session;
       var shareId = $routeParams.shareId;
       var errorMessage = '';
       if (shareId !== undefined) {
@@ -38,7 +39,7 @@
             $scope.share = share;
           },
           function(message) {
-            msg = 'Failed to load share';
+            var msg = 'Failed to load share';
             if (message) {
               msg += ': ' + message;
             }

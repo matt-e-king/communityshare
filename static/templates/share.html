@@ -1,4 +1,5 @@
-<div>
+<div cs-main-view has-permission="{{(!(Session.activeUser === undefined))}}">
+
   <h4>Share: {{share.title}}</h4>
 
   <div class="alert alert-danger" ng-show="errorMessage">{{errorMessage}}</div>
