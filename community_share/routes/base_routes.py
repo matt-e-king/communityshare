@@ -110,31 +110,6 @@ def make_blueprint(Item, resourceName):
 
     api = Blueprint(resourceName, __name__)
 
-    def _args_to_filter_params():
-        filter_args = []
-        for key in request.args.keys():
-            bits = key.split('.')
-            if hasattr(Item, bits[0]):
-                if len(bits) > 2:
-                    raise Exception('Unknown filter parameter')
-                elif len(bits) == 2:
-                    if bits[1] in ('like', 'ilike'):
-                        new_arg = getattr(getattr(Item, bits[0]), bits[1])(request.args[key])
-                        filter_args.append(new_arg)
-                    else:
-                        raise Exception('Unknown filter parameter')
-                elif len(bits) == 1:
-                    typ = getattr(Item, key).property.columns[0].type
-                    value = request.args[key]
-                    if (isinstance(typ, Boolean)):
-                        if (value == 'true'):
-                            value = True
-                        elif (value == 'false'):
-                            value = False
-                    criterium = (getattr(Item, key) == value)
-                    filter_args.append(criterium)
-        return filter_args
-
     @api.route(API_MANY_FORMAT.format(resourceName), methods=['GET'])
     def get_items():
         logger.debug('get_items')
