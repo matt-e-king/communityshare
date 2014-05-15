@@ -26,7 +26,9 @@
         var m = $modal.open(opts);
         m.result.then(
           function(conversation) {
-            $location.path('/conversation/' + conversation.id);
+            if (conversation) {
+              $location.path('/conversation/' + conversation.id);
+            }
           });
       }
       if (searchId !== undefined) {
