@@ -3,28 +3,30 @@
 
   <div class="alert alert-danger" ng-show="errorMessage">{{errorMessage}}</div>
 
-  <div ng-show="upcomingShares">
-    <h5>Upcoming Shares</h5>
-    <table class="table">
-      <thead><tr><th>Date</th><th>Title</th><th>With</th></tr></thead>
-      <tbody>
-        <tr ng-repeat = "evnt in upcomingShares | orderBy:'datetime_start':false">
-          <td><a href="/#/share/{{evnt.share.id}}">
-              {{evnt.datetime_start | date : 'EEEE MMMM d yyyy'}}
-          </a></td>
-          <td><a href="/#/share/{{evnt.share.id}}">
-            {{evnt.share.title}}
-          </a></td>
-          <td><a href="/#/user/{{evnt.share.otherUser.id}}">
-            {{evnt.share.otherUser.name}}
-          </a></td>
-          <td></td>
-          <td></td>
-        </tr></a>
-      </tbody>
-    </table>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h5 class="panel-title">Upcoming Shares</h5>
+    </div>
+    <div class="panel-body">
+      <table class="table">
+        <thead><tr><th>Date</th><th>Title</th><th>With</th></tr></thead>
+        <tbody>
+          <tr ng-repeat = "evnt in upcomingShares | orderBy:'datetime_start':false">
+            <td><a href="/#/share/{{evnt.share.id}}">
+                {{evnt.datetime_start | date : 'EEEE MMMM d yyyy'}}
+            </a></td>
+            <td><a href="/#/share/{{evnt.share.id}}">
+                {{evnt.share.title}}
+            </a></td>
+            <td><a href="/#/user/{{evnt.share.otherUser.id}}">
+                {{evnt.share.otherUser.name}}
+            </a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
-  
+
   <div ng-show="Session.activeUser.is_administrator" cs-administrator-home>
   </div>
   
