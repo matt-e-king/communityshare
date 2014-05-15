@@ -40,6 +40,8 @@ class Share(Base, Serializable):
     date_created = Column(DateTime, nullable=False, default=datetime.utcnow)
 
     events = relationship("Event")
+    educator = relationship('User', primaryjoin='Share.educator_user_id == User.id')
+    community_partner = relationship('User', primaryjoin='Share.community_partner_user_id == User.id')
 
     @classmethod
     def has_add_rights(cls, data, user):
@@ -67,6 +69,9 @@ class Share(Base, Serializable):
         return has_rights
 
     def standard_serialize(self):
+        d = {}
+        d['educator'] = self.educator.standard_serialize()
+        d['community_partner'] = self.community_partner.standard_serialize()
         for fieldname in self.STANDARD_READABLE_FIELDS:
             if fieldname == 'events':
                 d[fieldname] = [e.standard_serialize() for e in self.events]
@@ -76,6 +81,8 @@ class Share(Base, Serializable):
 
     def admin_serialize(self):
         d = {}
+        d['educator'] = self.educator.standard_serialize()
+        d['community_partner'] = self.community_partner.standard_serialize()
         for fieldname in self.ADMIN_READABLE_FIELDS:
             if fieldname == 'events':
                 d[fieldname] = [e.admin_serialize() for e in self.events]
