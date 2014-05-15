@@ -76,6 +76,13 @@ class Serializable(object):
             item = self.admin_deserialize_add(data)
         return item
 
+    CONDITION_MAPPING = {
+        'greaterthanorequal': lambda x, y: (x >= y),
+        'greaterthan': lambda x, y: (x > y),
+        'lessthanorequal': lambda x, y: (x <= y),
+        'lessthan': lambda x, y: (x < y),
+    }
+
     @classmethod
     def _args_to_filter_params(cls, args):
         filter_args = []
@@ -88,6 +95,11 @@ class Serializable(object):
                     if bits[1] in ('like', 'ilike'):
                         new_arg = getattr(getattr(cls, bits[0]), bits[1])(args[key])
                         filter_args.append(new_arg)
+                    elif bits[1] in cls.CONDITION_MAPPING.keys():
+                        field = getattr(cls, bits[0])
+                        value = args[key]
+                        condition = cls.CONDITION_MAPPING[bits[1]](field, value)
+                        filter_args.append(condition)
                     else:
                         raise Exception('Unknown filter parameter')
                 elif len(bits) == 1:
@@ -103,7 +115,12 @@ class Serializable(object):
         return filter_args
 
     @classmethod
-    def args_to_query(cls, args, requester=None):
+    def _args_to_query(cls, args, requester=None):
         filter_args = cls._args_to_filter_params(args)
         query = session.query(cls).filter(*filter_args)
+        return query
+
+    @classmethod
+    def args_to_query(cls, args, requester=None):
+        query = cls._args_to_query(args, requester)
         return query
