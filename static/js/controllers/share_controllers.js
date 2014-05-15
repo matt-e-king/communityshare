@@ -12,17 +12,10 @@
   var combineDates = function(dateDate, timeDate) {
     var year = dateDate.getFullYear();
     var month = dateDate.getMonth();
-    var day = dateDate.getDay();
+    var day = dateDate.getDate();
     var hours = timeDate.getHours();
     var minutes = timeDate.getMinutes();
-    console.log(year);
-    console.log(month);
-    console.log(day);
-    console.log(hours);
-    console.log(minutes);
     var newDate = new Date(year, month, day, hours, minutes);
-    console.log('new date is ');
-    console.log(newDate);
     return newDate;
   };
 
@@ -60,8 +53,8 @@
           var sharePromise = $scope.share.save();
           sharePromise.then(
             function(share) {
-              for (var i=0; i<$scope.share.events.length; i++) {
-                var evnt = $scope.share.events[i];
+              for (var i=0; i<$scope.events.length; i++) {
+                var evnt = $scope.events[i];
                 console.log(evnt);
                 evnt.datetime_start = combineDates(evnt.date, evnt.time_start);
                 evnt.datetime_stop = combineDates(evnt.date, evnt.time_stop);
@@ -107,7 +100,7 @@
                 title: undefined,
                 description: undefined
               });
-              $scope.share.events = [
+              $scope.events = [
                 new Evnt({
                   share_id: undefined,
                   title: undefined,

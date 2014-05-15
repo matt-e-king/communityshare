@@ -1,5 +1,29 @@
 <div cs-main-view has-permission="{{(!(Session.activeUser === undefined))}}">
   <h4>Home</h4>
+
+  <div class="alert alert-danger" ng-show="errorMessage">{{errorMessage}}</div>
+
+  <div ng-show="upcomingShares">
+    <h5>Upcoming Shares</h5>
+    <table class="table">
+      <thead><tr><th>Date</th><th>Title</th><th>With</th></tr></thead>
+      <tbody>
+        <tr ng-repeat = "evnt in upcomingShares | orderBy:'datetime_start':false">
+          <td><a href="/#/share/{{evnt.share.id}}">
+              {{evnt.datetime_start | date : 'EEEE MMMM d yyyy'}}
+          </a></td>
+          <td><a href="/#/share/{{evnt.share.id}}">
+            {{evnt.share.title}}
+          </a></td>
+          <td><a href="/#/user/{{evnt.share.otherUser.id}}">
+            {{evnt.share.otherUser.name}}
+          </a></td>
+          <td></td>
+          <td></td>
+        </tr></a>
+      </tbody>
+    </table>
+  </div>
   
   <div ng-show="Session.activeUser.is_administrator" cs-administrator-home>
   </div>

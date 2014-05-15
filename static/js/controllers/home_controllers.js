@@ -6,13 +6,31 @@
     [
       'communityshare.directives.home',
       'communityshare.services.search',
-      'communityshare.services.modal'
+      'communityshare.services.modal',
+      'communityshare.services.share'
     ]);
   
   module.controller(
     'HomeController',
-    function($scope, Session) {
+    function($scope, Session, Evnt) {
       $scope.Session = Session;
+      var params = {
+        user_id: Session.activeUser.id,
+        'datetime_start.greaterthan': new Date()
+      };
+      var sharesPromise = Evnt.get_many(params);
+      sharesPromise.then(
+        function(shares) {
+          $scope.upcomingShares = shares;
+        },
+        function(message) {
+          var msg = 'Failed to load upcoming shares'
+          if (message) {
+            msg += ': ' + message;
+          }
+          $scope.errorMessage = msg;
+        });
+      $scope.upcomingShares 
     });
 
   module.controller(

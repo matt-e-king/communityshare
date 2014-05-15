@@ -74,7 +74,7 @@
         };
         var searchesPromise = Search.get_many(searchParams);
         return searchesPromise;
-      }
+      };
 
       return User;
     });
