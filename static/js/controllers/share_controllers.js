@@ -47,18 +47,14 @@
     function(Session, $scope, $location, $routeParams, Conversation, Share, Evnt) {
       $scope.share = undefined;
       $scope.save = function() {
-        console.log('bb');
-        console.log($scope.share);
         if ($scope.share) {
           var sharePromise = $scope.share.save();
           sharePromise.then(
             function(share) {
               for (var i=0; i<$scope.events.length; i++) {
                 var evnt = $scope.events[i];
-                console.log(evnt);
                 evnt.datetime_start = combineDates(evnt.date, evnt.time_start);
                 evnt.datetime_stop = combineDates(evnt.date, evnt.time_stop);
-                console.log(evnt);
                 evnt.share_id = share.id;
                 var eventPromise = evnt.save();
                 eventPromise.then(

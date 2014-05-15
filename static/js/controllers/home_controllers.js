@@ -14,9 +14,11 @@
     'HomeController',
     function($scope, Session, Evnt) {
       $scope.Session = Session;
+      var now = new Date();
+      var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       var params = {
         user_id: Session.activeUser.id,
-        'datetime_start.greaterthan': new Date()
+        'datetime_start.greaterthan': today
       };
       var sharesPromise = Evnt.get_many(params);
       sharesPromise.then(
@@ -51,7 +53,6 @@
           var btns = [{result:'yes', label: 'Yes', cssClass: 'btn-primary'},
                        {result:'no', label: 'No'}];
           var d = makeDialog(title, msg, btns);
-          console.log(d);
           d.result.then(
             function(result) {
               if (result === 'yes') {

@@ -18,6 +18,8 @@
             this.initialize();
           }
         };
+        Item.cache = {};
+        Item.searchCache = {};
         Item.prototype.toData = function() {
           var data = JSON.parse(JSON.stringify(this));          
           return data;
@@ -34,43 +36,61 @@
           }
           return url;
         };
-        Item.get = function(id) {
+        Item.get = function(id, forceRefresh) {
           var deferred = $q.defer();
-          var dataPromise = $http({
-            method: 'GET',
-            url: Item.makeUrl(id) 
-          });
-          dataPromise.then(
-            function(data) {
-              var item = new Item(data.data.data);
-              deferred.resolve(item);
-            },
-            function(response) {
-              deferred.reject(response.message);
-            }
-          );
+          var item = Item.cache[id];
+          if ((item === undefined) || forceRefresh) {
+            var dataPromise = $http({
+              method: 'GET',
+              url: Item.makeUrl(id) 
+            });
+            dataPromise.then(
+              function(data) {
+                var item = new Item(data.data.data);
+                Item.cache[id] = item;
+                deferred.resolve(item);
+              },
+              function(response) {
+                deferred.reject(response.message);
+              }
+            );
+          } else {
+            deferred.resolve(item);
+          }
           return deferred.promise;
         };
-        Item.get_many = function(searchParams) {
+        Item.get_many = function(searchParams, forceRefresh) {
           var deferred = $q.defer();
-          var dataPromise = $http({
-            method: 'GET',
-            url: Item.makeUrl(),
-            params: searchParams
-          });
-          dataPromise.then(
-            function(response) {
-              var items = []
-              for (var i=0; i<response.data.data.length; i++) {
-                var item = new Item(response.data.data[i]);
-                items.push(item);
+
+          var searchHash = JSON.stringify(searchParams);
+          var items = Item.searchCache[searchHash];
+          if ((items === undefined) | forceRefresh) {
+          
+            var dataPromise = $http({
+              method: 'GET',
+              url: Item.makeUrl(),
+              params: searchParams
+            });
+
+            dataPromise.then(
+              function(response) {
+                var items = []
+                for (var i=0; i<response.data.data.length; i++) {
+                  var item = new Item(response.data.data[i]);
+                  Item.cache[item.id] = item;
+                  items.push(item);
+                }
+                Item.searchCache[searchHash] = items;
+                deferred.resolve(items);
+              },
+              function(response) {
+                deferred.reject(response.message);
               }
-              deferred.resolve(items);
-            },
-            function(response) {
-              deferred.reject(response.message);
-            }
-          );
+            );
+
+          } else {
+            deferred.resolve(items);
+          }
           return deferred.promise;          
         };
         Item.prototype.updateFromData = function(itemData) {
@@ -113,6 +133,7 @@
           
         };
         Item.prototype.destroy = function() {
+          var _this = this;
           var deferred = $q.defer();
           var dataPromise = $http({
               method: 'DELETE',
@@ -120,6 +141,15 @@
             });
           dataPromise.then(
             function(response) {
+              Item.cache[id] = undefined;
+              // Remove the items from the cached searches.
+              for (var searchHash in Item.searchCache) {
+                var items = Item.searchCache[searchHash];
+                var index = items.indexOf(_this);
+                if (index >= 0) {
+                  items.splice(index, 1);
+                }
+              }
               deferred.resolve();
             },
             function(response) {
