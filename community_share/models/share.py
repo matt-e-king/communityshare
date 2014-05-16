@@ -22,11 +22,12 @@ class Share(Base, Serializable):
         'educator_approved', 'community_partner_approved', 'title', 'description']
     STANDARD_READABLE_FIELDS = [
         'id', 'educator_user_id', 'community_partner_user_id', 'title' ,
-        'description',
+        'description', 'conversation_id',
     ]
     ADMIN_READABLE_FIELDS = [
         'id', 'educator_user_id', 'community_partner_user_id', 'title' ,'description',
         'educator_approved', 'community_partner_approved', 'date_created',
+        'conversation_id',
     ]
 
     PERMISSIONS = {
@@ -34,6 +35,7 @@ class Share(Base, Serializable):
     }
 
     id = Column(Integer, primary_key=True)
+    conversation_id = Column(Integer, ForeignKey('conversation.id'), nullable=False)
     educator_user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
     community_partner_user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
     educator_approved = Column(Boolean, default=False, nullable=False)
