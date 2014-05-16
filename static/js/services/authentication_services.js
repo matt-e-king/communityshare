@@ -26,10 +26,11 @@
 
   module.factory(
     'Authenticator',
-    function($q, $http, User, SessionBase, $cookies, Conversation, Messages) {
+    function($q, $http, User, SessionBase, $cookies, $cookieStore, Conversation, Messages) {
       var Authenticator = {};
       Authenticator.clean = function() {
         $http.defaults.headers.common['Authorization'] = '';
+        $cookieStore.remove('apiKey');
       };
       Authenticator.setApiKey = function(key) {
         $http.defaults.headers.common['Authorization'] = 
