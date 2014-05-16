@@ -20,10 +20,11 @@
 
   module.controller(
     'ConversationController',
-    function($scope, $location, $timeout, $routeParams, Session,
-             Conversation, Message, User) {
+    function($scope, $q, $location, $timeout, $routeParams, $modal, Session,
+             Conversation, Message, User, Share) {
       var conversationId = $routeParams.conversationId;
       var conversationPromise = Conversation.get(conversationId);
+      var sharesPromise = Share.get_many({conversation_id: conversationId});
       $scope.otherUser = undefined;
       $scope.conversation = undefined;
       $scope.newMessage = undefined;
@@ -50,7 +51,7 @@
           },
           showErrorMessage
         );
-      }
+      };
       conversationPromise.then(
         function(conversation) {
           conversation.markMessagesAsViewed();
@@ -65,10 +66,25 @@
         },
         showErrorMessage
       );
-      $scope.createShare = function() {
-        $location.path('/share/new');
-        $location.search('conversationId', $scope.conversation.id);
-      }
+      var bothPromise = $q.all([conversationPromise, sharesPromise]);
+      bothPromise.then(
+        function(both) {
+          var conversation = both[0];
+          var shares = both[1];
+          shares.sort(function(a, b) { return a.id - b.id; });
+          if (shares.length === 0) {
+            $scope.share = conversation.makeShare();
+            $scope.events = $scope.share.events;
+          } else {
+            $scope.share = shares[0];
+            if ($scope.share.events.length === 0) {
+              $scope.share.addNewEvent();
+            }
+            $scope.events = $scope.share.events;
+          }
+        },
+        showErrorMessage
+      );
       $scope.sendMessage = function() {
         var messagePromise = $scope.newMessage.save();
         messagePromise.then(
@@ -79,6 +95,16 @@
           },
           showErrorMessage
         );
+      }
+      $scope.editShare = function() {
+        var opts = {
+          templateUrl: './static/templates/share_edit.html',
+          controller: 'EditShareController',
+          resolve: {
+            share: function() {return $scope.share;},
+          }
+        };
+        var m = $modal.open(opts);
       }
     });
   

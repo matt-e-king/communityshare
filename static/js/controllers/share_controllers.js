@@ -8,17 +8,6 @@
       'communityshare.services.conversation'
     ]);
 
-
-  var combineDates = function(dateDate, timeDate) {
-    var year = dateDate.getFullYear();
-    var month = dateDate.getMonth();
-    var day = dateDate.getDate();
-    var hours = timeDate.getHours();
-    var minutes = timeDate.getMinutes();
-    var newDate = new Date(year, month, day, hours, minutes);
-    return newDate;
-  };
-
   module.controller(
     'ShareController',
     function(Session, $scope, $routeParams, Share) {
@@ -43,78 +32,75 @@
       
 
   module.controller(
-    'NewShareController',
-    function(Session, $scope, $location, $routeParams, Conversation, Share, Evnt) {
-      $scope.share = undefined;
+    'EditShareController',
+    function($scope, share, $modalInstance, $q) {
+      $scope.share = share;
+      $scope.events = share.events;
+      $scope.cancel = $modalInstance.close;
+      var showErrorMessage = function(message) {
+        var msg = 'Failed to save share details';
+        if (message) {
+          msg += ': ' + message;
+        }
+        $scope.errorMessage = msg;
+      }
+      var saveEvents = function() {
+        var eventPromises = [];
+        for (var i=0; i<$scope.events.length; i++) {
+          var evnt = $scope.events[i];
+          evnt.updateDateTimes();
+          evnt.share_id = $scope.share.id;
+          var eventPromise = evnt.save();
+          eventPromises.push(eventPromise);
+        }
+        var allEventsPromise = $q.all(eventPromises);
+        return allEventsPromise;
+      };
+      var close = function() {
+        $modalInstance.close($scope.share);
+      };
       $scope.save = function() {
-        if ($scope.share) {
+        var saveEventsFirst = ($scope.share.id >= 0);
+        if (saveEventsFirst) {
+          var eventsPromise = saveEvents();
+          var shareDeferred = $q.defer();
+          eventsPromise.then(
+            function() {
+              var sharePromise = $scope.share.save();
+              sharePromise.then(
+                function(share) {
+                  shareDeferred.resolve(share);
+                },
+                function(message) {
+                  shareDeferred.reject(message);
+                });
+            },
+            function(message) {
+              shareDeferred.reject(message);
+            });
+          var finalPromise = shareDeferred.promise;
+          finalPromise.then(
+            close,
+            showErrorMessage);
+        } else {
           var sharePromise = $scope.share.save();
           sharePromise.then(
             function(share) {
-              for (var i=0; i<$scope.events.length; i++) {
-                var evnt = $scope.events[i];
-                evnt.datetime_start = combineDates(evnt.date, evnt.time_start);
-                evnt.datetime_stop = combineDates(evnt.date, evnt.time_stop);
-                evnt.share_id = share.id;
-                var eventPromise = evnt.save();
-                eventPromise.then(
-                  function(evnt) {
-                    $location.$$search = {};
-                    $location.path('/share/' + share.id);
-                  });
-              }
-            },
-            function(message) {
-            }
-          );
-        };
-      };
-      var conversationId = $routeParams.conversationId;
-      if (conversationId !== undefined) {
-        var conversationPromise = Conversation.get(conversationId);
-        conversationPromise.then(
-          function(conversation) {
-            var educator_user_id = undefined;
-            var community_partner_user_id = undefined;
-            if (Session.activeUser.is_educator) {
-              educator_user_id = Session.activeUser.id;
-            } else if (Session.activeUser.is_community_partner) {
-              community_partner_user_id = Session.activeUser.id;
-            }
-            if (conversation.otherUser.is_educator) {
-              educator_user_id = conversation.otherUser.id;
-            } else if (conversation.otherUser.is_community_partner) {
-              community_partner_user_id = conversation.otherUser.id;
-            }
-            if ((educator_user_id === undefined) || (community_partner_user_id === undefined)) {
-              $scope.errorMessage = 'A share required both an educator and a community partner.';
-            } else {
-              $scope.share = new Share({
-                conversation_id: conversation.id,
-                educator_user_id: educator_user_id,
-                community_partner_user_id: community_partner_user_id,
-                title: undefined,
-                description: undefined
-              });
-              $scope.events = [
-                new Evnt({
-                  share_id: undefined,
-                  title: undefined,
-                  description: undefined,
-                  datetime_start: undefined,
-                  datetime_stop: undefined
-                  })]
-            }
-          },
-          function(message) {
-            var msg = '';
-            if (message) {
-              msg = ': ' + message;
-            }
-            $scope.errorMessage = 'Failed to load conversation' + msg;
-          });
-      } else {
-        $scope.errorMessage = 'Missing conversation ID';
+              var eventsPromise = saveEvents();
+              eventsPromise.then(
+                function(events) {
+                  for (var i=0; i<events.length; i++) {
+                    var evnt = events[i];
+                    var index = share.events.indexOf(evnt);
+                    if (index === -1) {
+                      share.events.push(evnt);
+                    }
+                  }
+                  close();
+                },
+                showErrorMessage);
+            });
+        }
       };
     });
   

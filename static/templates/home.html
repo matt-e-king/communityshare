@@ -8,14 +8,14 @@
       <h5 class="panel-title">Upcoming Shares</h5>
     </div>
     <div class="panel-body">
-      <table class="table" ng-show="upcomingShares">
+      <table class="table" ng-show="upcomingShares && upcomingShares.length>0">
         <thead><tr><th>Date</th><th>Title</th><th>With</th></tr></thead>
         <tbody>
           <tr ng-repeat = "evnt in upcomingShares | orderBy:'datetime_start':false">
-            <td><a href="/#/share/{{evnt.share.id}}">
+            <td><a href="/#/conversation/{{evnt.share.conversation_id}}">
                 {{evnt.datetime_start | date : 'EEEE MMMM d yyyy'}}
             </a></td>
-            <td><a href="/#/share/{{evnt.share.id}}">
+            <td><a href="/#/conversation/{{evnt.share.conversation_id}}">
                 {{evnt.share.title}}
             </a></td>
             <td><a href="/#/user/{{evnt.share.otherUser.id}}">
@@ -24,7 +24,7 @@
           </tr>
         </tbody>
       </table>
-      <div ng-show="!upcomingShares">
+      <div ng-show="(!upcomingShares) || upcomingShares.length===0">
         No upcoming Shares
       </div>
     </div>

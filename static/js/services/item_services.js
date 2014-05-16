@@ -103,6 +103,11 @@
           }
           return deferred.promise;          
         };
+        Item.prototype._baseUpdateFromData = function(itemData) {
+          for (var key in itemData) {
+            this[key] = itemData[key];
+          }
+        };
         Item.prototype.updateFromData = function(itemData) {
           for (var key in itemData) {
             this[key] = itemData[key];

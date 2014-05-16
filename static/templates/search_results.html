@@ -4,9 +4,6 @@
 
 <div ng-repeat="search in searches" class="search-result">
   <a ng-href="#/user/{{search.searcher_user_id}}"><h5>{{search.searcher_user.name}}</h5></a>
-  <button class="btn" ng-click="startConversation(search.searcher_user_id)">
-    Start a New Conversation
-  </button>
   <div ng-show="search.searcher_user.conversationsWithMe">
     <h5>Past Conversations</h5>
     <button ng-repeat="conversation in search.searcher_user.conversationsWithMe"
@@ -16,6 +13,9 @@
       {{conversation.title}}
     </button>
   </div>
+  <button class="btn" ng-click="startConversation(search.searcher_user_id)">
+    Start a New Conversation
+  </button>
   <h5>{{ {'partner': 'We require', 'educator': 'We offer'}[search.searcher_role] }}</h5>
   <div ng-repeat="label in search.targetLabels"
        ng-class="{true: 'labelbox-selected', false: 'labelbox'}[search.matchingLabels[label]]"

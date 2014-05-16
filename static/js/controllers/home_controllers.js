@@ -14,18 +14,18 @@
     'HomeController',
     function($scope, Session, Evnt) {
       $scope.Session = Session;
-      if ($scope.activeUser) {
+      if (Session.activeUser) {
         var now = new Date();
         var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         var params = {
           user_id: Session.activeUser.id,
           'datetime_start.greaterthan': today
         };
-        var sharesPromise = Evnt.get_many(params);
-        sharesPromise.then(
-        function(shares) {
-          $scope.upcomingShares = shares;
-        },
+        var eventsPromise = Evnt.get_many(params);
+        eventsPromise.then(
+          function(events) {
+            $scope.upcomingShares = events;
+          },
           function(message) {
             var msg = 'Failed to load upcoming shares'
             if (message) {
