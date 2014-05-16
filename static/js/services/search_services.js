@@ -10,7 +10,7 @@
 
   module.factory(
     'Search',
-    function(ItemFactory, $q, $http, makeBaseLabels, sortLabels) {
+    function(ItemFactory, $q, $http, makeBaseLabels, sortLabels, UserBase) {
       var baseLabels = makeBaseLabels();
       var labellists = {
         gradeLevels: baseLabels.all.gradeLevels,
@@ -48,6 +48,9 @@
       Search.prototype.initialize = function() {
         if (this.labels) {
           sortLabels(this.labels);
+        }
+        if(this.searcher_user) {
+          this.searcher_user = UserBase.make(this.searcher_user);
         }
       };
       Search.getResults = function(searchId) {

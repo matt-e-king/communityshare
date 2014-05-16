@@ -45,11 +45,34 @@
     });
 
   module.factory(
-    'User',
-    function(ItemFactory, $q, $http, Search) {
-      var User = ItemFactory('user');
+    'UserBase',
+    function(ItemFactory) {
+      var UserBase = ItemFactory('user');
+      return UserBase;
+    });
 
-      User.getByEmail = function(email) {
+  module.factory(
+    'User',
+    function(UserBase, $q, $http, Search, Conversation, SessionBase) {
+      UserBase.prototype.initialize = function() {
+        var _this = this;
+        if (SessionBase.activeUser) {
+          var conversationsPromise = Conversation.get_many(
+            {user_id: SessionBase.activeUser.id});
+          conversationsPromise.then(
+            function(conversations) {
+              _this.conversationsWithMe = [];
+              for (var i=0; i<conversations.length; i++) {
+                var conversation = conversations[i];
+                if (conversation.otherUser.id == _this.id) {
+                  _this.conversationsWithMe.push(conversation);
+                }
+              }
+            });
+        }
+      };
+
+      UserBase.getByEmail = function(email) {
         var deferred = $q.defer();
         var dataPromise = $http({
           method: 'GET',
@@ -57,7 +80,7 @@
         });
         dataPromise.then(
           function(data) {
-            var user = new User(data.data.data);
+            var user = new UserBase(data.data.data);
             deferred.resolve(user);
           },
           function(response) {
@@ -67,7 +90,7 @@
         return deferred.promise;
       };
       
-      User.prototype.getSearches = function() {
+      UserBase.prototype.getSearches = function() {
         var searchParams = {
           'searcher_user_id': this.id,
           'active': true
@@ -76,7 +99,7 @@
         return searchesPromise;
       };
 
-      return User;
+      return UserBase;
     });
 
   module.factory(

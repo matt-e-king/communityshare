@@ -14,25 +14,26 @@
     'HomeController',
     function($scope, Session, Evnt) {
       $scope.Session = Session;
-      var now = new Date();
-      var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      var params = {
-        user_id: Session.activeUser.id,
-        'datetime_start.greaterthan': today
-      };
-      var sharesPromise = Evnt.get_many(params);
-      sharesPromise.then(
+      if ($scope.activeUser) {
+        var now = new Date();
+        var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        var params = {
+          user_id: Session.activeUser.id,
+          'datetime_start.greaterthan': today
+        };
+        var sharesPromise = Evnt.get_many(params);
+        sharesPromise.then(
         function(shares) {
           $scope.upcomingShares = shares;
         },
-        function(message) {
-          var msg = 'Failed to load upcoming shares'
-          if (message) {
-            msg += ': ' + message;
-          }
-          $scope.errorMessage = msg;
-        });
-      $scope.upcomingShares 
+          function(message) {
+            var msg = 'Failed to load upcoming shares'
+            if (message) {
+              msg += ': ' + message;
+            }
+            $scope.errorMessage = msg;
+          });
+      }
     });
 
   module.controller(

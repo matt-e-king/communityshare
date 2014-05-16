@@ -14,6 +14,9 @@
       $scope.infoMessage = 'Searching for matches...';
       $scope.errorMessage = '';
       $scope.title = '';
+      $scope.goToConversation = function(conversation) {
+        $location.path('/conversation/' + conversation.id);
+      };
       $scope.startConversation = function(userId) {
         var opts = {
           templateUrl: './static/templates/new_conversation.html',

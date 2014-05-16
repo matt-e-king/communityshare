@@ -36,6 +36,16 @@
           }
           return url;
         };
+        Item.make = function(itemData) {
+          var item = Item.cache[itemData.id];
+          if (item === undefined) {
+            item = new Item(itemData);
+            Item.cache[itemData.id] = item;
+          } else {
+            item.updateFromData(itemData);
+          }
+          return item;
+        }
         Item.get = function(id, forceRefresh) {
           var deferred = $q.defer();
           var item = Item.cache[id];

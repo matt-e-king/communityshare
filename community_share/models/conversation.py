@@ -86,21 +86,21 @@ class Conversation(Base, Serializable):
 
     @classmethod
     def args_to_query(cls, args, requester):
-        user_id = args.get('user_id_with_unviewed_messages', None)
-        logger.debug('user id with unviewed messages is {0}'.format(user_id))
-        logger.debug('user id requesting is {0}'.format(user_id))
-        try:
-            user_id = int(user_id)
-            if requester.id == user_id:
-                query = session.query(Conversation)
-                query = query.filter(
-                    or_(Conversation.userA==requester, Conversation.userB==requester))
-                query = query.filter(
-                    and_(Message.viewed==False, Message.sender_user!=requester))
-            else:
+        user_id = args.get('user_id', None)
+        with_unviewed_messages = args.get('with_unviewed_messages', None)
+        query = None
+        if user_id is not None:
+            try:
+                user_id = int(user_id)
+                if requester.id == user_id:
+                    query = session.query(Conversation)
+                    query = query.filter(
+                        or_(Conversation.userA==requester, Conversation.userB==requester))
+                    if with_unviewed_messages:
+                        query = query.filter(
+                            and_(Message.viewed==False, Message.sender_user!=requester))
+            except ValueError:
                 query = None
-        except ValueError:
-            query = None
         logger.debug('query is {0}'.format(query))
         return query
 

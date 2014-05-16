@@ -10,14 +10,14 @@
 
   module.factory(
     'Conversation',
-    function(SessionBase, ItemFactory, User, Message) {
+    function(SessionBase, ItemFactory, UserBase, Message) {
       var Conversation = ItemFactory('conversation');
       Conversation.prototype.updateFromData = function(data) {
         for (var key in data) {
           this[key] = data[key];
         }
-        this.userA = new User(this.userA);
-        this.userB = new User(this.userB);
+        this.userA = UserBase.make(this.userA);
+        this.userB = UserBase.make(this.userB);
         if (SessionBase.activeUser.id === this.userA.id) {
           this.otherUser = this.userB;
         } else if (SessionBase.activeUser.id === this.userB.id) {
@@ -56,11 +56,13 @@
       };
       Conversation.getUnviewedForUser = function(user_id) {
         var data = {
-          user_id_with_unviewed_messages: user_id
+          user_id: user_id,
+          with_unviewed_messages: true
         }
         var conversationsPromise = Conversation.get_many(data=data);
         return conversationsPromise;
       };
+
       return Conversation;
     });
 

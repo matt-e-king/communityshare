@@ -8,7 +8,7 @@
       <h5 class="panel-title">Upcoming Shares</h5>
     </div>
     <div class="panel-body">
-      <table class="table">
+      <table class="table" ng-show="upcomingShares">
         <thead><tr><th>Date</th><th>Title</th><th>With</th></tr></thead>
         <tbody>
           <tr ng-repeat = "evnt in upcomingShares | orderBy:'datetime_start':false">
@@ -24,6 +24,9 @@
           </tr>
         </tbody>
       </table>
+      <div ng-show="!upcomingShares">
+        No upcoming Shares
+      </div>
     </div>
   </div>
 
