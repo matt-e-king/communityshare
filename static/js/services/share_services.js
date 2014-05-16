@@ -22,9 +22,9 @@
         }
         if (this.educator && this.community_partner) {
           if (SessionBase.activeUser.id === this.educator.id) {
-            this.otherUser = this.educator;
-          } else if (SessionBase.activeUser.id === this.community_partner.id) {
             this.otherUser = this.community_partner;
+          } else if (SessionBase.activeUser.id === this.community_partner.id) {
+            this.otherUser = this.educator;
           }
         }
       };
