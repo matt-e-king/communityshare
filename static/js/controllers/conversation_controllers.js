@@ -21,7 +21,7 @@
   module.controller(
     'ConversationController',
     function($scope, $q, $location, $timeout, $routeParams, $modal, Session,
-             Conversation, Message, User, Share) {
+             Conversation, Message, User, Share, makeDialog) {
       var conversationId = $routeParams.conversationId;
       var conversationPromise = Conversation.get(conversationId);
       var sharesPromise = Share.get_many({conversation_id: conversationId});
@@ -105,7 +105,38 @@
           }
         };
         var m = $modal.open(opts);
-      }
+      };
+      $scope.cancelShare = function() {
+        var title = 'Cancel Share';
+        var msg = 'Do you really want to cancel this share with ' +
+          $scope.otherUser.name;
+        var btns = [{result:'yes', label: 'Yes', cssClass: 'btn-primary'},
+                    {result:'no', label: 'No'}];
+        var d = makeDialog(title, msg, btns);
+        d.result.then(
+          function(result) {
+            if (result === 'yes') {
+              // FIXME: Send email to otherUser saying they want to cancel it.
+              var deletePromises = [];
+              for (var i=0; i<$scope.share.events.length; i++) {
+                var evnt = $scope.share.events[i];
+                if (evnt.id >= 0) {
+                  deletePromises.push(evnt.destroy());
+                }
+              }
+              var allPromise = $q.all(deletePromises)
+              allPromise.then(
+                function() {
+                  $scope.share.addNewEvent();
+                },
+                function(message) {
+                  var baseMessage = 'Failed to cancel share';
+                  var msg = combineMessages(baseMessage, message);
+                  $scope.errorMessage = msg;
+                });
+            }
+          });
+      };
     });
   
   module.controller(

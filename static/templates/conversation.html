@@ -10,7 +10,7 @@
           <tr><th>Title of Share</th><td>{{share.title}}</td></tr>
           <tr><th>Description of Share</th><td>{{share.description}}</td></tr>
         </tbody>
-        <tbody ng-repeat="evnt in share.events">
+        <tbody ng-repeat="evnt in share.events" ng-show="evnt.active">
           <tr>
             <th>Location</th>
             <td ng-show="evnt.location">{{evnt.location}}</td>
@@ -28,13 +28,22 @@
           </tr>
         </tbody>
       </table>
-      <button class="btn" type="submit" ng-click="editShare()"
-              ng-disabled="newMessage.content">
+      <button class="btn" type="submit" ng-click="editShare()">
         Edit Share Details
       </button>
-      <button class="btn" type="submit" ng-click="confirmShare()"
-              ng-disabled="newMessage.content">
+      <button class="btn" type="submit" ng-click="confirmShare()" ng-show="evnt.share.canApprove">
         Confirm Share Details
+      </button>
+      <button class="btn" disabled type="submit"
+              ng-show="(!evnt.share.approved) && (!evnt.share.canApprove)">
+        Waiting for Confirmation from {{otherUser.name}}
+      </button>
+      <button class="btn" disabled type="submit" ng-show="evnt.share.approved">
+        Confirmed
+      </button>
+      <button class="btn" type="submit" ng-click="cancelShare()"
+              ng-disabled="!share.hasActiveEvent()">
+        Cancel Share
       </button>
     </div>
   </div>

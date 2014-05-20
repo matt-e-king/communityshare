@@ -20,18 +20,40 @@
         } else {
           this.events = [];
         }
+        var iAmCommunityPartner = (
+          SessionBase.activeUser.id === this.community_partner.id);
+        var iAmEducator = (
+          SessionBase.activeUser.id === this.educator.id);
         if (this.educator && this.community_partner) {
-          if (SessionBase.activeUser.id === this.educator.id) {
+          if (iAmEducator) {
             this.otherUser = this.community_partner;
-          } else if (SessionBase.activeUser.id === this.community_partner.id) {
+          } else if (iAmCommunityPartner) {
             this.otherUser = this.educator;
           }
         }
+        this.canApprove = false;
+        if ((iAmEducator) && (!this.educator_approved)) {
+          this.canApprove = true;
+        } else if ((iAmCommunityPartner) && (!this.community_partner_approved)) {
+          this.canApprove = true;
+        }
+        this.approved = (this.educator_approved && this.community_partner_approved);
+      };
+      Share.prototype.hasActiveEvent = function() {
+        var hasEvents = false;
+        for (var i=0; i<this.events.length; i++) {
+          var evnt = this.events[i];
+          if ((evnt.id >= 0) && (evnt.active)) {
+            hasEvents = true;
+          }
+        }
+        return hasEvents;
       };
       Share.prototype.addNewEvent = function() {
         var evnt = new EvntBase({
           share_id: this.id,
           title: this.title,
+          active: true,
           description: '',
           datetime_start: undefined,
           datetime_stop: undefined

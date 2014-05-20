@@ -156,7 +156,8 @@
             });
           dataPromise.then(
             function(response) {
-              Item.cache[id] = undefined;
+              _this.active = false;
+              Item.cache[_this.id] = undefined;
               // Remove the items from the cached searches.
               for (var searchHash in Item.searchCache) {
                 var items = Item.searchCache[searchHash];
