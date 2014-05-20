@@ -112,7 +112,7 @@ def make_blueprint(Item, resourceName):
 
     @api.route(API_MANY_FORMAT.format(resourceName), methods=['GET'])
     def get_items():
-        logger.debug('get_items')
+        logger.debug('get_items - {0}'.format(resourceName) )
         requester = get_requesting_user()
         if requester is None:
             response = make_not_authorized_response()
@@ -128,7 +128,8 @@ def make_blueprint(Item, resourceName):
                 else:
                     response = make_forbidden_response()
             else:
-                items = _get_raw_items()
+                query = Item.args_to_query(request.args, requester)
+                items = query.all()
                 response = make_admin_many_response(items)
         return response
 

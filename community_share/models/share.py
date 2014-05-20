@@ -145,11 +145,9 @@ class Event(Base, Serializable):
     def has_add_rights(cls, data, user):
         has_rights = False
         share_id = int(data.get('share_id', -1))
-        logger.debug('share id is {0}'.format(share_id))
         if share_id >= 0:
             query = session.query(Share).filter(Share.id==share_id)
             share = query.first()
-            logger.debug('share is {0}'.format(share))
             if share is not None:
                 if user.id == share.educator_user_id:
                     has_rights = True
@@ -200,10 +198,11 @@ class Event(Base, Serializable):
         if user_id is not None:
             try:
                 user_id = int(user_id)
+                query = query.join(Share)
                 query = query.filter(
                     or_(Share.educator_user_id==user_id,
                         Share.community_partner_user_id==user_id))
-            except ValueError:
-                pass
+            except ValueError(e):
+                logger.warning('Error trying to get user_id: {0}'.format(e))
         
         return query
