@@ -1,4 +1,8 @@
 import logging
+import datetime
+
+import dateutil
+from dateutil import parser
 
 from sqlalchemy import Column, String, DateTime, Boolean
 
@@ -48,6 +52,9 @@ class Serializable(object):
             d[fieldname] = getattr(self, fieldname)
         return d
 
+    def on_edit(self):
+        pass
+
     @classmethod
     def admin_deserialize_add(cls, data):
         for fieldname in cls.MANDATORY_FIELDS:
@@ -62,10 +69,19 @@ class Serializable(object):
             fieldnames = set(self.MANDATORY_FIELDS) | set(self.WRITEABLE_FIELDS)
         else:
             fieldnames = self.WRITEABLE_FIELDS
-        logger.debug('FIELDnames is {0}'.format(fieldnames))
         for fieldname in data.keys():
             if fieldname in fieldnames and hasattr(self, fieldname):
-                setattr(self, fieldname, data[fieldname])
+                current = getattr(self, fieldname)
+                # Force type conversion of datetime beforehand so sqlalchemy doesn't
+                # falsely label things as dirty.
+                new_value = data[fieldname]
+                if type(current) == datetime.datetime:
+                    new_value = dateutil.parser.parse(data[fieldname])
+                    new_value = new_value.replace(tzinfo=None)
+                if current != new_value:
+                    logger.debug('{0} - changing attr from {1} to {2}'.format(
+                        fieldname, current, data[fieldname]))
+                    setattr(self, fieldname, data[fieldname])
             
     @classmethod
     def admin_deserialize(self, data):

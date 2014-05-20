@@ -4,6 +4,7 @@ from flask import session, jsonify, request, Blueprint
 
 from sqlalchemy import Boolean
 from sqlalchemy.exc import IntegrityError, InvalidRequestError
+from sqlalchemy.orm.attributes import instance_state
 
 from community_share.store import session
 from community_share.utils import StatusCodes, is_integer
@@ -205,12 +206,15 @@ def make_blueprint(Item, resourceName):
                     response = make_not_found_response()
                 else:
                     if item.has_admin_rights(requester):
-                       item.admin_deserialize_update(data)
-                       session.add(item)
-                       session.commit()
-                       response = make_admin_single_response(item)
+                        item.admin_deserialize_update(data)
+                        session.add(item)
+                        really_added = item in session.dirty
+                        session.commit()
+                        if really_added:
+                            item.on_edit()
+                        response = make_admin_single_response(item)
                     else:
-                       response = make_forbidden_response()
+                        response = make_forbidden_response()
         return response
 
     @api.route(API_SINGLE_FORMAT.format(resourceName), methods=['DELETE'])
