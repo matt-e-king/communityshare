@@ -22,12 +22,12 @@ class Share(Base, Serializable):
         'educator_approved', 'community_partner_approved', 'title', 'description']
     STANDARD_READABLE_FIELDS = [
         'id', 'educator_user_id', 'community_partner_user_id', 'title' ,
-        'description', 'conversation_id',
+        'description', 'conversation_id', 'active',
     ]
     ADMIN_READABLE_FIELDS = [
         'id', 'educator_user_id', 'community_partner_user_id', 'title' ,'description',
         'educator_approved', 'community_partner_approved', 'date_created',
-        'conversation_id',
+        'conversation_id', 'active',
     ]
 
     PERMISSIONS = {
@@ -80,7 +80,7 @@ class Share(Base, Serializable):
         d['community_partner'] = self.community_partner.standard_serialize()
         if include_events:
             d['events'] = [e.standard_serialize(include_share=False)
-                           for e in self.events]            
+                           for e in self.events if e.active]
         for fieldname in self.STANDARD_READABLE_FIELDS:
             d[fieldname] = getattr(self, fieldname)
         return d
@@ -91,10 +91,20 @@ class Share(Base, Serializable):
         d['community_partner'] = self.community_partner.standard_serialize()
         if include_events:
             d['events'] = [e.admin_serialize(include_share=False)
-                           for e in self.events]
+                           for e in self.events if e.active]
         for fieldname in self.ADMIN_READABLE_FIELDS:
             d[fieldname] = getattr(self, fieldname)
         return d
+
+    def on_edit(self, requester):
+        logger.debug('share: on_edit')
+        self.educator_approved = False
+        self.community_partner_approved = False
+        if requester.id == self.educator_user_id:
+            self.educator_approved = True
+        if requester.id == self.community_partner_user_id:
+            self.community_partner.approved = True
+        session.add(self)
 
     @classmethod
     def args_to_query(cls, args, requester):
@@ -121,10 +131,10 @@ class Event(Base, Serializable):
         'datetime_start', 'datetime_stop', 'title', 'description', 'location',]
     STANDARD_READABLE_FIELDS = [
         'id', 'share_id', 'datetime_start', 'datetime_stop', 'title',
-        'description', 'location']
+        'description', 'location', 'active']
     ADMIN_READABLE_FIELDS = [
         'id', 'share_id', 'datetime_start', 'datetime_stop', 'title',
-        'description', 'location']
+        'description', 'location', 'active']
 
     PERMISSIONS = {
         'standard_can_read_many': True
@@ -154,6 +164,17 @@ class Event(Base, Serializable):
                 elif user.id == share.community_partner_user_id:
                     has_rights = True
         return has_rights
+
+    def on_edit(self, requester):
+        logger.debug('event: on_edit')
+        self.share.educator_approved = False
+        self.share.community_partner_approved = False
+        if requester.id == self.share.educator_user_id:
+            self.share.educator_approved = True
+        if requester.id == self.share.community_partner_user_id:
+            self.share.community_partner_approved = True
+        logger.debug('ed {0} cp {1}'.format(self.share.educator_approved, self.share.community_partner_approved))
+        session.add(self.share)
 
     def has_standard_rights(self, requester):
         has_rights = False

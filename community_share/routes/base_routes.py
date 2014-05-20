@@ -208,10 +208,10 @@ def make_blueprint(Item, resourceName):
                     if item.has_admin_rights(requester):
                         item.admin_deserialize_update(data)
                         session.add(item)
-                        really_added = item in session.dirty
+                        if item in session.dirty:
+                            logger.debug('calling on_edit on {0}'.format(item))
+                            item.on_edit(requester)
                         session.commit()
-                        if really_added:
-                            item.on_edit()
                         response = make_admin_single_response(item)
                     else:
                         response = make_forbidden_response()
@@ -231,8 +231,11 @@ def make_blueprint(Item, resourceName):
                 response = make_not_found_response()
             else:
                 if item.has_admin_rights(requester):
+                    previously_deleted = not item.active
                     item.active = False
                     session.add(item)
+                    if not previously_deleted:
+                        item.on_edit(requester)
                     session.commit()
                     response = make_admin_single_response(item)
                 else:
