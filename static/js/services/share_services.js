@@ -24,9 +24,9 @@
         var iAmEducator = false;
         if (SessionBase.activeUser) {
           iAmCommunityPartner = (
-            SessionBase.activeUser.id === this.community_partner_id);
+            SessionBase.activeUser.id === this.community_partner_user_id);
           iAmEducator = (
-            SessionBase.activeUser.id === this.educator_id);
+            SessionBase.activeUser.id === this.educator_user_id);
         }
         if (this.educator && this.community_partner) {
           if (iAmEducator) {
