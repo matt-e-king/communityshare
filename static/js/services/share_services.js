@@ -20,10 +20,14 @@
         } else {
           this.events = [];
         }
-        var iAmCommunityPartner = (
-          SessionBase.activeUser.id === this.community_partner.id);
-        var iAmEducator = (
-          SessionBase.activeUser.id === this.educator.id);
+        var iAmCommunityPartner = false;
+        var iAmEducator = false;
+        if (SessionBase.activeUser) {
+          iAmCommunityPartner = (
+            SessionBase.activeUser.id === this.community_partner_id);
+          iAmEducator = (
+            SessionBase.activeUser.id === this.educator_id);
+        }
         if (this.educator && this.community_partner) {
           if (iAmEducator) {
             this.otherUser = this.community_partner;
