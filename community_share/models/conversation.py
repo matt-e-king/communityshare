@@ -88,6 +88,8 @@ class Conversation(Base, Serializable):
     def args_to_query(cls, args, requester):
         user_id = args.get('user_id', None)
         with_unviewed_messages = args.get('with_unviewed_messages', None)
+        messages_date_created_greaterthan = args.get(
+            'messages.date_created.greaterthan', None)
         query = None
         if user_id is not None:
             try:
@@ -100,6 +102,10 @@ class Conversation(Base, Serializable):
                         query = query.join(Message)
                         query = query.filter(
                             and_(Message.viewed==False, Message.sender_user!=requester))
+                    if messages_date_created_greaterthan:
+                        query = query.join(Message)
+                        query = query.filter(
+                            Message.date_created > messages_date_created_greaterthan)
             except ValueError:
                 query = None
         logger.debug('query is {0}'.format(query))
