@@ -116,7 +116,7 @@
 
   module.controller(
     'SettingsController',
-    function($scope, $location, Session, Messages) {
+    function($scope, $location, Session, Messages, $q) {
       $scope.Session = Session;
       $scope.user = Session.activeUser;
       $scope.properties = {};
@@ -126,26 +126,42 @@
       if (Session.activeUser) {
         $scope.editedUser = Session.activeUser.clone();
       }
+
+      var onError = function(message) {
+        var msg = '';
+        if (message) {
+          msg = ': ' + message;
+        }
+        var msg = 'Failed to update settings' + msg;
+        $scope.errorMessage = msg;
+        $scope.successMessage = '';
+      };
+      
       $scope.saveSettings = function() {
         var saveUserPromise = $scope.editedUser.save();
+        var combinedPromise;
+        var saveCPSettingsPromise;
+        var methods = $scope.communityPartnerSettingsMethods;
+        if (methods.saveSettings) {
+          saveCPSettingsPromise = methods.saveSettings();
+          combinedPromise = $q.all([saveUserPromise, saveCPSettingsPromise]);
+        } else {
+          combinedPromise = $q.all([saveUserPromise]);
+        }
         saveUserPromise.then(
           function(user) {
             Session.activeUser.updateFromData(user.toData());
-            $location.path('/home');
           },
-          function(message) {
-            var msg = ''
-            if (message) {
-              msg = ': ' + message;
-            }
-            var msg = 'Failed to update settings' + msg;
-            $scope.errorMessage = msg;
-            $scope.successMessage = '';
-          });
-        var methods = $scope.communityPartnerSettingsMethods;
-        if (methods.saveSettings) {
-          var saveCPSettingsPromise = methods.saveSettings();
+          onError);
+        if (saveCPSettingsPromise) {
+          saveCPSettingsPromise.then(
+            function() {},
+            onError);
         }
+        combinedPromise.then(
+          function() {
+            $location.path('/home');
+          });
       };
     });
 
