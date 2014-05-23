@@ -103,7 +103,7 @@ class Share(Base, Serializable):
         if requester.id == self.educator_user_id:
             self.educator_approved = True
         if requester.id == self.community_partner_user_id:
-            self.community_partner.approved = True
+            self.community_partner_approved = True
         session.add(self)
 
     @classmethod
