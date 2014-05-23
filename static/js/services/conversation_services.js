@@ -28,6 +28,7 @@
         } else if (SessionBase.activeUser.id === this.userB_id) {
           this.otherUser = this.userA;
         }
+        this.datetime_last_message = undefined;
         if (this.messages) {
           for (var i=0; i<this.messages.length; i++) {
             var messageData = this.messages[i];
@@ -36,6 +37,10 @@
               this.messages[i].sender_user = this.userA;
             } else if (messageData.sender_user_id === this.userB.id) {
               this.messages[i].sender_user = this.userB;
+            }
+            if ((this.datetime_last_message === undefined) ||
+                (this.messages[i].date_created > this.datetime_last_message)) {
+              this.datetime_last_message = this.messages[i].date_created;
             }
           }
         }
@@ -106,8 +111,14 @@
   module.factory(
     'Message',
     function(ItemFactory) {
-      var message = ItemFactory('message');
-      return message;
+      var Message = ItemFactory('message');
+      Message.prototype.updateFromData = function(data) {
+        for (var key in data) {
+          this[key] = data[key];
+        }
+        this.date_created = new Date(this.date_created);
+      };
+      return Message;
     });
 
 })();

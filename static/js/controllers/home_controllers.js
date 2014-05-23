@@ -12,9 +12,11 @@
   
   module.controller(
     'HomeController',
-    function($scope, Session, Evnt) {
+    function($scope, Session, Evnt, Conversation) {
       $scope.Session = Session;
       if (Session.activeUser) {
+
+        // Get upcoming events for this user.
         var now = new Date();
         var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         var params = {
@@ -33,6 +35,26 @@
             }
             $scope.errorMessage = msg;
           });
+        
+        // Get recent conversations for this user.
+        var oneMonthAgo = new Date(now.getFullYear(), now.getMonth()-1, now.getDate());
+        var conversationParams = {
+          user_id: Session.activeUser.id,
+          'messages.date_created.greaterthan': oneMonthAgo
+        };
+        var conversationsPromise = Conversation.get_many(conversationParams);
+        conversationsPromise.then(
+          function(conversations) {
+            $scope.recentConversations = conversations;
+          },
+          function(message) {
+            var msg = 'Failed to load recent conversations'
+            if (message) {
+              msg += ': ' + message;
+            }
+            $scope.errorMessage = msg;            
+          });
+          
       }
     });
 

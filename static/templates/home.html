@@ -30,6 +30,33 @@
     </div>
   </div>
 
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h5 class="panel-title">Recent Conversations</h5>
+    </div>
+    <div class="panel-body">
+      <table class="table" ng-show="recentConversations && recentConversations.length>0">
+        <thead><tr><th>Date</th><th>Title</th><th>With</th></tr></thead>
+        <tbody>
+          <tr ng-repeat = "conversation in recentConversations | orderBy:'datetime_last_message':true">
+            <td><a href="/#/conversation/{{conversation.id}}">
+                {{conversation.datetime_last_message | date : 'EEEE MMMM d yyyy'}}
+            </a></td>
+            <td><a href="/#/conversation/{{evnt.share.conversation_id}}">
+                {{conversation.title}}
+            </a></td>
+            <td><a href="/#/user/{{evnt.share.otherUser.id}}">
+                {{conversation.otherUser.name}}
+            </a></td>
+          </tr>
+        </tbody>
+      </table>
+      <div ng-show="(!recentConversations) || recentConversations.length===0">
+        No recent conversations
+      </div>
+    </div>
+  </div>
+
   <div ng-show="Session.activeUser.is_administrator" cs-administrator-home>
   </div>
   
