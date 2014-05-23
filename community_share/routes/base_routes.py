@@ -208,9 +208,8 @@ def make_blueprint(Item, resourceName):
                     if item.has_admin_rights(requester):
                         item.admin_deserialize_update(data)
                         session.add(item)
-                        if item in session.dirty:
-                            logger.debug('calling on_edit on {0}'.format(item))
-                            item.on_edit(requester)
+                        logger.debug('calling on_edit on {0}'.format(item))
+                        item.on_edit(requester, unchanged = not session.dirty)
                         session.commit()
                         response = make_admin_single_response(item)
                     else:

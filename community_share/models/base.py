@@ -52,7 +52,7 @@ class Serializable(object):
             d[fieldname] = getattr(self, fieldname)
         return d
 
-    def on_edit(self, requester):
+    def on_edit(self, requester, unchanged=False):
         pass
 
     @classmethod

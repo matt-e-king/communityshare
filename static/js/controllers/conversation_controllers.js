@@ -106,6 +106,10 @@
         };
         var m = $modal.open(opts);
       };
+      $scope.confirmShare = function() {
+        // Saving with no changes acts as an approve.
+        $scope.share.save();
+      };
       $scope.cancelShare = function() {
         var title = 'Cancel Share';
         var msg = 'Do you really want to cancel this share with ' +

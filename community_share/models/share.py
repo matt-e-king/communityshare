@@ -96,10 +96,11 @@ class Share(Base, Serializable):
             d[fieldname] = getattr(self, fieldname)
         return d
 
-    def on_edit(self, requester):
+    def on_edit(self, requester, unchanged=False):
         logger.debug('share: on_edit')
-        self.educator_approved = False
-        self.community_partner_approved = False
+        if not unchanged:
+            self.educator_approved = False
+            self.community_partner_approved = False
         if requester.id == self.educator_user_id:
             self.educator_approved = True
         if requester.id == self.community_partner_user_id:
@@ -165,16 +166,17 @@ class Event(Base, Serializable):
                     has_rights = True
         return has_rights
 
-    def on_edit(self, requester):
+    def on_edit(self, requester, unchanged=False):
         logger.debug('event: on_edit')
-        self.share.educator_approved = False
-        self.share.community_partner_approved = False
-        if requester.id == self.share.educator_user_id:
-            self.share.educator_approved = True
-        if requester.id == self.share.community_partner_user_id:
-            self.share.community_partner_approved = True
-        logger.debug('ed {0} cp {1}'.format(self.share.educator_approved, self.share.community_partner_approved))
-        session.add(self.share)
+        if not unchanged:
+            self.share.educator_approved = False
+            self.share.community_partner_approved = False
+            if requester.id == self.share.educator_user_id:
+                self.share.educator_approved = True
+            if requester.id == self.share.community_partner_user_id:
+                self.share.community_partner_approved = True
+            logger.debug('ed {0} cp {1}'.format(self.share.educator_approved, self.share.community_partner_approved))
+            session.add(self.share)
 
     def has_standard_rights(self, requester):
         has_rights = False
