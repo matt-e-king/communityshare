@@ -97,6 +97,7 @@ class Conversation(Base, Serializable):
                     query = query.filter(
                         or_(Conversation.userA==requester, Conversation.userB==requester))
                     if with_unviewed_messages:
+                        query = query.join(Message)
                         query = query.filter(
                             and_(Message.viewed==False, Message.sender_user!=requester))
             except ValueError:
