@@ -82,7 +82,9 @@
             educator_user_id: educator_user_id,
             community_partner_user_id: community_partner_user_id,
             title: undefined,
-            description: undefined
+            description: undefined,
+            educator_approved: false,
+            community_partner_approved: false
           });
           share.addNewEvent();
         }

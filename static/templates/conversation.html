@@ -31,14 +31,14 @@
       <button class="btn" type="submit" ng-click="editShare()">
         Edit Share Details
       </button>
-      <button class="btn" type="submit" ng-click="confirmShare()" ng-show="evnt.share.canApprove">
+      <button class="btn" type="submit" ng-click="confirmShare()" ng-show="share.canApprove">
         Confirm Share Details
       </button>
       <button class="btn" disabled type="submit"
-              ng-show="(!evnt.share.approved) && (!evnt.share.canApprove)">
+              ng-show="(!share.approved) && (!share.canApprove) && (share.id >= 0)">
         Waiting for Confirmation from {{otherUser.name}}
       </button>
-      <button class="btn" disabled type="submit" ng-show="evnt.share.approved">
+      <button class="btn" disabled type="submit" ng-show="share.approved">
         Confirmed
       </button>
       <button class="btn" type="submit" ng-click="cancelShare()"
