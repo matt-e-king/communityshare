@@ -172,6 +172,7 @@ def make_blueprint(Item, resourceName):
             try:
                 item = Item.admin_deserialize_add(data)
                 session.add(item)
+                item.on_edit(requester, unchanged=False)
                 session.commit()
                 if item.has_admin_rights(requester):
                     response = make_admin_single_response(
@@ -234,7 +235,7 @@ def make_blueprint(Item, resourceName):
                     item.active = False
                     session.add(item)
                     if not previously_deleted:
-                        item.on_edit(requester)
+                        item.on_edit(requester, unchanged=False)
                     session.commit()
                     response = make_admin_single_response(item)
                 else:

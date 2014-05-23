@@ -169,14 +169,18 @@ class Event(Base, Serializable):
     def on_edit(self, requester, unchanged=False):
         logger.debug('event: on_edit')
         if not unchanged:
-            self.share.educator_approved = False
-            self.share.community_partner_approved = False
-            if requester.id == self.share.educator_user_id:
-                self.share.educator_approved = True
-            if requester.id == self.share.community_partner_user_id:
-                self.share.community_partner_approved = True
-            logger.debug('ed {0} cp {1}'.format(self.share.educator_approved, self.share.community_partner_approved))
-            session.add(self.share)
+            share = self.share
+            if share is None:
+                share = session.query(Share).filter_by(id=self.share_id).first()
+            share.educator_approved = False
+            share.community_partner_approved = False
+            if requester.id == share.educator_user_id:
+                share.educator_approved = True
+            if requester.id == share.community_partner_user_id:
+                share.community_partner_approved = True
+            logger.debug('ed {0} cp {1}'.format(
+                share.educator_approved, share.community_partner_approved))
+            session.add(share)
 
     def has_standard_rights(self, requester):
         has_rights = False
