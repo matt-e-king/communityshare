@@ -30,10 +30,14 @@
                  type="text"/>
         </div>
       </div>
+
+      <div cs-institutions institutions="editedUser.institutions">
+      </div>      
+
     </form>
   </div>
 
-  <div ng-show="Session.activeUser.is_community_partner"
+  <div ng-if="Session.activeUser.is_community_partner"
        cs-community-partner-settings
        user="Session.activeUser"
        methods="communityPartnerSettingsMethods"
