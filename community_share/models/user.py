@@ -1,7 +1,8 @@
 from datetime import datetime
 import logging
 
-from sqlalchemy import Column, Integer, String, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, Table
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship, backref
 
 import passlib
@@ -14,15 +15,23 @@ from community_share.models.search import Search
 
 logger = logging.getLogger(__name__)
 
+user_institution_table = Table('user_institution', Base.metadata,
+    Column('user_id', Integer, ForeignKey('user.id')),
+    Column('institution_id', Integer, ForeignKey('institution.id'))
+)
+
 class User(Base, Serializable):
     __tablename__ = 'user'
 
     MANDATORY_FIELDS = ['name', 'email']
-    WRITEABLE_FIELDS = ['name', 'is_administrator']
-    STANDARD_READABLE_FIELDS = ['id', 'name', 'is_administrator', 'last_active', 'is_educator',
-                                'is_community_partner']
-    ADMIN_READABLE_FIELDS = ['id', 'name', 'email' , 'date_created', 'last_active',
-                             'is_administrator', 'is_educator', 'is_community_partner']
+    WRITEABLE_FIELDS = ['name', 'is_administrator', 'institutions']
+    STANDARD_READABLE_FIELDS = [
+        'id', 'name', 'is_administrator', 'last_active', 'is_educator',
+        'is_community_partner', 'institutions',]
+    ADMIN_READABLE_FIELDS = [
+        'id', 'name', 'email' , 'date_created', 'last_active',
+        'is_administrator', 'is_educator', 'is_community_partner',
+        'institutions',]
     
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False)
@@ -34,6 +43,7 @@ class User(Base, Serializable):
     last_active = Column(DateTime)
 
     searches = relationship("Search", backref="searcher_user")
+    institutions = relationship("Institution", secondary=user_institution_table)
 
     pwd_context = passlib.context.CryptContext(
         schemes=['sha512_crypt'],
@@ -84,7 +94,34 @@ class User(Base, Serializable):
             elif user.id == self.id:
                 has_admin_rights = True
         return has_admin_rights
+
+    def standard_serialize(self):
+        d = {}
+        for fieldname in self.STANDARD_READABLE_FIELDS:
+            if fieldname == 'institutions':
+                d[fieldname] = [i.standard_serialize() for i in self.institutions]
+            else:
+                d[fieldname] = getattr(self, fieldname)
+        return d
+
+    def admin_serialize(self):
+        d = {}
+        for fieldname in self.ADMIN_READABLE_FIELDS:
+            if fieldname == 'institutions':
+                d[fieldname] = [i.standard_serialize() for i in self.institutions]
+            else:
+                d[fieldname] = getattr(self, fieldname)
+        return d
             
+    def admin_deserialize_update(self, data, add=False):
+        for fieldname in data.keys():
+            if fieldname == 'institutions':
+                institution_data_list = data.get('institutions', [])
+                self.institutions = Institution.data_list_to_object_list(
+                    institution_data_list)
+            else:
+                setattr(self, fieldname, data[fieldname])
+
     def make_api_key(self):
         secret_data = {
             'userId': self.id,
@@ -111,3 +148,31 @@ class User(Base, Serializable):
         return user
 
         
+class Institution(Base, Serializable):
+    __tablename__ = 'institution'
+
+    MANDATORY_FIELDS = ['name']
+    WRITEABLE_FIELDS = ['name']
+    STANDARD_READABLE_FIELDS = ['name']
+    ADMIN_READABLE_FIELDS = ['name']
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50), nullable=False, unique=True)
+    institution_type = Column(String(50), nullable=True)
+    active = Column(Boolean, default=True)
+    description = Column(String)
+    
+    @classmethod
+    def data_list_to_object_list(cls, data_list):
+        names = [data.get('name', None) for data in data_list]
+        names = [name for name in  names if ((name is not None) and (name != ''))]
+        objs = session.query(cls).filter(cls.name.in_(names)).all()
+        missing_names = set(names)
+        for obj in objs:
+            missing_names.remove(obj.name)
+        for data in data_list:
+            name = data.get('name', None)
+            if name is not None and name != '':
+                new_obj = cls.admin_deserialize_add(data)
+                objs.append(new_obj)
+        return objs

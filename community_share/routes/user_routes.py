@@ -18,7 +18,8 @@ def register_user_routes(app):
     @app.route('/api/usersignup', methods=['POST'])
     def usersignup():
         data = request.json
-        email = data.get('email', '')
+        user = data.get('user', None)
+        email = user.get('email', '')
         password = data.get('password', None)
         # Check that the email isn't in use.
         existing_user = session.query(User).filter_by(email=email).first()
@@ -29,7 +30,7 @@ def register_user_routes(app):
             response = base_routes.make_bad_request_response(
                 'A password was not specified.');
         else:
-            user = User.admin_deserialize_add(data)
+            user = User.admin_deserialize_add(user)
             user.set_password(password)
             session.add(user)
             session.commit()
