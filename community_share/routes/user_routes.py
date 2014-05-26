@@ -3,7 +3,7 @@ import logging
 from flask import request, jsonify
 
 from community_share.store import session
-from community_share.models.user import User
+from community_share.models.user import User, Institution
 from community_share.authorization import get_requesting_user
 from community_share import mail_actions
 from community_share.routes import base_routes
@@ -14,6 +14,9 @@ def register_user_routes(app):
 
     user_blueprint = base_routes.make_blueprint(User, 'user')
     app.register_blueprint(user_blueprint)
+
+    institution_blueprint = base_routes.make_blueprint(Institution, 'institution')
+    app.register_blueprint(institution_blueprint)
 
     @app.route('/api/usersignup', methods=['POST'])
     def usersignup():

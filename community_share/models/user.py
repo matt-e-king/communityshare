@@ -157,6 +157,10 @@ class Institution(Base, Serializable):
     STANDARD_READABLE_FIELDS = ['name']
     ADMIN_READABLE_FIELDS = ['name']
 
+    PERMISSIONS = {
+        'standard_can_read_many': True
+    }
+
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False, unique=True)
     institution_type = Column(String(50), nullable=True)
@@ -177,3 +181,4 @@ class Institution(Base, Serializable):
                 new_obj = cls.admin_deserialize_add(data)
                 objs.append(new_obj)
         return objs
+
