@@ -1,0 +1,17 @@
+<div>
+
+  <div ng-repeat="institution in institutions" class="form-group">
+    <label for="institution{{$index}}"
+           class="control-label cs-form-label">Institution Name {{$index+1}}</label>
+    <div class="cs-form-control">
+      <input ng-model="institution.name"
+             name="institution{{$index}}"
+             id="institution{{$index}}"
+             class="form-control"
+             type="text"/>
+    </div>
+    
+  </div>
+  <a ng-click="institutions.push({})" class="cs-form-button">Add another institution</a>
+
+</div>

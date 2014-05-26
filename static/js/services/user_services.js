@@ -17,14 +17,13 @@
   module.factory(
     'signUp',
     function($q, $http, User, Authenticator, Session) {
-      var signUp = function(name, email, password) {
+      var signUp = function(user, password) {
         var deferred = $q.defer();
         var dataPromise = $http({
           method: 'POST',
           url: '/api/usersignup',
           data: {
-            'name': name,
-            'email': email,
+            'user': user,
             'password': password
           }});
         dataPromise.then(
@@ -56,6 +55,9 @@
     function(UserBase, $q, $http, Search, Conversation, SessionBase) {
       UserBase.prototype.initialize = function() {
         var _this = this;
+        if (this.institutions === undefined)  {
+          this.institutions = [{}];
+        }
         if (SessionBase.activeUser) {
           var conversationsPromise = Conversation.get_many(
             {user_id: SessionBase.activeUser.id});

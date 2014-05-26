@@ -5,7 +5,8 @@
     'communityshare.controllers.user',
     [
       'communityshare.services.user',
-      'communityshare.directives.user'
+      'communityshare.directives.user',
+      'communityshare.directives.institutions'
     ]);
 
   // User Views
@@ -46,8 +47,7 @@
       $scope.communityPartnerSettingsMethods = {}
       $scope.properties = {};
       $scope.saveSettings = function() {
-        var userPromise = signUp($scope.newUser.name, $scope.newUser.email,
-                                 $scope.newUser.password);
+        var userPromise = signUp($scope.newUser, $scope.newUser.password);
         userPromise.then(
           function(user) {
             var methods = $scope.communityPartnerSettingsMethods;
@@ -89,7 +89,7 @@
       });
       
       $scope.saveSettings = function() {
-        var userPromise = signUp($scope.newUser.name, $scope.newUser.email,
+        var userPromise = signUp($scope.newUser, 
                                  $scope.newUser.password);
         userPromise.then(
           function(user) {
