@@ -55,6 +55,8 @@ class Serializable(object):
     def on_edit(self, requester, unchanged=False):
         pass
 
+    custom_deserializers = {}
+
     @classmethod
     def admin_deserialize_add(cls, data):
         for fieldname in cls.MANDATORY_FIELDS:
@@ -70,7 +72,10 @@ class Serializable(object):
         else:
             fieldnames = self.WRITEABLE_FIELDS
         for fieldname in data.keys():
-            if fieldname in fieldnames and hasattr(self, fieldname):
+            if fieldname in self.custom_deserializers:
+                value = data.get(fieldname, None)
+                self.custom_deserializers[fieldname](self, value)
+            elif fieldname in fieldnames and hasattr(self, fieldname):
                 current = getattr(self, fieldname)
                 # Force type conversion of datetime beforehand so sqlalchemy doesn't
                 # falsely label things as dirty.

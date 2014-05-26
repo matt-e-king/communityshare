@@ -113,14 +113,15 @@ class User(Base, Serializable):
                 d[fieldname] = getattr(self, fieldname)
         return d
             
-    def admin_deserialize_update(self, data, add=False):
-        for fieldname in data.keys():
-            if fieldname == 'institutions':
-                institution_data_list = data.get('institutions', [])
-                self.institutions = Institution.data_list_to_object_list(
-                    institution_data_list)
-            else:
-                setattr(self, fieldname, data[fieldname])
+    def deserialize_institutions(self, data_list):
+        if data_list is None:
+            data_list = []
+        self.institutions = Institution.data_list_to_object_list(
+            data_list)
+
+    custom_deserializers = {
+        'institutions': deserialize_institutions,
+        }
 
     def make_api_key(self):
         secret_data = {
@@ -172,7 +173,7 @@ class Institution(Base, Serializable):
             missing_names.remove(obj.name)
         for data in data_list:
             name = data.get('name', None)
-            if name is not None and name != '':
+            if name in missing_names and name is not None and name != '':
                 new_obj = cls.admin_deserialize_add(data)
                 objs.append(new_obj)
         return objs

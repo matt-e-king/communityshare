@@ -110,16 +110,17 @@ class Search(Base, Serializable):
             else:
                 d[fieldname] = getattr(self, fieldname)
         return d
-                
-    def admin_deserialize_update(self, data, add=False):
-        for fieldname in data.keys():
-            if fieldname == 'labels':
-                labelnames = data.get('labels', [])
-                logger.debug('labelnames is {0}'.format(labelnames))
-                self.labels = Label.name_list_to_object_list(labelnames)
-            else:
-                setattr(self, fieldname, data[fieldname])
 
+    def deserialize_labels(self, labelnames):
+        if labelnames is None:
+            labelnames = []
+        logger.debug('labelnames is {0}'.format(labelnames))
+        self.labels = Label.name_list_to_object_list(labelnames)
+
+    custom_deserializers = {
+        'labels': deserialize_labels,
+        }
+        
 
 class Label(Base, Serializable):
     __tablename__ = 'label'
