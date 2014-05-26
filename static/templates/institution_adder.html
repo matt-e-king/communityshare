@@ -8,6 +8,7 @@
              name="institution{{$index}}"
              id="institution{{$index}}"
              class="form-control"
+             typeahead="i.name for i in institution_options | filter:$viewValue | limitTo: 100"
              type="text"/>
     </div>
     

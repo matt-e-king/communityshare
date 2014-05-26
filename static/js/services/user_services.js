@@ -132,5 +132,11 @@
       return CommunityPartnerUtils;
     });
   
+  module.factory(
+    'Institution',
+    function(ItemFactory) {
+      var Institution = ItemFactory('institution');
+      return Institution;
+    });
 
 })();
