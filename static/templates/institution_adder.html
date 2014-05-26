@@ -1,10 +1,10 @@
 <div>
 
-  <div ng-repeat="institution in institutions" class="form-group">
+  <div ng-repeat="ia in user.institution_associations" class="form-group">
     <label for="institution{{$index}}"
            class="control-label cs-form-label">Institution Name {{$index+1}}</label>
     <div class="cs-form-control">
-      <input ng-model="institution.name"
+      <input ng-model="ia.institution.name"
              name="institution{{$index}}"
              id="institution{{$index}}"
              class="form-control"
@@ -13,6 +13,7 @@
     </div>
     
   </div>
-  <a ng-click="institutions.push({})" class="cs-form-button">Add another institution</a>
+  <a ng-click="user.addNewInstitutionAssociation()" class="cs-form-button">
+    Add another institution</a>
 
 </div>

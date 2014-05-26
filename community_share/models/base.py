@@ -40,16 +40,24 @@ class Serializable(object):
     def has_admin_rights(self, requester):
         return (requester is not None and requester.is_administrator)
 
+    custom_serializers = {}
+
     def standard_serialize(self):
         d = {}
         for fieldname in self.STANDARD_READABLE_FIELDS:
-            d[fieldname] = getattr(self, fieldname)
+            if fieldname in self.custom_serializers:
+                d[fieldname] = self.custom_serializers[fieldname]['standard'](self)
+            else:
+                d[fieldname] = getattr(self, fieldname)
         return d
 
     def admin_serialize(self):
         d = {}
         for fieldname in self.ADMIN_READABLE_FIELDS:
-            d[fieldname] = getattr(self, fieldname)
+            if fieldname in self.custom_serializers:
+                d[fieldname] = self.custom_serializers[fieldname]['admin'](self)
+            else:
+                d[fieldname] = getattr(self, fieldname)
         return d
 
     def on_edit(self, requester, unchanged=False):

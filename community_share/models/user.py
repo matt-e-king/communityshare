@@ -1,7 +1,7 @@
 from datetime import datetime
 import logging
 
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, Table
+from sqlalchemy import Column, Integer, String, DateTime, Boolean
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship, backref
 
@@ -12,26 +12,23 @@ from community_share.store import Base, session
 from community_share.models.base import Serializable
 from community_share.models.secret import Secret
 from community_share.models.search import Search
+from community_share.models.institution import InstitutionAssociation
+
 
 logger = logging.getLogger(__name__)
-
-user_institution_table = Table('user_institution', Base.metadata,
-    Column('user_id', Integer, ForeignKey('user.id')),
-    Column('institution_id', Integer, ForeignKey('institution.id'))
-)
 
 class User(Base, Serializable):
     __tablename__ = 'user'
 
     MANDATORY_FIELDS = ['name', 'email']
-    WRITEABLE_FIELDS = ['name', 'is_administrator', 'institutions']
+    WRITEABLE_FIELDS = ['name', 'is_administrator', 'institution_associations']
     STANDARD_READABLE_FIELDS = [
         'id', 'name', 'is_administrator', 'last_active', 'is_educator',
-        'is_community_partner', 'institutions',]
+        'is_community_partner', 'institution_associations',]
     ADMIN_READABLE_FIELDS = [
         'id', 'name', 'email' , 'date_created', 'last_active',
         'is_administrator', 'is_educator', 'is_community_partner',
-        'institutions',]
+        'institution_associations',]
     
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False)
@@ -43,7 +40,7 @@ class User(Base, Serializable):
     last_active = Column(DateTime)
 
     searches = relationship("Search", backref="searcher_user")
-    institutions = relationship("Institution", secondary=user_institution_table)
+    institution_associations = relationship("InstitutionAssociation")
 
     pwd_context = passlib.context.CryptContext(
         schemes=['sha512_crypt'],
@@ -95,32 +92,28 @@ class User(Base, Serializable):
                 has_admin_rights = True
         return has_admin_rights
 
-    def standard_serialize(self):
-        d = {}
-        for fieldname in self.STANDARD_READABLE_FIELDS:
-            if fieldname == 'institutions':
-                d[fieldname] = [i.standard_serialize() for i in self.institutions]
-            else:
-                d[fieldname] = getattr(self, fieldname)
-        return d
+    def serialize_institution_associations(self):
+        associations = [i.standard_serialize()
+                        for i in self.institution_associations]
+        return associations
 
-    def admin_serialize(self):
-        d = {}
-        for fieldname in self.ADMIN_READABLE_FIELDS:
-            if fieldname == 'institutions':
-                d[fieldname] = [i.standard_serialize() for i in self.institutions]
-            else:
-                d[fieldname] = getattr(self, fieldname)
-        return d
+    custom_serializers = {
+        'institution_associations': {
+            'standard': serialize_institution_associations,
+            'admin': serialize_institution_associations,
+        }
+    }
             
-    def deserialize_institutions(self, data_list):
+    def deserialize_institution_associations(self, data_list):
         if data_list is None:
             data_list = []
-        self.institutions = Institution.data_list_to_object_list(
-            data_list)
+        self.institution_associations = [
+            InstitutionAssociation.admin_deserialize(data) for data in data_list]
+        for ia in self.institution_associations:
+            ia.user = self
 
     custom_deserializers = {
-        'institutions': deserialize_institutions,
+        'institution_associations': deserialize_institution_associations,
         }
 
     def make_api_key(self):
@@ -147,38 +140,4 @@ class User(Base, Serializable):
         else:
             user = None
         return user
-
-        
-class Institution(Base, Serializable):
-    __tablename__ = 'institution'
-
-    MANDATORY_FIELDS = ['name']
-    WRITEABLE_FIELDS = ['name']
-    STANDARD_READABLE_FIELDS = ['name']
-    ADMIN_READABLE_FIELDS = ['name']
-
-    PERMISSIONS = {
-        'standard_can_read_many': True
-    }
-
-    id = Column(Integer, primary_key=True)
-    name = Column(String(50), nullable=False, unique=True)
-    institution_type = Column(String(50), nullable=True)
-    active = Column(Boolean, default=True)
-    description = Column(String)
-    
-    @classmethod
-    def data_list_to_object_list(cls, data_list):
-        names = [data.get('name', None) for data in data_list]
-        names = [name for name in  names if ((name is not None) and (name != ''))]
-        objs = session.query(cls).filter(cls.name.in_(names)).all()
-        missing_names = set(names)
-        for obj in objs:
-            missing_names.remove(obj.name)
-        for data in data_list:
-            name = data.get('name', None)
-            if name in missing_names and name is not None and name != '':
-                new_obj = cls.admin_deserialize_add(data)
-                objs.append(new_obj)
-        return objs
 

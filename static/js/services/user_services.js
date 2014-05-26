@@ -55,8 +55,9 @@
     function(UserBase, $q, $http, Search, Conversation, SessionBase) {
       UserBase.prototype.initialize = function() {
         var _this = this;
-        if (this.institutions === undefined)  {
-          this.institutions = [{}];
+        if (this.institution_associations === undefined)  {
+          this.institution_associations = [];
+          this.addNewInstitutionAssociation();
         }
         if (SessionBase.activeUser) {
           var conversationsPromise = Conversation.get_many(
@@ -72,6 +73,14 @@
               }
             });
         }
+      };
+
+      UserBase.prototype.addNewInstitutionAssociation = function() {
+        var ia = {
+          institution: {},
+          role: 'worker'
+        };
+        this.institution_associations.push(ia);
       };
 
       UserBase.getByEmail = function(email) {
@@ -131,7 +140,7 @@
       };
       return CommunityPartnerUtils;
     });
-  
+
   module.factory(
     'Institution',
     function(ItemFactory) {

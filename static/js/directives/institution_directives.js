@@ -10,7 +10,7 @@
      function(Session, Institution) {
        return {
          scope: {
-           institutions: '='
+           user: '='
          },
          templateUrl: './static/templates/institution_adder.html',
          controller: function($scope) {
