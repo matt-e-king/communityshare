@@ -56,9 +56,9 @@ class Institution(Base, Serializable):
     __tablename__ = 'institution'
 
     MANDATORY_FIELDS = ['name']
-    WRITEABLE_FIELDS = ['name']
-    STANDARD_READABLE_FIELDS = ['name']
-    ADMIN_READABLE_FIELDS = ['name']
+    WRITEABLE_FIELDS = ['name', 'institution_type']
+    STANDARD_READABLE_FIELDS = ['name', 'institution_type']
+    ADMIN_READABLE_FIELDS = ['name', 'institution_type']
 
     PERMISSIONS = {
         'standard_can_read_many': True

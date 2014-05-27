@@ -16,13 +16,27 @@
          controller: function($scope) {
            // FIXME: Not scaleable.  Change to get the most popular.
            var institutionsPromise = Institution.get_many();
-           $scope.institution_options = [];
+           $scope.options = {'institutions': []};
            institutionsPromise.then(
              function(institutions) {
-               $scope.institution_options = institutions;
+               $scope.options.institutions = institutions;
              });
          }
        };
      });
+
+  module.directive(
+    'csInstitutionAssociationEdit',
+    function() {
+      return {
+        scope: {
+          institutionAssociation: '=',
+          institutionOptions: '=',
+          methods: '=',
+          index: '@'
+        },
+        templateUrl: 'static/templates/institution_association.html'
+      };
+    });
   
 })();

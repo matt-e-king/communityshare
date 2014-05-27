@@ -53,11 +53,27 @@
   module.factory(
     'User',
     function(UserBase, $q, $http, Search, Conversation, SessionBase) {
+
+      UserBase.prototype.addInstitutionAssociationRemoveMethod = function(ia) {
+        var _this = this;
+        ia.remove = function() {
+          var index = _this.institution_associations.indexOf(ia);
+          if (index > -1) {
+            _this.institution_associations.splice(index, 1);
+          }
+        };
+      };
+
       UserBase.prototype.initialize = function() {
         var _this = this;
         if (this.institution_associations === undefined)  {
           this.institution_associations = [];
           this.addNewInstitutionAssociation();
+        } else {
+          for (var i=0; i<this.institution_associations.length; i++) {
+            var ia = this.institution_associations[i];
+            this.addInstitutionAssociationRemoveMethod(ia);
+          }
         }
         if (SessionBase.activeUser) {
           var conversationsPromise = Conversation.get_many(
@@ -78,9 +94,10 @@
       UserBase.prototype.addNewInstitutionAssociation = function() {
         var ia = {
           institution: {},
-          role: 'worker'
+          role: ''
         };
         this.institution_associations.push(ia);
+        this.addInstitutionAssociationRemoveMethod(ia);
       };
 
       UserBase.getByEmail = function(email) {

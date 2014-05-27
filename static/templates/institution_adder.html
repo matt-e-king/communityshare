@@ -1,18 +1,10 @@
 <div>
 
-  <div ng-repeat="ia in user.institution_associations" class="form-group">
-    <label for="institution{{$index}}"
-           class="control-label cs-form-label">Institution Name {{$index+1}}</label>
-    <div class="cs-form-control">
-      <input ng-model="ia.institution.name"
-             name="institution{{$index}}"
-             id="institution{{$index}}"
-             class="form-control"
-             typeahead="i.name for i in institution_options | filter:$viewValue | limitTo: 100"
-             type="text"/>
-    </div>
-    
+  <div ng-repeat="ia in user.institution_associations" cs-institution-association-edit
+       institution-association="ia", index="{{$index+1}}"
+       institution-options="options.institutions">
   </div>
+
   <a ng-click="user.addNewInstitutionAssociation()" class="cs-form-button">
     Add another institution</a>
 
