@@ -74,27 +74,30 @@ class Share(Base, Serializable):
             has_rights = True
         return has_rights
 
-    def standard_serialize(self, include_events=True):
-        d = {}
-        d['educator'] = self.educator.standard_serialize()
-        d['community_partner'] = self.community_partner.standard_serialize()
-        if include_events:
-            d['events'] = [e.standard_serialize(include_share=False)
-                           for e in self.events if e.active]
-        for fieldname in self.STANDARD_READABLE_FIELDS:
-            d[fieldname] = getattr(self, fieldname)
-        return d
+    def standard_serialize_events(self):
+        serialized = [e.standard_serialize(exclude=['share'])
+                      for e in self.events if e.active]
+        return serialized
 
-    def admin_serialize(self, include_events=True):
-        d = {}
-        d['educator'] = self.educator.standard_serialize()
-        d['community_partner'] = self.community_partner.standard_serialize()
-        if include_events:
-            d['events'] = [e.admin_serialize(include_share=False)
-                           for e in self.events if e.active]
-        for fieldname in self.ADMIN_READABLE_FIELDS:
-            d[fieldname] = getattr(self, fieldname)
-        return d
+    def admin_serialize_events(self):
+        serialized = [e.admin_serialize(exclude=['share'])
+                      for e in self.events if e.active]
+        return serialized
+
+    custom_serializers = {
+        'educator': {
+            'standard': lambda self: self.educator.standard_serialize(),
+            'admin': lambda self: self.educator.standard_serialize(),
+        },
+        'community_partner': {
+            'standard': lambda self: self.community_partner.standard_serialize(),
+            'admin': lambda self: self.community_partner.standard_serialize(),
+        },
+        'events': {
+            'standard': standard_serialize_events,
+            'admin': admin_serialize_events,
+        }
+    }
 
     def on_edit(self, requester, unchanged=False):
         logger.debug('share: on_edit')
@@ -201,21 +204,14 @@ class Event(Base, Serializable):
                     has_rights = True
         return has_rights
 
-    def standard_serialize(self, include_share=True):
-        d = {}
-        if include_share:
-            d['share'] = self.share.standard_serialize(include_events=False)
-        for fieldname in self.STANDARD_READABLE_FIELDS:
-            d[fieldname] = getattr(self, fieldname)
-        return d
-
-    def admin_serialize(self, include_share=True):
-        d = {}
-        if include_share:
-            d['share'] = self.share.admin_serialize(include_events=False)
-        for fieldname in self.ADMIN_READABLE_FIELDS:
-            d[fieldname] = getattr(self, fieldname)
-        return d
+    custom_serializers = {
+        'share': {
+            'standard': lambda self: self.share.standard_serialize(
+                exclude=['events']),
+            'admin': lambda self: self.share.admin_serialize(
+                exclude=['events']),
+        }
+    }
 
     @classmethod
     def args_to_query(cls, args, requester):

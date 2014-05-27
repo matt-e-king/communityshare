@@ -61,6 +61,7 @@ class Institution(Base, Serializable):
     ADMIN_READABLE_FIELDS = ['name', 'institution_type']
 
     PERMISSIONS = {
+        'all_can_read_many': True,
         'standard_can_read_many': True
     }
 
@@ -70,3 +71,5 @@ class Institution(Base, Serializable):
     active = Column(Boolean, default=True)
     description = Column(String)
 
+    def has_standard_rights(self, requester):
+        return True

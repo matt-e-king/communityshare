@@ -89,26 +89,26 @@ class Search(Base, Serializable):
             has_rights = True
         return has_rights
 
-    def standard_serialize(self, include_searcher_user=False):
-        d = {}
-        if include_searcher_user:
-            d['searcher_user'] = self.searcher_user.standard_serialize()
-        for fieldname in self.STANDARD_READABLE_FIELDS:
-            if fieldname == 'labels':
-                d[fieldname] = [l.name for l in self.labels]
-            else:
-                d[fieldname] = getattr(self, fieldname)
+    def serialize_labels(self):
+        return [l.name for l in self.labels]
+
+    custom_serializers = {
+        'labels': {
+            'standard': serialize_labels,
+            'admin': serialize_labels,
+        },
+        'searcher_user': {
+            'standard': lambda self: self.searcher_user.standard_serialize(),
+            'admin': lambda self: self.searcher_user.standard_serialize(),
+        }
+    }
+
+    def standard_serialize(self, exclude=['searcher_user']):
+        d = self._base_standard_serialize(exclude)
         return d
 
-    def admin_serialize(self, include_searcher_user=False):
-        d = {}
-        if include_searcher_user:
-            d['searcher_user'] = self.searcher_user.standard_serialize()
-        for fieldname in self.ADMIN_READABLE_FIELDS:
-            if fieldname == 'labels':
-                d[fieldname] = [l.name for l in self.labels]
-            else:
-                d[fieldname] = getattr(self, fieldname)
+    def admin_serialize(self, exclude=['searcher_user']):
+        d = self._base_admin_serialize(exclude)
         return d
 
     def deserialize_labels(self, labelnames):
@@ -140,6 +140,3 @@ class Label(Base, Serializable):
             new_label = Label(name=labelname)
             labels.append(new_label)
         return labels
-        
-    
-    

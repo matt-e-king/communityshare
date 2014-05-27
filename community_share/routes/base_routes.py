@@ -115,11 +115,12 @@ def make_blueprint(Item, resourceName):
     def get_items():
         logger.debug('get_items - {0}'.format(resourceName) )
         requester = get_requesting_user()
-        if requester is None:
+        if requester is None and not Item.PERMISSIONS.get('all_can_read_many', False):
             response = make_not_authorized_response()
         else:
-            if not requester.is_administrator:
-                if Item.PERMISSIONS.get('standard_can_read_many', False):
+            if requester is None or not requester.is_administrator:
+                if (Item.PERMISSIONS.get('standard_can_read_many', False) or 
+                    Item.PERMISSIONS.get('all_can_read_many', False)):
                     query = Item.args_to_query(request.args, requester)
                     if query is None:
                         response = make_forbidden_response()

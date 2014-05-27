@@ -24,6 +24,7 @@ class Serializable(object):
     ADMIN_READABLE_FIELDS = ['id']
 
     PERMISSIONS = {
+        'all_can_read_many': False,
         'standard_can_read_many': False
     }
 
@@ -42,23 +43,31 @@ class Serializable(object):
 
     custom_serializers = {}
 
-    def standard_serialize(self):
+    def _base_standard_serialize(self, exclude=[]):
         d = {}
         for fieldname in self.STANDARD_READABLE_FIELDS:
-            if fieldname in self.custom_serializers:
-                d[fieldname] = self.custom_serializers[fieldname]['standard'](self)
-            else:
-                d[fieldname] = getattr(self, fieldname)
+            if fieldname not in exclude:
+                if fieldname in self.custom_serializers:
+                    d[fieldname] = self.custom_serializers[fieldname]['standard'](self)
+                else:
+                    d[fieldname] = getattr(self, fieldname)
         return d
 
-    def admin_serialize(self):
+    def standard_serialize(self, exclude=[]):
+        return self._base_standard_serialize(exclude)
+
+    def _base_admin_serialize(self, exclude=[]):
         d = {}
         for fieldname in self.ADMIN_READABLE_FIELDS:
-            if fieldname in self.custom_serializers:
-                d[fieldname] = self.custom_serializers[fieldname]['admin'](self)
-            else:
-                d[fieldname] = getattr(self, fieldname)
+            if fieldname not in exclude:
+                if fieldname in self.custom_serializers:
+                    d[fieldname] = self.custom_serializers[fieldname]['admin'](self)
+                else:
+                    d[fieldname] = getattr(self, fieldname)
         return d
+
+    def admin_serialize(self, exclude=[]):
+        return self._base_admin_serialize(exclude)
 
     def on_edit(self, requester, unchanged=False):
         pass
