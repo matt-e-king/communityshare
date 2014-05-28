@@ -6,7 +6,7 @@
     [
       'communityshare.services.item',
       'communityshare.services.message'
-    ])
+    ]);
 
   var isEmail = function(email) {
     // from http://stackoverflow.com/questions/46155/validate-email-address-in-javascript

@@ -2,6 +2,8 @@
   'use strict';
   
   var module = angular.module('communityshare.directives.user', [
+      'communityshare.services.survey',
+      'communityshare.directives.survey'
   ]);
   
   module.directive(
@@ -111,10 +113,20 @@
         scope: {
           methods: '=',
           user: '=',
-          form: '='
+          form: '=',
+          includeDetails: '@'
         },
         templateUrl: './static/templates/community_partner_settings.html',
-        controller: function($scope, Search, Messages, CommunityPartnerUtils) {
+        controller: function($scope, Search, Messages, CommunityPartnerUtils, Question) {
+
+          var questionsPromise = Question.get_many({
+            question_type: 'signup_community_partner'
+          });
+          questionsPromise.then(
+            function(questions) {
+              $scope.questions = questions;
+            });
+
           $scope.properties = {};
           var haveSetForm = false;
           $scope.$watch('partnerSettingsForm', function() {

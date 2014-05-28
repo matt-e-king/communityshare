@@ -1,6 +1,8 @@
 <form novalidate
       action="" role="form" name="partnerSettingsForm" class="form-horizontal">
 
+  <div ng-repeat="question in questions" cs-question question="question">sdfs</div>
+
   <div class="form-group">
     <label for="location"
            class="control-label cs-form-label">ZIP Code</label>
@@ -18,6 +20,106 @@
       </p>
     </div>
   </div>
+
+  <div cs-educator-labels search="properties.search"></div>
+
+  <div class="form-group" ng-if="includeDetails">
+    <label for="birthyear"
+           class="control-label cs-form-label">Year of Birth</label>
+    <div class="cs-form-control">
+      <input ng-model="user.birthyear"
+             name="birthyear"
+             id="birthyear"
+             class="form-control"
+             type="integer"/>
+    </div>
+  </div>
+
+  <div class="form-group" ng-if="includeDetails">
+    <label for="gender"
+           class="control-label cs-form-label">Gender</label>
+    <div class="cs-form-control">
+      <input type="radio" name="gender"
+             ng-model="user.gender"
+             value="Female"/>
+      Female<br/>
+      <input type="radio" name="gender"
+             ng-model="user.gender"
+             value="Male"/>
+      Male<br/>
+      <input type="radio" name="gender"
+             ng-model="user.gender"
+             ng-value="custom_gender"/>
+      Other (enter below)<br/>
+      <input ng-model="custom_gender"
+             name="custom_gender"
+             class="form-control"
+             type="text"/>
+    </div>
+  </div>
+
+  <div class="form-group" ng-if="includeDetails">
+    <label for="ethnicity"
+           class="control-label cs-form-label">Ethnicity</label>
+    <div class="cs-form-control">
+      <input type="radio" name="ethnicity"
+             ng-model="user.ethnicity"
+             value="Hispanic or Latino"/>
+      Hispanic or Latino<br/>
+      <input type="radio" name="ethnicity"
+             ng-model="user.ethnicity"
+             value="Not Hispanic or Latino"/>
+      Not Hispanic or Latino<br/>
+    </div>
+  </div>
+
+  <div class="form-group" ng-if="includeDetails">
+    <label for="website"
+           class="control-label cs-form-label">Website</label>
+    <div class="cs-form-control">
+      <input ng-model="user.website"
+             name="website"
+             id="website"
+             class="form-control"
+             type="text"/>
+    </div>
+  </div>
+
+  <div class="form-group" ng-if="includeDetails">
+    <label for="phone_number"
+           class="control-label cs-form-label">Phone Number</label>
+    <div class="cs-form-control">
+      <input ng-model="user.phone_number"
+             name="phone_number"
+             id="phone_number"
+             class="form-control"
+             type="text"/>
+    </div>
+  </div>
+
+  <div class="form-group" ng-if="includeDetails">
+    <label for="twitter_handle"
+           class="control-label cs-form-label">Twitter Handle</label>
+    <div class="cs-form-control">
+      <input ng-model="user.twitter_handle"
+             name="twitter_handle"
+             id="twitter_handle"
+             class="form-control"
+             type="text"/>
+    </div>
+  </div>
+
+  <div class="form-group" ng-if="includeDetails">
+    <label for="linkedin_link"
+           class="control-label cs-form-label">LinkedIn Profile URL</label>
+    <div class="cs-form-control">
+      <input ng-model="user.linkedin_link"
+             name="linkedin_link"
+             id="linkedin_link"
+             class="form-control"
+             type="text"/>
+    </div>
+  </div>
+
 </form>
 
-<div cs-educator-labels search="properties.search"</div>

@@ -6,6 +6,7 @@ from sqlalchemy.exc import IntegrityError, InvalidRequestError
 from community_share.models.search import Label, Search
 from community_share.models.user import User
 from community_share.models.secret import Secret
+from community_share.models.survey import Question, SuggestedAnswer
 from community_share.models.conversation import Conversation, Message
 from community_share.store import session, Base, engine
 from community_share import settings
@@ -127,9 +128,65 @@ def make_admin_user(name, email, password):
         session.commit()
     except (IntegrityError, InvalidRequestError):
         session.rollback()
+        new_user = None
+    return new_user
 
+def make_questions(creator):
+    logger.debug('creator is {0}'.format(creator))
+    question_one = Question(
+        text='To what extent have you worked with educators/educational institutions before?',
+        creator=creator,
+        question_type='signup_community_partner',
+        public=True,
+        only_suggested_answers=False,
+        order=0,
+        suggested_answers=[
+            SuggestedAnswer(creator=creator,
+                            text='Never'),
+            SuggestedAnswer(creator=creator,
+                            text='A few times'),
+            SuggestedAnswer(creator=creator,
+                            text='6+ times'),
+            SuggestedAnswer(creator=creator,
+                            text='Dozens'),
+        ]
+    )
+    question_two = Question(
+        text='If you have worked with educators/educational institutions before, please list them here.',
+        creator=creator,
+        question_type='signup_community_partner',
+        public=True,
+        only_suggested_answers=False,
+        order=1,
+    )
+    question_three = Question(
+        text='How did you hear about Community Share?',
+        creator=creator,
+        question_type='signup',
+        public=True,
+        only_suggested_answers=False,
+        order=2,
+        suggested_answers=[
+            SuggestedAnswer(creator=creator,
+                            text='Colleague'),
+            SuggestedAnswer(creator=creator,
+                            text='Friend'),
+            SuggestedAnswer(creator=creator,
+                            text='Media'),
+            SuggestedAnswer(creator=creator,
+                            text='Web search'),
+        ],
+    )
+    session.add(question_one)
+    session.add(question_two)
+    try:
+        session.commit()
+    except (IntegrityError, InvalidRequestError):
+        session.rollback()
 
 def setup():
+    first_admin = None
+    Base.metadata.reflect(engine)
     Base.metadata.drop_all(engine);
     Base.metadata.create_all(engine);
     make_labels()
@@ -140,7 +197,11 @@ def setup():
     logger.info('admin_emails is {0}'.format(admin_emails))
     for email in admin_emails:
         if email:
-            make_admin_user(email, email, Secret.make_key(20))
+            user = make_admin_user(email, email, Secret.make_key(20))
+            if user is not None and first_admin is None:
+                first_admin = user
+    logger.info('made admin users')
+    make_questions(first_admin)
     # Make 100 random users
     for i in range(100):
         make_random_user()

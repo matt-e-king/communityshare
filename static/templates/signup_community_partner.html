@@ -51,11 +51,22 @@
   <div cs-institutions user="newUser">
   </div>
 
+  <div class="form-group">
+    <label for="bio"
+           class="control-label cs-form-label">Bio</label>
+    <div class="cs-form-control">
+      <textarea ng-model="editedUser.bio"
+                name="bio"
+                class="form-control"></textarea>
+    </div>
+  </div>
+  
 </form>
 
 <div cs-community-partner-settings
      methods="communityPartnerSettingsMethods"
      form="properties.partnerSettingsForm"
+     include-details="false"
      ></div>
 
 <button class="btn"
