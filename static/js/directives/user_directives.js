@@ -104,7 +104,14 @@
         }
       };
     });
-   
+
+  module.directive(
+    'csSignupSettings',
+    function() {
+      return {
+        templateUrl: 'static/templates/signup_common.html'
+      };
+    });
   
   module.directive(
     'csCommunityPartnerSettings',
