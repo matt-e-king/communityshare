@@ -79,6 +79,8 @@
       $scope.newUser = new User();
       $scope.properties = {};
       $scope.educatorSearchSettingsMethods = {}
+      // passwordMethods hooks up the password matching directives.
+      $scope.passwordMethods = {};
       $scope.search = new Search({
         searcher_user_id: undefined,
         searcher_role: 'educator',
