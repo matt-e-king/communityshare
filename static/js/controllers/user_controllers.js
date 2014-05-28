@@ -46,6 +46,8 @@
       $scope.newUser = new User();
       $scope.communityPartnerSettingsMethods = {}
       $scope.properties = {};
+      // passwordMethods hooks up the password matching directives.
+      $scope.passwordMethods = {};
       $scope.saveSettings = function() {
         var userPromise = signUp($scope.newUser, $scope.newUser.password);
         userPromise.then(

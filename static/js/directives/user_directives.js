@@ -186,5 +186,66 @@
         }
       };
     });
+
+  module.directive('csParserHook', function() {
+    return {
+      require: 'ngModel',
+      scope: {
+        methods: '='
+      },
+      link: function(scope, elem, attrs, ctrl) {
+        var methodName = attrs.csParserHook;
+        ctrl.$parsers.push(function(value) {
+          var output = undefined;
+          if (scope.methods[methodName]) {
+            output = scope.methods[methodName](value);
+          }
+          return output;
+        });
+      }
+    };
+  });
+
+  module.directive('csMatch', function() {
+    return {
+      require: 'ngModel',
+      scope: {
+        methods: '='
+      },
+      link: function(scope, elem, attrs, ctrl) {
+
+        var methodName = attrs.csMatch;
+        var otherValue;
+        
+        var isMatch = function(value1, value2) {
+          if (value1 === undefined) {
+            value1 = '';
+          }
+          if (value2 === undefined) {
+            value2 = '';
+          }
+          return (value1 === value2);
+        };
+
+        ctrl.$parsers.push(function(value) {
+          var output = undefined;
+          var matches = isMatch(value, otherValue);
+          ctrl.$setValidity('match', matches);
+          if (matches) {
+            output = value;
+          }
+          return output;
+        });
+
+        scope.methods[methodName] = function(value) {
+          otherValue = value;
+          var matches = isMatch(value, ctrl.$viewValue);
+          ctrl.$setValidity('match', matches);
+          return value;
+        };
+        
+      }
+    };
+  });
       
 })();
