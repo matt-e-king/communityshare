@@ -21,14 +21,21 @@ class User(Base, Serializable):
     __tablename__ = 'user'
 
     MANDATORY_FIELDS = ['name', 'email']
-    WRITEABLE_FIELDS = ['name', 'is_administrator', 'institution_associations']
+    WRITEABLE_FIELDS = ['name', 'is_administrator', 'institution_associations',
+                        'zipcode', 'website', 'twitter_handle', 'linkedin_link',
+                        'year_of_birth', 'gender', 'ethnicity',]
     STANDARD_READABLE_FIELDS = [
         'id', 'name', 'is_administrator', 'last_active', 'is_educator',
-        'is_community_partner', 'institution_associations',]
+        'is_community_partner', 'institution_associations',
+        'zipcode', 'website', 'twitter_handle', 'linkedin_link',
+        'year_of_birth', 'gender', 'ethnicity',]
+
     ADMIN_READABLE_FIELDS = [
         'id', 'name', 'email' , 'date_created', 'last_active',
         'is_administrator', 'is_educator', 'is_community_partner',
-        'institution_associations',]
+        'institution_associations',
+        'zipcode', 'website', 'twitter_handle', 'linkedin_link',
+        'year_of_birth', 'gender', 'ethnicity',]
     
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False)
@@ -39,6 +46,14 @@ class User(Base, Serializable):
     is_administrator = Column(Boolean, nullable=False, default=False) 
     last_active = Column(DateTime)
 
+    zipcode = Column(String(50))
+    website = Column(String(100))
+    twitter_handle = Column(String(100))
+    linkedin_link = Column(String(100))
+    year_of_birth = Column(Integer)
+    gender = Column(String(100))
+    ethnicity = Column(String(100))
+    
     searches = relationship("Search", backref="searcher_user")
     institution_associations = relationship("InstitutionAssociation")
 
