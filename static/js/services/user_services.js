@@ -19,6 +19,15 @@
     function($q, $http, User, Authenticator, Session) {
       var signUp = function(user, password) {
         var deferred = $q.defer();
+        // Remove any insitutions with no names
+        var filteredInstitutionAssociations = [];
+        for (var i=0; i<user.institution_associations.length; i++) {
+          var institution_association = user.institution_associations[i];
+          if (institution_association.institution && institution_association.institution.name) {
+            filteredInstitutionAssociations.push(institution_association);
+          }
+          user.institution_associations = filteredInstitutionAssociations;
+        }
         var dataPromise = $http({
           method: 'POST',
           url: '/api/usersignup',

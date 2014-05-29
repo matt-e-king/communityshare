@@ -9,7 +9,8 @@
     function() {
       return {
         scope: {
-          question: '='
+          question: '=',
+          answers: '='
         },
         controller: function($scope) {
           // Set custom_answer to ' ' so that it is not initally

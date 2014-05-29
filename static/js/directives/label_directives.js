@@ -34,6 +34,29 @@
        };
      });
 
+  var LabelsController = function($scope) {
+    $scope.newLabel = {
+      name: ''
+    };
+    $scope.newLabelMethods = {
+      onUpdate: function() {
+        var newLabelName = $scope.newLabel.name;
+        if (newLabelName) {
+          $scope.search.displayLabelsAll.subjectAreas.Custom.push(newLabelName);
+          $scope.search.activeLabels[newLabelName] = true;
+        }
+        $scope.newLabel.name = '';
+      }
+    };
+    $scope.toggleLabel = function(label) {
+      if ($scope.search.activeLabels[label]) {
+        $scope.search.activeLabels[label] = false;
+      } else {
+        $scope.search.activeLabels[label] = true;
+      }
+    }
+  };
+
   module.directive(
     'csEducatorLabels',
      function(Session) {
@@ -42,28 +65,19 @@
            search: '=',
          },
          templateUrl: './static/templates/educator_labels.html',
-         controller: function($scope) {
-           $scope.newLabel = {
-             name: ''
-           };
-           $scope.newLabelMethods = {
-             onUpdate: function() {
-               var newLabelName = $scope.newLabel.name;
-               if (newLabelName) {
-                 $scope.search.displayLabelsAll.subjectAreas.Custom.push(newLabelName);
-                 $scope.search.activeLabels[newLabelName] = true;
-               }
-               $scope.newLabel.name = '';
-             }
-           };
-           $scope.toggleLabel = function(label) {
-             if ($scope.search.activeLabels[label]) {
-               $scope.search.activeLabels[label] = false;
-             } else {
-               $scope.search.activeLabels[label] = true;
-             }
-           }
-         }
+         controller: LabelsController
+       };
+     });
+
+  module.directive(
+    'csCommunityPartnerLabels',
+     function(Session) {
+       return {
+         scope: {
+           search: '=',
+         },
+         templateUrl: './static/templates/community_partner_labels.html',
+         controller: LabelsController
        };
      });
   

@@ -70,41 +70,6 @@
       };
     });
 
-  
-  module.directive(
-    'csEducatorSearchSettings',
-    function() {
-      return {
-        scope: {
-          methods: '=',
-          search: '=',
-          form: '='
-        },
-        templateUrl: './static/templates/educator_search_settings.html',
-        controller: function($scope, Search, Messages) {
-          $scope.properties = {};
-          var haveSetForm = false;
-          $scope.$watch('educatorSearchSettingsForm', function() {
-            if (!haveSetForm) {
-              $scope.form = $scope.educatorSearchSettingsForm;
-            }
-          });
-          $scope.methods.setSearch = function(search) {
-            $scope.properties.search = search;
-            search.makeLabelDisplay();
-          };
-          if ($scope.search) {
-            $scope.methods.setSearch($scope.search);
-          }
-          $scope.methods.saveSettings = function() {
-            $scope.properties.search.processLabelDisplay();
-            var searchPromise = $scope.properties.search.save();
-            return searchPromise;
-          };
-        }
-      };
-    });
-
   module.directive(
     'csSignupSettings',
     function() {
@@ -112,85 +77,36 @@
         templateUrl: 'static/templates/signup_common.html'
       };
     });
-  
+
   module.directive(
-    'csCommunityPartnerSettings',
+    'csPersonalSettings',
     function() {
       return {
-        scope: {
-          methods: '=',
-          user: '=',
-          form: '=',
-          includeDetails: '@'
-        },
-        templateUrl: './static/templates/community_partner_settings.html',
-        controller: function($scope, Search, Messages, CommunityPartnerUtils, Question) {
+        templateUrl: 'static/templates/personal_settings.html'
+      };
+    });
 
-          var questionsPromise = Question.get_many({
-            question_type: 'signup_community_partner'
-          });
-          questionsPromise.then(
-            function(questions) {
-              $scope.questions = questions;
-            });
+  module.directive(
+    'csMorePersonalSettings',
+    function() {
+      return {
+        templateUrl: 'static/templates/more_personal_settings.html'
+      };
+    });
 
-          $scope.properties = {};
-          var haveSetForm = false;
-          $scope.$watch('partnerSettingsForm', function() {
-            if (!haveSetForm) {
-              $scope.form = $scope.partnerSettingsForm;
-            }
-          });
-          var makeNewSearch = function() {
-            var search = new Search({
-              searcher_user_id: undefined,
-              searcher_role: 'partner',
-              searching_for_role: 'educator',
-              active: true,
-              labels: [],
-              latitude: undefined,
-              longitude: undefined,
-              distance: undefined
-            });
-            return search;
-          };
-          $scope.search = undefined;
-          if (($scope.user) && ($scope.user.is_community_partner)) {
-            // User exists.  Load the search.
-            var searchesPromise = $scope.user.getSearches();
-            var searchPromise = CommunityPartnerUtils.searchesPromiseToSearchPromise(
-              searchesPromise);
-            searchPromise.then(
-              function(search) {
-                if (search) {
-                  $scope.search = search;
-                  $scope.properties.search = search;
-                  search.makeLabelDisplay();
-                } else {
-                  // Apparently the user didn't have a search.
-                  $scope.search = makeNewSearch();
-                  $scope.properties.search = $scope.search;
-                  $scope.search.makeLabelDisplay();
-                }
-              },
-              function(message) {
-                Messages.error(message);
-              });
-          } else {
-            // User does not exist.  Create a new search.
-            $scope.search = makeNewSearch();
-            $scope.properties.search = $scope.search;
-            $scope.search.makeLabelDisplay();
-          }
-          $scope.methods.setUser = function(user) {
-            $scope.search.searcher_user_id = user.id
-          }
-          $scope.methods.saveSettings = function() {
-            $scope.search.processLabelDisplay();
-            var searchPromise = $scope.search.save();
-            return searchPromise;
-          };
-        }
+  module.directive(
+    'csSignupAccountSettings',
+    function() {
+      return {
+        templateUrl: 'static/templates/signup_account_settings.html'
+      };
+    });
+
+  module.directive(
+    'csAccountSettings',
+    function() {
+      return {
+        templateUrl: 'static/templates/account_settings.html'
       };
     });
 
@@ -254,5 +170,13 @@
       }
     };
   });
-      
+
+  module.directive('emitScope', function() {
+    return {
+      link: function(scope, element, attrs) {
+        scope.$emit(attrs['emitScope'], scope);
+      }
+    };
+  });
+
 })();

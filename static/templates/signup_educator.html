@@ -1,20 +1,54 @@
-<h1>Educator SignUp</h1>
+<h4>Educator SignUp</h4>
 
-<form novalidate
-      action="" role="form" name="signUpForm" class="form-horizontal">
+<div tabset>
+  <div tab>
+    <div tab-heading>
+      <span ng-class="">
+        Needs
+      </span>
+    </div>
+    <div class="tab-content" active="needsTabActive">
+      <div cs-educator-labels search="newSearch"></div>
+      <input type="submit" value="Continue" class="btn"
+             ng-click="personalTabActive=true; needsTabCompleted=true;"/>
+    </div>
+  </div>
+  <div tab active="personalTabActive" disabled="!needsTabCompleted">
+    <div tab-heading>
+      <span ng-class="{'tab-heading-error': personalSettingsForm.$invalid && !personalSettingsForm.$pristine}">
+        Personal
+      </span>
+    </div>
+    <div class="tab-content">
+      <form novalidate action="" role="form" name="personalSettingsForm"
+            class="form-horizontal">
+        <div cs-personal-settings></div>
+      </form>
+      <input type="submit" value="Continue" class="btn"
+             ng-disabled="personalSettingsForm.$invalid"
+             ng-click="accountTabActive=true; personalTabCompleted=true;"/>
+    </div>
+  </div>
+  <div tab active="accountTabActive" disabled="!personalTabCompleted">
+    <div tab-heading>
+      <span ng-class="{'tab-heading-error': (accountSettingsForm.$invalid && !accountSettingsForm.$pristine)}">
+        Account
+      </span>
+    </div>
+    <div class="tab-content">
+      <form novalidate action="" role="form" name="accountSettingsForm"
+            class="form-horizontal">
+        <div cs-signup-account-settings></div>
+      </form>
 
-  <div cs-signup-settings></div>
+      <div ng-show="personalSettingsForm.$invalid" class="help-block">
+        Personal Settings are incomplete.
+      </div>
 
-</form>
-
-<div cs-educator-search-settings
-     methods="educatorSearchSettingsMethods"
-     search="search"
-     form="properties.educatorSearchSettingsForm"
-     ></div>
-
-<button class="btn cs-form-button"
-        ng-disabled="signUpForm.$invalid || properties.educatorSearchSettingsForm.$invalid"
-        ng-click="saveSettings()">
-  Sign Up!
-</button>
+      <input type="submit" value="Sign Up!" class="btn"
+             ng-disabled="personalSettingsForm.$invalid || accountSettingsForm.$invalid"
+             ng-click="submit();"/>
+    </div>
+  </div>
+  
+</div>

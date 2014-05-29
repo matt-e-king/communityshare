@@ -1,75 +1,64 @@
 <div cs-main-view has-permission="{{(!(Session.activeUser === undefined))}}">
+
   <h4>Settings</h4>
-  <div class="row">
-    <form novalidate
-          action="" role="form" name="settingsForm" class="form-horizontal">
-       <div class="form-group">
-        <label for="name"
-               class="control-label cs-form-label">Name</label>
-        <div class="cs-form-control">
-          <input ng-model="editedUser.name"
-                 type="text"
-                 required
-                 name="name"
-                 id="name"
-                 class="form-control"/>
-          <p ng-show="settingsForm.name.$invalid && !settingsForm.name.$pristine" class="help-block">
-            A name is required.
-          </p>
-        </div>
+
+  <div tabset name="settingsTabSet">
+
+    <div tab active="personalTabActive">
+      <div tab-heading>
+        <span ng-class="{'tab-heading-error': personalSettingsForm.$invalid}">
+          Personal
+        </span>
       </div>
-      <div class="form-group">
-        <label for="email"
-               class="control-label cs-form-label">Email</label>
-        <div class="cs-form-control">
-          <input ng-model="editedUser.email"
-                 disabled
-                 name="email"
-                 id="email"
-                 class="form-control"
-                 type="text"/>
-        </div>
+      <div class="tab-content">
+        <form novalidate action="" role="form" name="personalSettingsForm"
+              class="form-horizontal" emit-scope="personalSettingsForm">
+          <div cs-account-settings></div>
+          <div cs-personal-settings></div>
+          <div cs-more-personal-settings>boo</div>
+        </form>
       </div>
 
-      <div cs-institutions user="editedUser">
-      </div>      
-
-      <div class="form-group">
-        <label for="bio"
-               class="control-label cs-form-label">Bio</label>
-        <div class="cs-form-control">
-          <textarea ng-model="editedUser.bio"
-                    name="bio"
-                    class="form-control"></textarea>
-        </div>
-      </div>
-
-    </form>
-  </div>
-
-  <div ng-if="Session.activeUser.is_community_partner"
-       cs-community-partner-settings
-       user="Session.activeUser"
-       methods="communityPartnerSettingsMethods"
-       form="properties.partnerSettingsForm"
-       include-details="true"
-       ></div>
-  
-  <div class="row">
-    <div class="alert alert-success cs-form-message" ng-show="successMessage">
-      {{successMessage}}
     </div>
-    <div class="alert alert-danger cs-form-message" ng-show="errorMessage">
-      {{errorMessage}}
+
+    <div tab active="interestsActive" 
+         ng-if="Session.activeUser.is_community_partner">
+      <div tab-heading>
+        <span ng-class="">
+          Interests
+        </span>
+      </div>
+      <div class="tab-content" active="interestsTabActive">
+        <div cs-community-partner-labels search="search"></div>
+      </div>
     </div>
+
+    <div tab active="experienceTabActive"
+         ng-if="Session.activeUser.is_community_partner">
+      <div tab-heading>
+        <span ng-class="{'tab-heading-error': experienceSettingsForm.$invalid}">
+          Experience
+        </span>
+      </div>
+      <div class="tab-content">
+        <form novalidate action="" role="form" name="experienceSettingsForm">
+          <div ng-repeat="question in questions" cs-question question="question"
+               answers="answers"></div>
+        </form>
+      </div>
+    </div>
+
   </div>
   
-  <div class="row">
-    <button class="btn cs-form-button"
-            ng-disabled="settingsForm.$invalid || (Session.activeUser.is_community_partner && properties.partnerSettingsForm.$invalid)"
-            ng-click="saveSettings()">
-      Save Changes
-    </button>
+  <div ng-show="personalSettingsForm.$invalid">
+    Personal Settings are invalid
+  </div>
+  <div ng-show="accountSettingsForm.$invalid">
+    Account Settings are invalid
   </div>
   
+  <input type="submit" value="Save" class="btn"
+         ng-disabled="personalSettingsForm.$invalid || accountSettingsForm.$invalid"
+         ng-click="save()"/>
+
 </div>

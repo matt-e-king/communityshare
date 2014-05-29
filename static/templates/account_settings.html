@@ -1,0 +1,15 @@
+<div class="form-group">
+  <label for="email"
+         class="control-label cs-form-label">Email</label>
+  <div class="cs-form-control">
+    <input ng-model="editedUser.email"
+           required
+           name="email"
+           id="email"
+           class="form-control"
+           type="email"/>
+    <p ng-show="accountSettingsForm.email.$invalid && !accountSettingsForm.email.$pristine" class="help-block">
+      Please enter a valid email.
+    </p>
+  </div>
+</div>

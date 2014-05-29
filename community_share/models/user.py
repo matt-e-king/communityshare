@@ -23,19 +23,19 @@ class User(Base, Serializable):
     MANDATORY_FIELDS = ['name', 'email']
     WRITEABLE_FIELDS = ['name', 'is_administrator', 'institution_associations',
                         'zipcode', 'website', 'twitter_handle', 'linkedin_link',
-                        'year_of_birth', 'gender', 'ethnicity',]
+                        'year_of_birth', 'gender', 'ethnicity', 'bio']
     STANDARD_READABLE_FIELDS = [
         'id', 'name', 'is_administrator', 'last_active', 'is_educator',
         'is_community_partner', 'institution_associations',
         'zipcode', 'website', 'twitter_handle', 'linkedin_link',
-        'year_of_birth', 'gender', 'ethnicity',]
+        'year_of_birth', 'gender', 'ethnicity', 'bio']
 
     ADMIN_READABLE_FIELDS = [
         'id', 'name', 'email' , 'date_created', 'last_active',
         'is_administrator', 'is_educator', 'is_community_partner',
         'institution_associations',
         'zipcode', 'website', 'twitter_handle', 'linkedin_link',
-        'year_of_birth', 'gender', 'ethnicity',]
+        'year_of_birth', 'gender', 'ethnicity', 'bio']
     
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False)
@@ -46,6 +46,7 @@ class User(Base, Serializable):
     is_administrator = Column(Boolean, nullable=False, default=False) 
     last_active = Column(DateTime)
 
+    bio = Column(String(1000))
     zipcode = Column(String(50))
     website = Column(String(100))
     twitter_handle = Column(String(100))
@@ -116,9 +117,9 @@ class User(Base, Serializable):
         'institution_associations': {
             'standard': serialize_institution_associations,
             'admin': serialize_institution_associations,
-        }
+        },
     }
-            
+         
     def deserialize_institution_associations(self, data_list):
         if data_list is None:
             data_list = []

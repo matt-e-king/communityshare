@@ -1,6 +1,7 @@
 <h4>{{title}}</h4>
 
-<div class="clearfix"></div>
+<div alert alert-info ng-show="infoMessage">{{infoMessage}}</div>
+<div alert alert-danger ng-show="errorMessage">{{errorMessage}}</div>
 
 <div ng-repeat="search in searches" class="search-result">
   <a ng-href="#/user/{{search.searcher_user_id}}"><h5>{{search.searcher_user.name}}</h5></a>

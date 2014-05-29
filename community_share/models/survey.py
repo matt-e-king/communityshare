@@ -11,17 +11,16 @@ from community_share.models.base import Serializable
 
 logger = logging.getLogger(__name__)
 
-
 class Question(Base, Serializable):
     __tablename__ = 'question'
 
     MANDATORY_FIELDS = ['text', 'question_type', 'public']
     WRITEABLE_FIELDS = ['public', 'order', 'only_suggested_answers', 'suggested_answers']
     STANDARD_READABLE_FIELDS = [
-        'text', 'question_type', 'public', 'only_suggested_answers', 'order',
+        'id', 'text', 'question_type', 'public', 'only_suggested_answers', 'order',
         'suggested_answers']
     ADMIN_READABLE_FIELDS = [
-        'text', 'creator', 'date_created', 'question_type', 'public',
+        'id', 'text', 'creator', 'date_created', 'question_type', 'public',
         'only_suggested_answers', 'order', 'suggested_answers']
     
     id = Column(Integer, primary_key=True)
@@ -32,7 +31,9 @@ class Question(Base, Serializable):
     question_type = Column(String(50), nullable=False)
     public = Column(Boolean, nullable=False)
     only_suggested_answers = Column(Boolean, nullable=False, default=False)
-    only_rating = Column(Boolean, nullable=False, default=False)
+    requires_share_id = Column(Boolean, nullable=False, default=False)
+    requires_event_id = Column(Boolean, nullable=False, default=False)
+    requires_user_id = Column(Boolean, nullable=False, default=False)
     order = Column(Integer)
 
     creator = relationship('User')
@@ -81,21 +82,59 @@ class SuggestedAnswer(Base, Serializable):
 class Answer(Base, Serializable):
     __tablename__ = 'answer'
 
+    MANDATORY_FIELDS = ['question_id', 'responder_id', 'text']
+    WRITEABLE_FIELDS = ['text']
+    STANDARD_READABLE_FIELDS = [
+        'id', 'question_id', 'responder_id', 'text', 'date_created',
+        'about_user_id', 'about_share_id', 'about_event_id']
+    ADMIN_READABLE_FIELDS = [
+        'id', 'question_id', 'responder_id', 'text', 'date_created',
+        'about_user_id', 'about_share_id', 'about_event_id']
+
+    PERMISSIONS = {
+        'all_can_read_many': True,
+        'standard_can_read_many': True
+    }
+
     id = Column(Integer, primary_key=True)
     question_id = Column(Integer, ForeignKey('question.id'), nullable=False)
     responder_id = Column(Integer, ForeignKey('user.id'), nullable=False)
     text = Column(String)
-    rating = Column(Integer)
     active = Column(Boolean, default=True)
     date_created = Column(DateTime, nullable=False, default=datetime.utcnow)
     about_user_id = Column(Integer, ForeignKey('user.id'), nullable=True)
     about_share_id = Column(Integer, ForeignKey('share.id'), nullable=True)
     about_event_id = Column(Integer, ForeignKey('event.id'), nullable=True)
 
-    __table_args__ = (
-        CheckConstraint(rating >= 0, name='check_rating_min'),
-        CheckConstraint(rating <= 5, name='check_rating_max'),
-        {})
-
     question = relationship('Question')
 
+    @classmethod
+    def has_add_rights(cls, data, requester):
+        data['responder_id'] = int(data.get('responder_id', requester.id))
+        if (requester is not None and requester.is_administrator):
+            has_rights = True
+        elif data['responder_id'] == requester.id:
+            has_rights = True
+        else:
+            has_rights = False
+        return has_rights
+            
+    def has_standard_rights(self, requester):
+        has_rights = False
+        if requester is not None:
+            if requester.is_administrator:
+                has_rights = True
+            elif self.question.public:
+                has_rights = True
+            elif self.responder_id == requester.id:
+                has_rights = True
+        return has_rights
+
+    def has_admin_rights(self, requester):
+        has_rights = False
+        if requester is not None:
+            if requester.is_administrator:
+                has_rights = True
+            elif self.responder_id == requester.id:
+                has_rights = True
+        return has_rights
