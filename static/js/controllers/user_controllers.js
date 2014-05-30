@@ -240,9 +240,12 @@
         if ($scope.questions) {
           var saveAnswerPromises = [];
           for (var i=0; i<$scope.questions.length; i++) {
-            var saveAnswerPromise = $scope.questions[i].answer.save();
-            saveAnswerPromises.push(saveAnswerPromise);
-            allPromises.push(saveAnswerPromise);
+            var answer = $scope.questions[i].answer;
+            if (answer.text) {
+              var saveAnswerPromise = answer.save();
+              saveAnswerPromises.push(saveAnswerPromise);
+              allPromises.push(saveAnswerPromise);
+            }
           }
         }
         var combinedPromise = $q.all(allPromises);
