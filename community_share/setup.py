@@ -60,9 +60,59 @@ def get_labels():
                 my_labels.append(label)
     return my_labels
 
+profile_picture_filenames = [
+    'aardvark.jpg', 'gila_monster.jpg', 'octopus.jpg', 'sloth.jpg',
+    'ant.jpg', 'honey_badger.jpg', 'pig.jpg',
+    'dolphin.jpg', 'llama.jpg', 'shiba.jpg',
+]
+
+schools = [
+    'School Number 42'
+]
+
+companies = ['the Big Univeristy',
+             'Acme',
+             'the City Opera',
+             'a Widget Factory',
+             'a Secret Goverment Research Lab',
+             'at home',
+             'a Copper Mine',
+         ]
+specialties = ['robotic molluscs',
+               'portmodern composition',
+               'mass surveillance',
+               'classical portraiture',
+               'laying fibreoptic cable',
+               'interpretative dance',
+           ]
+hobbies = ['underwater skiing.',
+           'playing competitive hide-and-seek.',
+           'playing minecraft',
+           'french cooking',
+           'watching reality TV',
+           'training for marathons',
+           'juggling'
+       ]
+           
+
 def random_item_from_list(ll):
     item = ll[random.randint(0, len(ll)-1)]
     return item
+
+def generate_expert_bio():
+    bio_template = "I work at {0} and specialize in the area of {1}.  My main hobby is {2}."
+    company = random_item_from_list(companies)
+    specialty = random_item_from_list(specialties)
+    hobby = random_item_from_list(hobbies)
+    bio = bio_template.format(company, specialty, hobby)
+    return bio
+
+def generate_educator_bio():
+    bio_template = "I work at {0}.  My main hobby is {1}"
+    school = random_item_from_list(schools)
+    hobby = random_item_from_list(hobbies)
+    bio = bio_template.format(school, hobby)
+    return bio
 
 def make_random_location():
     latitude = 32.223303 + (random.random()-0.5)+0.1
@@ -84,17 +134,21 @@ def make_random_user():
     email = make_email(first_name, last_name)
     password_hash = User.pwd_context.encrypt(password)
     name = '{0} {1}'.format(first_name, last_name)
-    new_user = User(name=name, email=email, password_hash=password_hash,
-                    is_administrator=False)
-    session.add(new_user)
-    session.commit()
+    picture_filename = random_item_from_list(profile_picture_filenames)
     randombinary = random.randint(0, 1)
     if randombinary:
         searcher_role = 'educator'
         searching_for_role = 'partner'
+        bio = generate_educator_bio()
     else:
         searcher_role = 'partner'
         searching_for_role = 'educator'
+        bio = generate_expert_bio()
+    new_user = User(name=name, email=email, password_hash=password_hash,
+                    picture_filename=picture_filename, bio=bio,
+                    is_administrator=False)
+    session.add(new_user)
+    session.commit()
     # Make the search
     location = make_random_location()
     search = Search(

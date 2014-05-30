@@ -26,10 +26,12 @@ class Search(Base, Serializable):
         'active', 'latitude', 'longitude', 'address', 'distance', 'zipcode']
     STANDARD_READABLE_FIELDS = [
         'id', 'searcher_user_id', 'searcher_role', 'searching_for_role',
-        'labels', 'longitude', 'latitude', 'address', 'zipcode', 'distance']
+        'labels', 'longitude', 'latitude', 'address', 'zipcode', 'distance',
+        'searcher_user',]
     ADMIN_READABLE_FIELDS = [
         'id', 'searcher_user_id', 'searcher_role', 'searching_for_role', 'labels',
-        'created', 'active', 'longitude', 'latitude', 'address', 'zipcode', 'distance']
+        'created', 'active', 'longitude', 'latitude', 'address', 'zipcode', 'distance',
+        'searcher_user',]
 
     PERMISSIONS = {
         'standard_can_read_many': True
@@ -103,11 +105,11 @@ class Search(Base, Serializable):
         }
     }
 
-    def standard_serialize(self, exclude=['searcher_user']):
+    def standard_serialize(self, exclude=[]):
         d = self._base_standard_serialize(exclude)
         return d
 
-    def admin_serialize(self, exclude=['searcher_user']):
+    def admin_serialize(self, exclude=[]):
         d = self._base_admin_serialize(exclude)
         return d
 

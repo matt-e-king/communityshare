@@ -59,7 +59,6 @@
           var searchPromise = $scope.newSearch.save();
           var allPromises = [searchPromise];
           // And save the answers to questions.
-          console.log($scope.questions);
           for (var i=0; i<$scope.questions.length; i++) {
             var question = $scope.questions[i];
             if (question.answer.text) {
@@ -137,13 +136,16 @@
     function($scope, $location, Session, Messages, $q, CommunityPartnerUtils,
              Question, Answer, $fileUploader, $http) {
       $scope.Session = Session;
+      if (!Session.activeUser) {
+        return;
+      }
       $scope.user = Session.activeUser;
       $scope.properties = {};
       $scope.settingsTabSet = {};
       // passwordMethods hooks up the password matching directives.
       $scope.passwordMethods = {};
       // Get the questions
-      if ($scope.user.is_community_partner) {
+      if ($scope.user && $scope.user.is_community_partner) {
         var questionsPromise = Question.get_many_with_answers(
           $scope.user.id,
           {question_type: 'signup_community_partner'}
@@ -154,7 +156,7 @@
           });
       };
       // Grab a community partner's passive search.
-      if ($scope.user.is_community_partner) {
+      if ($scope.user && $scope.user.is_community_partner) {
         var searchesPromise = $scope.user.getSearches();
         var searchPromise = CommunityPartnerUtils.searchesPromiseToSearchPromise(
           searchesPromise);

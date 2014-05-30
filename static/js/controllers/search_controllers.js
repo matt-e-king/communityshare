@@ -9,7 +9,8 @@
 
   module.controller(
     'SearchResultsController',
-    function($scope, $location, $routeParams, $modal, Search, Messages) {
+    function(Session, $scope, $location, $routeParams, $modal, Search, Messages) {
+      $scope.Session = Session;
       var searchId = $routeParams.searchId;
       $scope.infoMessage = 'Searching for matches...';
       $scope.errorMessage = '';
