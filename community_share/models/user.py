@@ -46,6 +46,7 @@ class User(Base, Serializable):
     is_administrator = Column(Boolean, nullable=False, default=False) 
     last_active = Column(DateTime)
 
+    picture_filename = Column(String(100))
     bio = Column(String(1000))
     zipcode = Column(String(50))
     website = Column(String(100))

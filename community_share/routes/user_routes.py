@@ -1,6 +1,8 @@
 import logging
+import os
 
-from flask import request, jsonify
+from flask import request, jsonify, send_from_directory
+from werkzeug.utils import secure_filename
 
 from community_share.store import session
 from community_share.models.user import User
@@ -100,5 +102,59 @@ def register_user_routes(app):
                 response = base_routes.make_admin_single_response(user)
         return response
         
-                
 
+    UPLOAD_FOLDER = os.environ.get('COMMUNITYSHARE_UPLOAD_FOLDER', None)
+    ALLOWED_EXTENSIONS = set(['.txt', '.pdf', '.png', '.jpg', '.jpeg', '.gif'])
+
+    def process_filename(filename, user_id):
+        base, extension = os.path.splitext(filename)
+        if extension in ALLOWED_EXTENSIONS:
+            # Maximum filename length = 100
+            # Use 50 to be safe
+            base = base[:50]
+            processed = 'user_{0}_{1}{2}'.format(user_id, base, extension)
+        else:
+            processed = None
+        return processed
+
+    @app.route('/api/user/<int:user_id>/picture', methods=['PUT', 'POST', 'PATCH'])
+    def post_picture(user_id):
+        requester = get_requesting_user()
+        if (user_id == requester.id):
+            user = requester
+            f = request.files['file']
+            if f:
+                filename = process_filename(f.filename, user_id)
+                if filename is None:
+                    response = base_routes.make_bad_request_response()
+                else:
+                    if UPLOAD_FOLDER is None:
+                        response = base_routes.make_server_error_response(
+                            "Upload folder is not specified")
+                    else:
+                        f.save(os.path.join(UPLOAD_FOLDER, filename))
+                        user.picture_filename = filename
+                        session.add(user)
+                        session.commit()
+                        response = base_routes.make_OK_response()
+            else:
+                response = base_routes.make_bad_request_response()
+        else:
+            response = base.routes.make_forbidden_response()
+        return response
+
+    @app.route('/api/user/<int:user_id>/picture', methods=['GET'])
+    def get_picture(user_id):
+        user = session.query(User).filter_by(id=user_id).first()
+        if user is None:
+            response = base_routes.make_not_found_response()
+        else:
+            if not user.picture_filename:
+                response = base_routes.make_not_found_response()
+            else:
+                response = send_from_directory(
+                    UPLOAD_FOLDER, user.picture_filename)
+        return response
+            
+        
+        
