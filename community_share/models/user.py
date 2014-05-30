@@ -118,7 +118,7 @@ class User(Base, Serializable):
     def serialize_picture_url(self):
         url = ''
         upload_location = os.environ.get('COMMUNITYSHARE_UPLOAD_LOCATION', None)
-        if upload_location is not None:
+        if (upload_location is not None) and self.picture_filename:
             url = upload_location + self.picture_filename
         return url
 
