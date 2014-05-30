@@ -6,7 +6,8 @@
     [
       'communityshare.services.user',
       'communityshare.directives.user',
-      'communityshare.directives.institutions'
+      'communityshare.directives.institutions',
+      'angularFileUpload'
     ]);
 
   // User Views
@@ -61,7 +62,9 @@
           console.log($scope.questions);
           for (var i=0; i<$scope.questions.length; i++) {
             var question = $scope.questions[i];
-            allPromises.push(question.answer.save());
+            if (question.answer.text) {
+              allPromises.push(question.answer.save());
+            }
           }
           $q.all(allPromises).then(
             function(data) {
@@ -132,7 +135,7 @@
   module.controller(
     'SettingsController',
     function($scope, $location, Session, Messages, $q, CommunityPartnerUtils,
-             Question, Answer) {
+             Question, Answer, $fileUploader, $http) {
       $scope.Session = Session;
       $scope.user = Session.activeUser;
       $scope.properties = {};
@@ -199,9 +202,32 @@
         $scope.errorMessage = msg;
         $scope.successMessage = '';
       };
-      
+
+      $scope.validImage = true;
+      var uploader = $scope.uploader = $fileUploader.create({
+        scope: $scope,
+        url: '/api/user/'+$scope.user.id+'/picture',
+        headers: $http.defaults.headers.common,
+        filters: [
+          function (item) {
+            var is_image = (item.type.substring(0, 5) == 'image');
+            $scope.validImage = is_image;
+            uploader.queue.splice(0, uploader.queue.length);
+            return is_image;
+          }
+        ]
+      });
+
+      // Make sure we only have one file in the uploader queue
+      uploader.bind('afteraddingfile', function (event, item) {
+        if (uploader.queue.length > 1) {
+          uploader.queue.splice(0, uploader.queue.length-1);
+        }
+      });
+
       $scope.save = function() {
         var saveUserPromise = $scope.editedUser.save();
+        var savedImages = uploader.uploadAll();
         var saveSearchPromise = undefined;
         var allPromises = [saveSearchPromise];
         if ($scope.search) {
