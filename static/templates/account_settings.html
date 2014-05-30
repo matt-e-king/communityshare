@@ -20,9 +20,7 @@
   <div class="cs-form-control">
     <input ng-file-select type="file" name="picture" id="picture"/>
     <div ng-show="!validImage">Not a valid image file</div>
-    <!--<div ng-show="(uploader.queue.length === 0) && currentPictureFile"
-         ng-thumb="{ file: currentPictureFile, height: 100 }"></div>-->
-    <image ng-show="(uploader.queue.length === 0)" ng-src="/api/user/{{user.id}}/picture" height="100"/>
+    <image ng-show="(uploader.queue.length === 0)" ng-src="{{user.picture_url}}" height="100"/>
     <div ng-show="uploader.isHTML5">
       <div ng-repeat="item in uploader.queue"
            ng-thumb="{ file: item.file, height: 100 }"></div>

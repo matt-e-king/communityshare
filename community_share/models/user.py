@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 import logging
 
@@ -28,14 +29,14 @@ class User(Base, Serializable):
         'id', 'name', 'is_administrator', 'last_active', 'is_educator',
         'is_community_partner', 'institution_associations',
         'zipcode', 'website', 'twitter_handle', 'linkedin_link',
-        'year_of_birth', 'gender', 'ethnicity', 'bio']
+        'year_of_birth', 'gender', 'ethnicity', 'bio', 'picture_url']
 
     ADMIN_READABLE_FIELDS = [
         'id', 'name', 'email' , 'date_created', 'last_active',
         'is_administrator', 'is_educator', 'is_community_partner',
         'institution_associations',
         'zipcode', 'website', 'twitter_handle', 'linkedin_link',
-        'year_of_birth', 'gender', 'ethnicity', 'bio']
+        'year_of_birth', 'gender', 'ethnicity', 'bio', 'picture_url']
     
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False)
@@ -114,11 +115,22 @@ class User(Base, Serializable):
                         for i in self.institution_associations]
         return associations
 
+    def serialize_picture_url(self):
+        url = ''
+        upload_location = os.environ.get('COMMUNITYSHARE_UPLOAD_LOCATION', None)
+        if upload_location is not None:
+            url = upload_location + self.picture_filename
+        return url
+
     custom_serializers = {
         'institution_associations': {
             'standard': serialize_institution_associations,
             'admin': serialize_institution_associations,
         },
+        'picture_url': {
+            'standard': serialize_picture_url,
+            'admin': serialize_picture_url,
+        }
     }
          
     def deserialize_institution_associations(self, data_list):

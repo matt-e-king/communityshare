@@ -1,6 +1,7 @@
 import logging
 import os
 
+import tinys3
 from flask import request, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
 
@@ -128,11 +129,18 @@ def register_user_routes(app):
                 if filename is None:
                     response = base_routes.make_bad_request_response()
                 else:
-                    if UPLOAD_FOLDER is None:
+                    S3_ACCESS_KEY = os.environ.get('COMMUNITYSHARE_S3_USERNAME', None)
+                    S3_SECRET_KEY = os.environ.get('COMMUNITYSHARE_S3_KEY', None)
+                    S3_BUCKETNAME = os.environ.get('COMMUNITYSHARE_S3_BUCKETNAME', None)
+                    
+                    if ((S3_ACCESS_KEY is None) or (S3_SECRET_KEY is None) or
+                        (S3_BUCKETNAME is None)):
                         response = base_routes.make_server_error_response(
-                            "Upload folder is not specified")
+                            "Server does not have access codes for S3.")
                     else:
-                        f.save(os.path.join(UPLOAD_FOLDER, filename))
+                        conn = tinys3.Connection(S3_ACCESS_KEY,S3_SECRET_KEY,tls=True)
+                        # Upload it.  Set cache expiry time to 1 hr.
+                        conn.upload(filename, f, S3_BUCKETNAME, expires=3600)
                         user.picture_filename = filename
                         session.add(user)
                         session.commit()
