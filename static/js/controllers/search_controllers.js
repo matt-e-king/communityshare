@@ -65,16 +65,13 @@
   module.controller(
     'SearchEditController',
     function(Session, $location, $scope, $routeParams, Search, Messages) {
-      $scope.searchSettingsMethods = {};
-      $scope.properties = {};
       var searchId = $routeParams.searchId;
       if (searchId !== undefined) {
         var searchPromise = Search.get(searchId);
         searchPromise.then(
           function(search) {
-            if ($scope.searchSettingsMethods.setSearch) {
-              $scope.searchSettingsMethods.setSearch(search);
-            }
+            $scope.search = search;
+            $scope.search.makeLabelDisplay()
           },
           function(message) {
             Messages.error(message);
@@ -89,26 +86,25 @@
           searcher_role = 'partner';
           searching_for_role = 'educator';
         }
-        var search = new Search({
+        $scope.search = new Search({
           searcher_user_id: Session.activeUser.id,
           searcher_role: searcher_role,
-          searching_for_role: searching_for_role
+          searching_for_role: searching_for_role,
+          zipcode: Session.activeUser.zipcode
         });
-        $scope.search = search;
+        $scope.search.makeLabelDisplay()
       }
 
       $scope.saveSettings = function() {
-          if ($scope.searchSettingsMethods.saveSettings) {
-            var promise = $scope.searchSettingsMethods.saveSettings();
-            promise.then(
-              function(search) {
-                $location.path('/search/' + search.id + '/results');
-              },
-              function(message) {
-                Messages.error(message);
-              });
-          }
-        
+        $scope.search.processLabelDisplay()
+        var promise = $scope.search.save();
+        promise.then(
+          function(search) {
+            $location.path('/search/' + search.id + '/results');
+          },
+          function(message) {
+            Messages.error(message);
+          });
       };
     });
   

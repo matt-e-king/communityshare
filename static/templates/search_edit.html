@@ -1,10 +1,7 @@
-<div cs-educator-search-settings
-     search="search"
-     methods="searchSettingsMethods"
-     form="properties.educatorSearchSettingsForm"
-     ></div>
+<div ng-if="Session.activeUser.is_educator" cs-educator-labels search="search"></div>
+<div ng-if="!Session.activeUser.is_educator" cs-community-partner-labels search="search"></div>
 
-<button class="btn cs-form-button"
+<button class="btn"
         ng-disabled="properties.educatorSearchSettingsForm.$invalid"
         ng-click="saveSettings()">
   Save Changes
