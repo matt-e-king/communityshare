@@ -53,19 +53,29 @@
 
     $routeProvider.when('/home', {
       templateUrl: './static/templates/home.html',
-      controller: 'HomeController'
+      controller: 'HomeController',
+      resolve: {
+        activeUser: function(activeUserLoader) {
+          return activeUserLoader();
+        }
+      }
     });
 
     $routeProvider.when('/searchusers', {
       templateUrl: './static/templates/search_users.html',
-      controller: 'SearchUsersController'
+      controller: 'SearchUsersController',
+      resolve: {
+        activeUser: function(activeUserLoader) {
+          return activeUserLoader();
+        }
+      }
     });
 
     $routeProvider.when('/settings', {
       templateUrl: './static/templates/settings.html',
       controller: 'SettingsController',
       resolve: {
-        user: function(activeUserLoader) {
+        activeUser: function(activeUserLoader) {
           return activeUserLoader();
         }
       }
@@ -73,42 +83,82 @@
 
     $routeProvider.when('/user/:userId', {
       templateUrl: './static/templates/user_view.html',
-      controller: 'UserController'
+      controller: 'UserController',
+      resolve: {
+        activeUser: function(activeUserLoader) {
+          return activeUserLoader();
+        }
+      }
     });
 
     $routeProvider.when('/search/:searchId/edit', {
       templateUrl: './static/templates/search_edit.html',
-      controller: 'SearchEditController'
+      controller: 'SearchEditController',
+      resolve: {
+        activeUser: function(activeUserLoader) {
+          return activeUserLoader();
+        }
+      }
     });
 
     $routeProvider.when('/search/:searchId/results', {
       templateUrl: './static/templates/search_results.html',
-      controller: 'SearchResultsController'
+      controller: 'SearchResultsController',
+      resolve: {
+        activeUser: function(activeUserLoader) {
+          return activeUserLoader();
+        }
+      }
     });
 
     $routeProvider.when('/search', {
       templateUrl: './static/templates/search_edit.html',
-      controller: 'SearchEditController'
+      controller: 'SearchEditController',
+      resolve: {
+        activeUser: function(activeUserLoader) {
+          return activeUserLoader();
+        }
+      }
     });
 
     $routeProvider.when('/conversation/unviewed', {
       templateUrl: './static/templates/unviewed_conversations.html',
-      controller: 'UnviewedConversationController'
+      controller: 'UnviewedConversationController',
+      resolve: {
+        activeUser: function(activeUserLoader) {
+          return activeUserLoader();
+        }
+      }
     });
 
     $routeProvider.when('/conversation/:conversationId', {
       templateUrl: './static/templates/conversation.html',
-      controller: 'ConversationController'
+      controller: 'ConversationController',
+      resolve: {
+        activeUser: function(activeUserLoader) {
+          return activeUserLoader();
+        }
+      }
     });
 
     $routeProvider.when('/share/new', {
       templateUrl: './static/templates/share_edit.html',
-      controller: 'NewShareController'
+      controller: 'NewShareController',
+      resolve: {
+        activeUser: function(activeUserLoader) {
+          return activeUserLoader();
+        }
+      }
     });
 
     $routeProvider.when('/share/:shareId', {
       templateUrl: './static/templates/share.html',
-      controller: 'ShareController'
+      controller: 'ShareController',
+      resolve: {
+        activeUser: function(activeUserLoader) {
+          return activeUserLoader();
+        }
+      }
     });
 
     $routeProvider.otherwise({
