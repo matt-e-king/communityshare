@@ -10,10 +10,28 @@
     ])
 
   module.factory(
+    'activeUserLoader',
+    function(SessionBase) {
+      return SessionBase.getActiveUserPromise;
+    });
+
+  module.factory(
     'SessionBase',
-    function() {
+    function($q) {
       var SessionBase = {};
-      SessionBase.activeUser = undefined;
+      var deferred;
+      SessionBase.clearUser = function() {
+        deferred = $q.defer();
+        SessionBase.activeUser = undefined;
+      };
+      SessionBase.setUser = function(user) {
+        deferred.resolve(user);
+        SessionBase.activeUser = user;
+      };
+      SessionBase.getActiveUserPromise = function() {
+        return deferred.promise;
+      }
+      SessionBase.clearUser();
       return SessionBase;
     });
 
@@ -31,6 +49,8 @@
       Authenticator.clean = function() {
         $http.defaults.headers.common['Authorization'] = '';
         $cookieStore.remove('apiKey');
+        SessionBase.clearUser();
+        SessionBase.setUser(undefined);
       };
       Authenticator.setApiKey = function(key) {
         $http.defaults.headers.common['Authorization'] = 
@@ -40,6 +60,7 @@
       Authenticator.setEmail = function(email) {
         $cookies.email = email;
       };
+
       Authenticator.getUnviewedConversations = 
         function() {
           if (SessionBase.activeUser) {
@@ -67,6 +88,7 @@
               });
           }
         };
+
       Authenticator.authenticateFromCookie =
         function() {
           var deferred = $q.defer();
@@ -77,17 +99,21 @@
             var userPromise = User.getByEmail(email);
             userPromise.then(
               function(user) {
-                SessionBase.activeUser = user;
+                SessionBase.setUser(user);
                 Authenticator.getUnviewedConversations();
               },
               function(message) {
+                SessionBase.setUser(undefined);
                 deferred.reject(message);
               }
             );
           } else {
-            deferred.reject('No cookie found');
+            var message = 'No cookie found';
+            SessionBase.setUser(undefined);
+            deferred.reject(message);
           }
         };
+
       Authenticator.authenticateWithEmailAndPassword =
         function(email, password) {
           $http.defaults.headers.common['Authorization'] = 
@@ -106,12 +132,14 @@
             function(response) {
             });
           var userPromise = User.getByEmail(email);
+          SessionBase.clearUser();
           userPromise.then(
             function(user) {
-              SessionBase.activeUser = user;
+              SessionBase.setUser(user);
               Authenticator.getUnviewedConversations();
             },
             function(response) {
+              SessionBase.setUser(undefined);
             }
           );
           return userPromise;

@@ -63,7 +63,12 @@
 
     $routeProvider.when('/settings', {
       templateUrl: './static/templates/settings.html',
-      controller: 'SettingsController'
+      controller: 'SettingsController',
+      resolve: {
+        user: function(activeUserLoader) {
+          return activeUserLoader();
+        }
+      }
     });
 
     $routeProvider.when('/user/:userId', {
