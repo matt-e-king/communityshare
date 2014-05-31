@@ -22,12 +22,13 @@ class Share(Base, Serializable):
         'educator_approved', 'community_partner_approved', 'title', 'description']
     STANDARD_READABLE_FIELDS = [
         'id', 'educator_user_id', 'community_partner_user_id', 'title' ,
-        'description', 'conversation_id', 'active',
+        'description', 'conversation_id', 'active', 'event', 'educator',
+        'community_partner'
     ]
     ADMIN_READABLE_FIELDS = [
         'id', 'educator_user_id', 'community_partner_user_id', 'title' ,'description',
         'educator_approved', 'community_partner_approved', 'date_created',
-        'conversation_id', 'active',
+        'conversation_id', 'active', 'events', 'educator', 'community_partner'
     ]
 
     PERMISSIONS = {
@@ -135,10 +136,10 @@ class Event(Base, Serializable):
         'datetime_start', 'datetime_stop', 'title', 'description', 'location',]
     STANDARD_READABLE_FIELDS = [
         'id', 'share_id', 'datetime_start', 'datetime_stop', 'title',
-        'description', 'location', 'active']
+        'description', 'location', 'active', 'share']
     ADMIN_READABLE_FIELDS = [
         'id', 'share_id', 'datetime_start', 'datetime_stop', 'title',
-        'description', 'location', 'active']
+        'description', 'location', 'active', 'share']
 
     PERMISSIONS = {
         'standard_can_read_many': True
