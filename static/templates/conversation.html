@@ -50,9 +50,7 @@
 </div>
 <div ng-repeat="message in conversation.messages" class="conversation-block">
   <div class="conversation-sender">{{message.sender_user.name}}</div>
-  <div class="conversation-message show-linebreaks">
-    {{message.content}}
-  </div>
+  <div class="conversation-message show-linebreaks">{{message.content}}</div>
 </div>
 
 <form novalidate login-with-auto-fill
