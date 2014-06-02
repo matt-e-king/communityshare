@@ -6,7 +6,8 @@
 
     <p>{{user.bio}}</p>
     
-    <image ng-src="{{user.picture_url}}" height="200"/>
+    <image ng-if="user.picture_url" ng-src="{{user.picture_url}}"
+           height="200"/>
     
     <div class="row" ng-show="Session.activeUser.is_administrator">
       <div class="col-lg-3 text-right">Email</div>
