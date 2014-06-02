@@ -67,6 +67,14 @@
     });
 
   module.controller(
+    'DefaultController',
+    function($scope, user, $location) {
+      if (user) {
+        $location.path('home');
+      }
+    });
+
+  module.controller(
     'LoginController',
     function($scope, $location, Authenticator) {
       $scope.email = undefined;

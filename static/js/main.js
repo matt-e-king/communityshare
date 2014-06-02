@@ -18,7 +18,13 @@
   app.config(function($routeProvider) {
 
     $routeProvider.when('/', {
-      templateUrl: './static/templates/default.html'
+      templateUrl: './static/templates/default.html',
+      controller: 'DefaultController',
+      resolve: {
+        user: function(activeUserLoader) {
+          return activeUserLoader();
+        }
+      }
     });
 
     $routeProvider.when('/login', {
