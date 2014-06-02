@@ -5,7 +5,11 @@
   <div class="conversation-message">{{message.content}}</div>
 </div>
 
-<table class="table">
+<div ng-show="conversations.length == 0">
+  There are no conversations with unviewed messages.
+</div>
+
+<table class="table" ng-show="conversations">
   <thead>
     <tr><th>Subject</th><th>Name</th><th>Number of Unviewed Message<th>Message</th></tr>
   </thead>
