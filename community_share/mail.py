@@ -29,6 +29,7 @@ class DummyMailer(object):
 
 class MailgunMailer(object):
     def send(email):
+        error_message = ''
         if not ('notarealemail' in email.to_address):
             payload = {
                 'from': email.from_address,
@@ -37,9 +38,15 @@ class MailgunMailer(object):
                 'text': email.content
             }
             r = requests.post(
-                'https://api.mailgun.net/v2/samples.mailgun.org/messages',
+                'https://api.mailgun.net/v2/{0}/messages'.format(
+                    settings.MAILGUN_DOMAIN),
                 auth=('api', settings.MAILGUN_API_KEY),
                 data=payload)
+            if not r.ok:
+                logger.error('Mailgun API failed with message: {0}'.format(
+                    r.json()['message']))
+                error_message = 'Server failed to connect to email service.'
+        return error_message
 
 mailer_type_to_mail = {
     'DUMMY': DummyMailer,

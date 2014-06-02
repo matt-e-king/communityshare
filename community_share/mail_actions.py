@@ -31,7 +31,8 @@ If you cannot click on the link copy it into the addressbar of your browser.
         subject='CommunityShare Password Reset Request',
         content=content
     )
-    mail.mailer.send(email)
+    error_message = mail.mailer.send(email)
+    return error_message
 
 def process_password_reset(secret_key, new_password):
     logger.debug('password reset secret key is {0}'.format(secret_key))

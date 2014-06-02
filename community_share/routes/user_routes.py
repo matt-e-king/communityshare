@@ -71,8 +71,11 @@ def register_user_routes(app):
         if user is None:
             response = base_routes.make_not_found_response()
         else:
-            mail_actions.request_password_reset(user)
-            response = base_routes.make_OK_response()
+            error_message = mail_actions.request_password_reset(user)
+            if error_message:
+                response = base_routes.make_server_error_response(error_message)
+            else:
+                response = base_routes.make_OK_response()
         return response
         
     @app.route('/api/requestapikey/', methods=['GET'])

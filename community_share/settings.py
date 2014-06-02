@@ -3,9 +3,10 @@ import logging
 
 DB_CONNECTION = os.environ.get('DATABASE_URL', '')
 
-# MAILER_TYPE = 'DUMMY'
-MAILER_TYPE = 'MAILGUN'
+# MAILER_TYPE can be 'MAILGUN' or 'DUMMY'
+MAILER_TYPE = os.environ.get('MAILER_TYPE')
 MAILGUN_API_KEY = os.environ.get('MAILGUN_API_KEY', 'invalidapikey')
+MAILGUN_DOMAIN = os.environ.get('MAILGUN_DOMAIN')
 
 DONOTREPLY_EMAIL_ADDRESS = os.environ.get('COMMUNITYSHARE_DONOTREPLY_EMAIL_ADDRESS',
                                           'donotreply@invalid.email.address')
