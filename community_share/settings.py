@@ -4,14 +4,13 @@ import logging
 DB_CONNECTION = os.environ.get('DATABASE_URL', '')
 
 # MAILER_TYPE can be 'MAILGUN' or 'DUMMY'
-MAILER_TYPE = os.environ.get('MAILER_TYPE')
-MAILGUN_API_KEY = os.environ.get('MAILGUN_API_KEY', 'invalidapikey')
-MAILGUN_DOMAIN = os.environ.get('MAILGUN_DOMAIN')
+MAILER_TYPE = os.environ['COMMUNITYSHARE_MAILER_TYPE']
+MAILGUN_API_KEY = os.environ['MAILGUN_API_KEY']
+MAILGUN_DOMAIN = os.environ['MAILGUN_DOMAIN']
 
-DONOTREPLY_EMAIL_ADDRESS = os.environ.get('COMMUNITYSHARE_DONOTREPLY_EMAIL_ADDRESS',
-                                          'donotreply@invalid.email.address')
+DONOTREPLY_EMAIL_ADDRESS = os.environ['COMMUNITYSHARE_DONOTREPLY_EMAIL_ADDRESS']
 
-BASEURL = os.environ.get('COMMUNITYSHARE_BASEURL', 'localhost:5000')
+BASEURL = os.environ['COMMUNITYSHARE_BASEURL']
 
 def setup_logging(level):
     "Utility function for setting up logging."
