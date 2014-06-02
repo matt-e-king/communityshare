@@ -17,13 +17,7 @@
       if (Session.activeUser) {
 
         // Get upcoming events for this user.
-        var now = new Date();
-        var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        var params = {
-          user_id: Session.activeUser.id,
-          'datetime_start.greaterthan': today
-        };
-        var eventsPromise = Evnt.get_many(params);
+        var eventsPromise = Session.activeUser.getUpcomingEvents();
         eventsPromise.then(
           function(events) {
             $scope.upcomingShares = events;
@@ -37,12 +31,7 @@
           });
         
         // Get recent conversations for this user.
-        var oneMonthAgo = new Date(now.getFullYear(), now.getMonth()-1, now.getDate());
-        var conversationParams = {
-          user_id: Session.activeUser.id,
-          'messages.date_created.greaterthan': oneMonthAgo
-        };
-        var conversationsPromise = Conversation.get_many(conversationParams);
+        var conversationsPromise = Session.activeUser.getRecentConversations();
         conversationsPromise.then(
           function(conversations) {
             $scope.recentConversations = conversations;

@@ -62,7 +62,7 @@
 
   module.factory(
     'User',
-    function(UserBase, $q, $http, Search, Conversation, SessionBase) {
+    function(UserBase, $q, $http, Search, Conversation, SessionBase, Evnt) {
 
       UserBase.prototype.addInstitutionAssociationRemoveMethod = function(ia) {
         var _this = this;
@@ -135,6 +135,51 @@
         };
         var searchesPromise = Search.get_many(searchParams);
         return searchesPromise;
+      };
+
+      UserBase.prototype.getRecentConversations = function() {
+        var now = new Date();
+        var oneMonthAgo = new Date(now.getFullYear(), now.getMonth()-1, now.getDate());
+        var conversationParams = {
+          user_id: this.id,
+          'messages.date_created.greaterthan': oneMonthAgo
+        };
+        var conversationsPromise = Conversation.get_many(
+          conversationParams, true);
+        return conversationsPromise;
+      };
+
+      UserBase.prototype.getUpcomingEvents = function() {
+        var now = new Date();
+        var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        var params = {
+          user_id: SessionBase.activeUser.id,
+          'datetime_start.greaterthan': today
+        };
+        var eventsPromise = Evnt.get_many(params);
+        return eventsPromise;
+      };
+
+      UserBase.prototype.updateUnviewedConversations = function() {
+        var _this = this;
+        var conversationsPromise = Conversation.getUnviewedForUser(this.id);
+        conversationsPromise.then(
+          function(conversations) {
+            var nUnviewedMessages = 0;
+            for (var i=0; i<conversations.length; i++) {
+              var conversation = conversations[i];
+              var messages = conversation.getUnviewedMessages();
+              nUnviewedMessages += messages.length;
+            }
+            _this.nUnviewedMessages = nUnviewedMessages;
+          },
+          function(message) {
+            var msg = '';
+            if (message) {
+              msg = ': ' + message;
+            }
+            Messages.showError('Failed to get messages: ' + msg);
+          });
       };
 
       return UserBase;
