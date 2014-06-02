@@ -36,9 +36,9 @@
           }
         }
         this.canApprove = false;
-        if ((iAmEducator) && (!this.educator_approved)) {
+        if ((iAmEducator) && (!this.educator_approved) && (this.community_partner_approved)) {
           this.canApprove = true;
-        } else if ((iAmCommunityPartner) && (!this.community_partner_approved)) {
+        } else if ((iAmCommunityPartner) && (!this.community_partner_approved) && (this.educator_approved)) {
           this.canApprove = true;
         }
         this.approved = (this.educator_approved && this.community_partner_approved);
