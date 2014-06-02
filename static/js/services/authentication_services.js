@@ -61,34 +61,6 @@
         $cookies.email = email;
       };
 
-      Authenticator.getUnviewedConversations = 
-        function() {
-          if (SessionBase.activeUser) {
-            var conversationsPromise = Conversation.getUnviewedForUser(
-              SessionBase.activeUser.id);
-            conversationsPromise.then(
-                function(conversations) {
-                  // Check again since we might have logged out since.
-                  if (SessionBase.activeUser) {
-                    var nUnviewedMessages = 0;
-                    for (var i=0; i<conversations.length; i++) {
-                      var conversation = conversations[i];
-                      var messages = conversation.getUnviewedMessages();
-                      nUnviewedMessages += messages.length;
-                    }
-                    SessionBase.activeUser.nUnviewedMessages = nUnviewedMessages;
-                  }
-                },
-              function(message) {
-                var msg = '';
-                if (message) {
-                  msg = ': ' + message;
-                }
-                Messages.showError('Failed to get messages: ' + msg);
-              });
-          }
-        };
-
       Authenticator.authenticateFromCookie =
         function() {
           var deferred = $q.defer();
@@ -100,7 +72,7 @@
             userPromise.then(
               function(user) {
                 SessionBase.setUser(user);
-                Authenticator.getUnviewedConversations();
+                user.updateUnviewedConversations();
               },
               function(message) {
                 SessionBase.setUser(undefined);

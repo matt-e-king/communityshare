@@ -41,6 +41,7 @@
             Authenticator.setApiKey(response.data.apiKey);
             Authenticator.setEmail(user.email);
             Session.activeUser = user;
+            user.updateUnviewedConversations();
             deferred.resolve(user);
           },
           function(response) {
