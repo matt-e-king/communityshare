@@ -147,12 +147,23 @@
 
       Authenticator.requestResetPassword = function(email) {
         var url = 'api/requestresetpassword/'+email;
+        var deferred = $q.defer();
         var promise = $http({
           url: url,
           method: 'GET'
         });
-        return promise;
+        promise.then(
+          function(response) {
+            deferred.resolve(response.data);
+          },
+          function(response) {
+            if (response.data && response.data.message) {
+              deferred.reject(response.data.message);
+            }
+          });
+        return deferred.promise;
       };
+
       Authenticator.resetPassword = function(key, password) {
         var url = 'api/resetpassword';
         var promise = $http({

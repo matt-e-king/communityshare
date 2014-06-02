@@ -39,9 +39,19 @@
         promise.then(
           function() {
             $scope.successfulRequest = true;
+            $scope.errorMessage = '';
           },
-          function() {
-            $scope.failedRequest = true;
+          function(message) {
+            $scope.successfulRequest = false;
+            var msg = 'Failed to reset password';
+            if (message) {
+              if (message == 'Not found') {
+                msg += ': ' + 'Unknown email address'
+              } else {
+                msg += ': ' + message;
+              }
+            }
+            $scope.errorMessage = msg;
           });
       };
     });
