@@ -35,20 +35,25 @@ If you cannot click on the link copy it into the addressbar of your browser.
     return error_message
 
 def process_password_reset(secret_key, new_password):
-    logger.debug('password reset secret key is {0}'.format(secret_key))
-    secret = Secret.lookup_secret(secret_key)
     user = None
-    if secret is not None:
-        secret_info = secret.get_info()
-        userId = secret_info.get('userId', None)
-        action = secret_info.get('action', None)
-        if action == 'password_reset' and userId is not None:
-            user = session.query(User).filter_by(id=userId).first()
-            if user is not None:
-                user.set_password(new_password)
-                secret.used = True
-                session.add(user)
-                session.add(secret)
-                session.commit()
-    return user
+    error_messages = User.is_password_valid(new_password)
+    if not error_messages:
+        secret = Secret.lookup_secret(secret_key)
+        error_message = ''
+        if secret is not None:
+            secret_info = secret.get_info()
+            userId = secret_info.get('userId', None)
+            action = secret_info.get('action', None)
+            if action == 'password_reset' and userId is not None:
+                user = session.query(User).filter_by(id=userId).first()
+                if user is not None:
+                    error_messages += user.set_password(new_password)
+                    if not error_messages:
+                        secret.used = True
+                        session.add(user)
+                        session.add(secret)
+                        session.commit()
+        else:
+            error_messages.append('Authorization for this action is invalid or expired.')
+    return (user, error_messages)
         

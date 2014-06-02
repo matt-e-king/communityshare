@@ -157,14 +157,17 @@
             deferred.resolve(response.data);
           },
           function(response) {
+            var message;
             if (response.data && response.data.message) {
-              deferred.reject(response.data.message);
+              message = response.data.message;
             }
+            deferred.reject(message);
           });
         return deferred.promise;
       };
 
       Authenticator.resetPassword = function(key, password) {
+        var deferred = $q.defer();
         var url = 'api/resetpassword';
         var promise = $http({
           url: url,
@@ -174,7 +177,18 @@
             password: password
           }
         });
-        return promise;
+        promise.then(
+          function(response) {
+            deferred.resolve(response.data)
+          },
+          function(response) {
+            var message = '';
+            if (response.data && response.data.message) {
+              message = response.data.message;
+            }
+            deferred.reject(message);
+          });
+        return deferred.promise;
       };
       return Authenticator;
     }

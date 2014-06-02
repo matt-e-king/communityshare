@@ -89,9 +89,21 @@ class User(Base, Serializable):
             is_correct = self.pwd_context.verify(password, self.password_hash)
         return is_correct
 
+    @classmethod
+    def is_password_valid(cls, password):
+        error_messages = []
+        if len(password) < 8:
+            error_messages.append(
+                'Password must have a length of at least 8 characters')
+        return error_messages
+
     def set_password(self, password):
-        password_hash = User.pwd_context.encrypt(password)
-        self.password_hash = password_hash
+        output = None
+        error_messages = self.is_password_valid(password)
+        if not error_messages:
+            password_hash = User.pwd_context.encrypt(password)
+            self.password_hash = password_hash
+        return error_messages
 
     def __repr__(self):
         output = "<User(email={email})>".format(email=self.email) 

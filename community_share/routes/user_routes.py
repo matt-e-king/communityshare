@@ -38,16 +38,20 @@ def register_user_routes(app):
                 'A password was not specified.');
         else:
             user = User.admin_deserialize_add(user)
-            user.set_password(password)
-            session.add(user)
-            session.commit()
-            secret = user.make_api_key()
-            serialized = user.admin_serialize()
-            response_data = {
-                'data': serialized,
-                'apiKey': secret.key
-            }
-            response = jsonify(response_data)
+            error_messages = user.set_password(password)
+            if error_messages:
+                error_message = ', '.join(error_messages)
+                response = base_routes.make_bad_request_response(error_message)
+            else:
+                session.add(user)
+                session.commit()
+                secret = user.make_api_key()
+                serialized = user.admin_serialize()
+                response_data = {
+                    'data': serialized,
+                    'apiKey': secret.key
+                }
+                response = jsonify(response_data)
         return response
 
     @app.route('/api/userbyemail/<string:email>', methods=['GET'])
@@ -96,11 +100,18 @@ def register_user_routes(app):
         data = request.json
         key = data.get('key', '')
         password = data.get('password', '')
-        if key == '' or password == '':
-            response = base_routes.make_bad_request_response()
+        if key == '':
+            response = base_routes.make_bad_request_response(
+                'Did not receive a key with password reset request.')
+        elif password == '':
+            response = base_routes.make_bad_request_response(
+                'Received password to reset to was blank.')
         else:
-            user = mail_actions.process_password_reset(key, password)
-            if user is None:
+            user, error_messages = mail_actions.process_password_reset(key, password)
+            if error_messages:
+                error_message = ', '.join(error_messages)
+                response = base_routes.make_bad_request_response(error_message)
+            elif user is None:
                 response = base_routes.make_bad_request_response()
             else:
                 response = base_routes.make_admin_single_response(user)

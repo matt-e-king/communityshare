@@ -12,9 +12,12 @@
     function($scope, Authenticator, $routeParams, $location) {
       var key = $routeParams.key;
       $scope.password = '';
-      $scope.passwordRepeat = '';
+      $scope.repeat_password = '';
       $scope.successfulReset = false;
       $scope.failedReset = false;
+      // passwordMethods is used for communication between password and
+      // password_repeat directives.
+      $scope.passwordMethods = {};
       $scope.resetPassword = function() {
         var promise = Authenticator.resetPassword(key, $scope.password);
         promise.then(
@@ -22,8 +25,8 @@
             $location.path('/login').search({});
             $scope.successfulReset = true;
           },
-          function() {
-            $scope.failedReset = true;
+          function(message) {
+            $scope.errorMessage = message;
           });
       };
     });
