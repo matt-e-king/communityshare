@@ -60,6 +60,22 @@
     });
 
   module.controller(
+    'ConfirmEmailController',
+    function($scope, Authenticator, $routeParams, $location) {
+      var key = $routeParams.key;
+      $scope.confirmed = false;
+      $scope.failedReset = false;
+      var promise = Authenticator.confirmEmail(key);
+      promise.then(
+        function(user) {
+          $scope.confirmed = true;
+        },
+        function(message) {
+          $scope.errorMessage = message;
+        });
+    });
+
+  module.controller(
     'LogoutController',
     function(Authenticator, Session) {
       Authenticator.clean();

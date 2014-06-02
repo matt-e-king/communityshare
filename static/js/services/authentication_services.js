@@ -27,6 +27,9 @@
       SessionBase.setUser = function(user) {
         deferred.resolve(user);
         SessionBase.activeUser = user;
+        if (user) {
+          user.updateUnviewedConversations();
+        }
       };
       SessionBase.getActiveUserPromise = function() {
         return deferred.promise;
@@ -72,7 +75,6 @@
             userPromise.then(
               function(user) {
                 SessionBase.setUser(user);
-                user.updateUnviewedConversations();
               },
               function(message) {
                 SessionBase.setUser(undefined);
@@ -108,7 +110,6 @@
           userPromise.then(
             function(user) {
               SessionBase.setUser(user);
-              Authenticator.getUnviewedConversations();
             },
             function(response) {
               SessionBase.setUser(undefined);
@@ -138,6 +139,35 @@
         return deferred.promise;
       };
 
+      Authenticator.confirmEmail = function(key) {
+        var deferred = $q.defer();
+        var url = 'api/confirmemail';
+        var promise = $http({
+          url: url,
+          method: 'POST',
+          data: {
+            key: key
+          }
+        });
+        SessionBase.clearUser();
+        promise.then(
+          function(response) {
+            var apiKey = response.data.apiKey;
+            var user = new User(response.data.data);
+            Authenticator.setApiKey(apiKey);
+            SessionBase.setUser(user);
+            deferred.resolve(user);
+          },
+          function(response) {
+            var message = '';
+            if (response.data && response.data.message) {
+              message = response.data.message;
+            }
+            deferred.reject(message);
+          });
+        return deferred.promise;
+      };
+
       Authenticator.resetPassword = function(key, password) {
         var deferred = $q.defer();
         var url = 'api/resetpassword';
@@ -151,7 +181,7 @@
         });
         promise.then(
           function(response) {
-            deferred.resolve(response.data)
+            deferred.resolve(response.data);
           },
           function(response) {
             var message = '';

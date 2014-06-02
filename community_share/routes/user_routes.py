@@ -45,11 +45,13 @@ def register_user_routes(app):
             else:
                 session.add(user)
                 session.commit()
+                error_message = mail_actions.request_signup_email_confirmation(user)
                 secret = user.make_api_key()
                 serialized = user.admin_serialize()
                 response_data = {
                     'data': serialized,
-                    'apiKey': secret.key
+                    'apiKey': secret.key,
+                    'warningMessage': 'Failed to send email confirmation: {0}'.format(error_message)
                 }
                 response = jsonify(response_data)
         return response
@@ -81,7 +83,7 @@ def register_user_routes(app):
             else:
                 response = base_routes.make_OK_response()
         return response
-        
+
     @app.route('/api/requestapikey/', methods=['GET'])
     def request_api_key():
         requester = get_requesting_user()
@@ -116,6 +118,31 @@ def register_user_routes(app):
             else:
                 response = base_routes.make_admin_single_response(user)
         return response
+
+    @app.route('/api/confirmemail', methods=['POST'])
+    def confirm_email():
+        data = request.json
+        key = data.get('key', '')
+        if key == '':
+            response = base_routes.make_bad_request_response(
+                'Did not receive a key with email confirmation.')
+        else:
+            user, error_messages = mail_actions.process_confirm_email(key)
+            if error_messages:
+                error_message = ', '.join(error_messages)
+                response = base_routes.make_bad_request_response(error_message)
+            elif user is None:
+                response = base_routes.make_bad_request_response()
+            else:
+                secret = user.make_api_key()
+                serialized = user.admin_serialize()
+                response_data = {
+                    'data': serialized,
+                    'apiKey': secret.key,
+                }
+                response = jsonify(response_data)
+        return response
+        
         
 
     UPLOAD_FOLDER = os.environ.get('COMMUNITYSHARE_UPLOAD_FOLDER', None)

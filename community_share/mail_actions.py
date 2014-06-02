@@ -9,6 +9,33 @@ from community_share import mail, settings
 
 logger = logging.getLogger(__name__)
 
+def request_signup_email_confirmation(user):
+    secret_info = {
+        'userId': user.id,
+        'email': user.email,
+        'action': 'email_confirmation',
+    }
+    hours_duration = 48
+    secret = Secret.create_secret(secret_info, hours_duration)
+    content = '''A community share account has been created and attached to this email address.
+
+To confirm that you created the account, please click on the following link.
+
+{BASEURL}/#/confirmemail?key={secret_key}
+
+If you did not create this account, simply ignore this email.
+'''
+    content = content.format(BASEURL=settings.BASEURL, secret_key=secret.key)
+    email = mail.Email(
+        from_address=settings.DONOTREPLY_EMAIL_ADDRESS,
+        to_address=user.email,
+        subject='CommunityShare Account Creation',
+        content=content
+    )
+    error_message = mail.mailer.send(email)
+    return error_message
+    
+
 def request_password_reset(user):
     secret_info = {
         'userId': user.id,
@@ -16,7 +43,7 @@ def request_password_reset(user):
     }
     hours_duration = 48
     secret = Secret.create_secret(secret_info, hours_duration)
-    content='''We received a request to reset your password for CommunityShare.
+    content = '''We received a request to reset your password for CommunityShare.
     
 To reset your password please click on the following link and follow the instructions.
     
@@ -55,5 +82,29 @@ def process_password_reset(secret_key, new_password):
                         session.commit()
         else:
             error_messages.append('Authorization for this action is invalid or expired.')
+    return (user, error_messages)
+
+def process_confirm_email(secret_key):
+    error_messages = []
+    user = None
+    secret = Secret.lookup_secret(secret_key)
+    if secret is not None:
+        secret_info = secret.get_info()
+        userId = secret_info.get('userId', None)
+        action = secret_info.get('action', None)
+        if action == 'email_confirmation' and userId is not None:
+            user = session.query(User).filter_by(id=userId).first()
+            if user is not None:
+                user.email_confirmed = True
+                secret.used = True
+                session.add(user)
+                session.add(secret)
+                session.commit()
+            else:
+                error_messages.append('Authorization is for an unknown user.')
+        else:
+            error_mesage('Authorization is not valid for this action.')
+    else:
+        error_messages.append('Authorization for this action is invalid or expired.')
     return (user, error_messages)
         

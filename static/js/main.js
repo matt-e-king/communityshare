@@ -57,6 +57,11 @@
       controller: 'ResetPasswordController'
     });
 
+    $routeProvider.when('/confirmemail', {
+      templateUrl: './static/templates/confirm_email.html',
+      controller: 'ConfirmEmailController'
+    });
+
     $routeProvider.when('/home', {
       templateUrl: './static/templates/home.html',
       controller: 'HomeController',

@@ -46,6 +46,8 @@ class MailgunMailer(object):
                 logger.error('Mailgun API failed with message: {0}'.format(
                     r.json()['message']))
                 error_message = 'Server failed to connect to email service.'
+        else:
+            logger.info(text)
         return error_message
 
 mailer_type_to_mail = {

@@ -16,7 +16,7 @@
 
   module.factory(
     'signUp',
-    function($q, $http, User, Authenticator, Session) {
+    function($q, $http, User, Authenticator, Session, Messages) {
       var signUp = function(user, password) {
         var deferred = $q.defer();
         // Remove any insitutions with no names
@@ -40,6 +40,9 @@
             var user = new User(response.data.data);
             Authenticator.setApiKey(response.data.apiKey);
             Authenticator.setEmail(user.email);
+            if (user.warningMessage) {
+              Messages.error('Failed to send email to confirm address.');
+            }
             Session.activeUser = user;
             user.updateUnviewedConversations();
             deferred.resolve(user);

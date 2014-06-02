@@ -36,11 +36,14 @@ class User(Base, Serializable):
         'is_administrator', 'is_educator', 'is_community_partner',
         'institution_associations',
         'zipcode', 'website', 'twitter_handle', 'linkedin_link',
-        'year_of_birth', 'gender', 'ethnicity', 'bio', 'picture_url']
+        'year_of_birth', 'gender', 'ethnicity', 'bio', 'picture_url',
+        'email_confirmed',
+    ]
     
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False)
     email = Column(String(50), nullable=False, unique=True)
+    email_confirmed = Column(Boolean, nullable=False, default=False)
     active = Column(Boolean, default=True)
     password_hash = Column(String(120), nullable=True)
     date_created = Column(DateTime, nullable=False, default=datetime.utcnow)
