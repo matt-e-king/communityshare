@@ -7,7 +7,7 @@
 
 <div ng-repeat="search in searches" class="search-result">
   <a ng-href="#/user/{{search.searcher_user_id}}"><h5>{{search.searcher_user.name}}</h5></a>
-  <p>{{search.searcher_user.bio}}</p>
+  <p class="show-linebreaks">{{search.searcher_user.bio}}</p>
   <image ng-src="{{search.searcher_user.picture_url}}" height="100"/>
   <div ng-show="search.searcher_user.conversationsWithMe">
     <h5>Past Conversations</h5>

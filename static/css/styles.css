@@ -5998,3 +5998,6 @@ body {
   padding: 10px;
   margin: 10px;
 }
+.show-linebreaks {
+  white-space: pre-wrap;
+}
