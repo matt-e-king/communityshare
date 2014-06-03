@@ -3,23 +3,20 @@ import os
 
 from flask import Flask, send_from_directory, render_template
 
-from community_share import settings
+from community_share import config, settings, store
 from community_share.routes.user_routes import register_user_routes
 from community_share.routes.search_routes import register_search_routes
 from community_share.routes.conversation_routes import register_conversation_routes
 from community_share.routes.share_routes import register_share_routes
 from community_share.routes.survey_routes import register_survey_routes
 from community_share.routes.email_routes import register_email_routes
-from community_share.store import session
-
-COMMIT_HASH = os.environ.get('COMMIT_HASH', 'dummy')
 
 logger = logging.getLogger(__name__)
 
 def make_app():
-    logger.debug('COMMIT_HASH is {0}'.format(COMMIT_HASH))
+    logger.debug('COMMIT_HASH is {0}'.format(config.COMMIT_HASH))
     app = Flask(__name__, template_folder='../static/')
-    app.config['SQLALCHEMY_DATABASE_URI'] = settings.DB_CONNECTION
+    app.config['SQLALCHEMY_DATABASE_URI'] = config.DB_CONNECTION
 
     register_user_routes(app)
     register_search_routes(app)
@@ -30,7 +27,7 @@ def make_app():
 
     @app.teardown_appcontext
     def close_db_connection(exception):
-        session.remove()
+        store.session.remove()
 
     @app.route('/static/js/<path:filename>')
     def js_static(filename):
@@ -50,15 +47,14 @@ def make_app():
 
     @app.route('/')
     def index():
-        return render_template('index.html', COMMIT_HASH=COMMIT_HASH)
+        logger.debug('rendering index')
+        return render_template('index.html', COMMIT_HASH=config.COMMIT_HASH)
         
     return app
 
-settings.setup_logging(logging.DEBUG)
-app = make_app()
-    
 if __name__ == '__main__':
-    # settings.setup_logging(logging.DEBUG)
-    # app = make_app()
+    config.load_from_environment()
+    settings.setup_logging(config.LOGGING_LEVEL)
+    app = make_app()
     app.debug = True
     app.run()

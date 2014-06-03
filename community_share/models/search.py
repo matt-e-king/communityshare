@@ -6,7 +6,7 @@ from sqlalchemy import Integer, String, Boolean, Float
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.expression import func
 
-from community_share.store import Base, session
+from community_share import Base, store
 from community_share.models.base import Serializable
 
 logger = logging.getLogger(__name__)
@@ -65,7 +65,7 @@ class Search(Base, Serializable):
     def get_many_ordered_by_label_matches(
             cls, labels, searcher_role, searching_for_role, max_number=10):
         labelnames = [label.name for label in labels]
-        query = session.query(Search, func.count(Label.id).label('matches'))
+        query = store.session.query(Search, func.count(Label.id).label('matches'))
         query = query.join(Search.labels)
         query = query.filter(Label.name.in_(labelnames))
         query = query.filter(Search.active==True)
@@ -136,7 +136,7 @@ class Label(Base, Serializable):
 
     @classmethod
     def name_list_to_object_list(cls, names):
-        labels = session.query(Label).filter(Label.name.in_(names)).all()
+        labels = store.session.query(Label).filter(Label.name.in_(names)).all()
         missing_labelnames = set(names)
         for label in labels:
             missing_labelnames.remove(label.name)

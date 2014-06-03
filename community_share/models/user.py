@@ -1,4 +1,3 @@
-import os
 from datetime import datetime
 import logging
 
@@ -9,7 +8,7 @@ from sqlalchemy.orm import relationship, backref
 import passlib
 from passlib import context
 
-from community_share.store import Base, session
+from community_share import store, Base, config
 from community_share.models.base import Serializable
 from community_share.models.secret import Secret
 from community_share.models.search import Search
@@ -71,7 +70,7 @@ class User(Base, Serializable):
     )
     
     def searches_as(self, role):
-        searches = session.query(Search).filter_by(
+        searches = store.session.query(Search).filter_by(
             searcher_user_id=self.id, searcher_role=role).all()
         return searches
 
@@ -139,9 +138,8 @@ class User(Base, Serializable):
 
     def serialize_picture_url(self):
         url = ''
-        upload_location = os.environ.get('COMMUNITYSHARE_UPLOAD_LOCATION', None)
-        if (upload_location is not None) and self.picture_filename:
-            url = upload_location + self.picture_filename
+        if (config.UPLOAD_LOCATION is not None) and self.picture_filename:
+            url = config.UPLOAD_LOCATION + self.picture_filename
         return url
 
     custom_serializers = {
@@ -186,7 +184,7 @@ class User(Base, Serializable):
             if info.get('action', None) == 'api_key':
                 user_id = info.get('userId', None)
         if user_id is not None:
-            user = session.query(User).filter_by(id=user_id).first()
+            user = store.session.query(User).filter_by(id=user_id).first()
             logger.debug('user from api_key is {0}'.format(user))
         else:
             user = None

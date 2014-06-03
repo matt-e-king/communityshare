@@ -7,7 +7,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql.expression import func
 from sqlalchemy import or_
 
-from community_share.store import Base, session
+from community_share import store, Base
 from community_share.models.base import Serializable
 
 logger = logging.getLogger(__name__)

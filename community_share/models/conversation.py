@@ -5,7 +5,7 @@ from sqlalchemy import Column, Integer, Boolean, DateTime, Table, ForeignKey
 from sqlalchemy import String, or_, and_
 from sqlalchemy.orm import relationship
 
-from community_share.store import Base, session
+from community_share import store, Base
 from community_share.models.base import Serializable
 
 conversation_user_table = Table('conversation_user', Base.metadata,
@@ -42,7 +42,7 @@ class Conversation(Base, Serializable):
     userA_id = Column(Integer, ForeignKey('user.id'), nullable=False)
     userB_id = Column(Integer, ForeignKey('user.id'), nullable=False)
 
-    messages = relationship('Message', backref='conversation')
+    messages = relationship('Message', backref='conversation', order_by="Message.date_created")
     userA = relationship('User', primaryjoin='Conversation.userA_id == User.id')
     userB = relationship('User', primaryjoin='Conversation.userB_id == User.id')
 
@@ -95,7 +95,7 @@ class Conversation(Base, Serializable):
             try:
                 user_id = int(user_id)
                 if requester.id == user_id:
-                    query = session.query(Conversation)
+                    query = store.session.query(Conversation)
                     query = query.filter(
                         or_(Conversation.userA==requester, Conversation.userB==requester))
                     if with_unviewed_messages:
@@ -142,7 +142,7 @@ class Message(Base, Serializable):
         has_rights = False
         if int(data.get('sender_user_id', -1)) == user.id:
             conversation_id = data.get('conversation_id', -1)
-            conversation = session.query(Conversation).filter(
+            conversation = store.session.query(Conversation).filter(
                 Conversation.id==conversation_id).first()
             if (conversation.userA_id == user.id) or (conversation.userB_id == user.id):
                 has_rights = True

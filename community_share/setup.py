@@ -10,8 +10,7 @@ from community_share.models.survey import Question, SuggestedAnswer
 from community_share.models.conversation import Conversation, Message
 from community_share.models.institution import InstitutionAssociation, Institution
 from community_share.models.share import Share, Event
-from community_share.store import session, Base, engine
-from community_share import settings
+from community_share import settings, store, Base
 
 logger = logging.getLogger(__name__)
 
@@ -149,8 +148,8 @@ def make_random_user():
     new_user = User(name=name, email=email, password_hash=password_hash,
                     picture_filename=picture_filename, bio=bio,
                     is_administrator=False, email_confirmed=True)
-    session.add(new_user)
-    session.commit()
+    store.session.add(new_user)
+    store.session.commit()
     # Make the search
     location = make_random_location()
     search = Search(
@@ -161,29 +160,29 @@ def make_random_user():
         longitude=location[1],
     )
     search.labels = Label.name_list_to_object_list(get_labels())
-    session.add(search)
-    session.commit()
+    store.session.add(search)
+    store.session.commit()
         
 def make_labels():
     all_labels = labels['GradeLevels'] + labels['SubjectAreas'] + labels['LevelOfEngagement']
     for name in all_labels:
         label = Label(name=name)
-        session.add(label)
+        store.session.add(label)
         try:
-            session.commit()
+            store.session.commit()
         except (IntegrityError, InvalidRequestError):
-            session.rollback()
+            store.session.rollback()
 
 
 def make_admin_user(name, email, password):
     password_hash = User.pwd_context.encrypt(password)
     new_user = User(name=name, email=email, password_hash=password_hash,
                     is_administrator=True)
-    session.add(new_user)
+    store.session.add(new_user)
     try:
-        session.commit()
+        store.session.commit()
     except (IntegrityError, InvalidRequestError):
-        session.rollback()
+        store.session.rollback()
         new_user = None
     return new_user
 
@@ -233,21 +232,24 @@ def make_questions(creator):
                             text='Web search'),
         ],
     )
-    session.add(question_one)
-    session.add(question_two)
+    store.session.add(question_one)
+    store.session.add(question_two)
     try:
-        session.commit()
+        store.session.commit()
     except (IntegrityError, InvalidRequestError):
-        session.rollback()
+        store.session.rollback()
 
-def setup():
-    logger.info('Starting setup script.')
-    first_admin = None
-    Base.metadata.reflect(engine)
+def init_db():
+    Base.metadata.reflect(store.engine)
     logger.info('Dropping all tables.')
-    Base.metadata.drop_all(engine);
+    Base.metadata.drop_all(store.engine);
     logger.info('Creating all tables.')
-    Base.metadata.create_all(engine);
+    Base.metadata.create_all(store.engine);    
+
+def setup(n_random_users=100):
+    logger.info('Starting setup script.')
+    init_db()
+    first_admin = None
     logger.info('Making lables.')
     make_labels()
     import os
@@ -263,12 +265,12 @@ def setup():
                 first_admin = user
     logger.info('Making questions')
     make_questions(first_admin)
-    logger.info('Making 100 random users')
-    for i in range(100):
+    logger.info('Making {0} random users'.format(n_random_users))
+    for i in range(n_random_users):
         make_random_user()
-    session.commit()
+    store.session.commit()
     
 if __name__ == '__main__':
     settings.setup_logging(logging.DEBUG)
-    setup()
+    setup(n_random_users=100)
               

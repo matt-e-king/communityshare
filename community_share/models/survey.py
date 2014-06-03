@@ -5,7 +5,7 @@ from sqlalchemy import Column, Integer, String, DateTime, Boolean
 from sqlalchemy import ForeignKey, CheckConstraint
 from sqlalchemy.orm import relationship
 
-from community_share.store import Base, session
+from community_share import Base
 from community_share.models.base import Serializable
 
 

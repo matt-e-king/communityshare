@@ -5,12 +5,12 @@ import tinys3
 from flask import request, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
 
-from community_share.store import session
 from community_share.models.user import User
 from community_share.models.institution import Institution
 from community_share.authorization import get_requesting_user
 from community_share import mail_actions
 from community_share.routes import base_routes
+from community_share import config, store
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +29,7 @@ def register_user_routes(app):
         email = user.get('email', '')
         password = data.get('password', None)
         # Check that the email isn't in use.
-        existing_user = session.query(User).filter_by(email=email).first()
+        existing_user = store.session.query(User).filter_by(email=email).first()
         if existing_user is not None:
             response = base_routes.make_bad_request_response(
                 'That email address is already associated with an account.')
@@ -43,8 +43,8 @@ def register_user_routes(app):
                 error_message = ', '.join(error_messages)
                 response = base_routes.make_bad_request_response(error_message)
             else:
-                session.add(user)
-                session.commit()
+                store.session.add(user)
+                store.session.commit()
                 error_message = mail_actions.request_signup_email_confirmation(user)
                 secret = user.make_api_key()
                 serialized = user.admin_serialize()
@@ -64,7 +64,7 @@ def register_user_routes(app):
         elif requester.email != email:
             response = base_routes.make_forbidden_response()
         else:
-            user = session.query(User).filter_by(email=email).first()
+            user = store.session.query(User).filter_by(email=email).first()
             if user is None:
                 response = base_routes.make_not_found_response()
             else:
@@ -73,7 +73,7 @@ def register_user_routes(app):
 
     @app.route('/api/requestresetpassword/<string:email>', methods=['GET'])
     def request_reset_password(email):
-        user = session.query(User).filter_by(email=email).first()
+        user = store.session.query(User).filter_by(email=email).first()
         if user is None:
             response = base_routes.make_not_found_response()
         else:
@@ -145,7 +145,6 @@ def register_user_routes(app):
         
         
 
-    UPLOAD_FOLDER = os.environ.get('COMMUNITYSHARE_UPLOAD_FOLDER', None)
     ALLOWED_EXTENSIONS = set(['.txt', '.pdf', '.png', '.jpg', '.jpeg', '.gif'])
 
     def process_filename(filename, user_id):
@@ -170,40 +169,17 @@ def register_user_routes(app):
                 if filename is None:
                     response = base_routes.make_bad_request_response()
                 else:
-                    S3_ACCESS_KEY = os.environ.get('COMMUNITYSHARE_S3_USERNAME', None)
-                    S3_SECRET_KEY = os.environ.get('COMMUNITYSHARE_S3_KEY', None)
-                    S3_BUCKETNAME = os.environ.get('COMMUNITYSHARE_S3_BUCKETNAME', None)
-                    
-                    if ((S3_ACCESS_KEY is None) or (S3_SECRET_KEY is None) or
-                        (S3_BUCKETNAME is None)):
-                        response = base_routes.make_server_error_response(
-                            "Server does not have access codes for S3.")
-                    else:
-                        conn = tinys3.Connection(S3_ACCESS_KEY,S3_SECRET_KEY,tls=True)
-                        # Upload it.  Set cache expiry time to 1 hr.
-                        conn.upload(filename, f, S3_BUCKETNAME, expires=3600)
-                        user.picture_filename = filename
-                        session.add(user)
-                        session.commit()
-                        response = base_routes.make_OK_response()
+                    conn = tinys3.Connection(
+                        config.S3_USERNAME, config.S3_KEY, tls=True)
+                    # Upload it.  Set cache expiry time to 1 hr.
+                    conn.upload(filename, f, config.S3_BUCKETNAME,
+                                expires=3600)
+                    user.picture_filename = filename
+                    store.session.add(user)
+                    store.session.commit()
+                    response = base_routes.make_OK_response()
             else:
                 response = base_routes.make_bad_request_response()
         else:
             response = base.routes.make_forbidden_response()
         return response
-
-    @app.route('/api/user/<int:user_id>/picture', methods=['GET'])
-    def get_picture(user_id):
-        user = session.query(User).filter_by(id=user_id).first()
-        if user is None:
-            response = base_routes.make_not_found_response()
-        else:
-            if not user.picture_filename:
-                response = base_routes.make_not_found_response()
-            else:
-                response = send_from_directory(
-                    UPLOAD_FOLDER, user.picture_filename)
-        return response
-            
-        
-        

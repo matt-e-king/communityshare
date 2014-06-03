@@ -3,7 +3,7 @@ import hashlib, hmac
 
 from flask import request
 
-from community_share import settings
+from community_share import config
 from community_share.routes import base_routes
 
 logger = logging.getLogger(__name__)
@@ -27,7 +27,7 @@ def register_email_routes(app):
         signature = request.values.get('signature', None)
         token = request.values.get('token', None)
         timestamp = request.values.get('timestamp', None)
-        verified = verify(settings.MAILGUN_API_KEY, token, timestamp, signature)
+        verified = verify(config.MAILGUN_API_KEY, token, timestamp, signature)
 
         data = {
             'recipient': recipient,

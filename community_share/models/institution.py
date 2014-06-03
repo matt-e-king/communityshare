@@ -4,7 +4,7 @@ from sqlalchemy import Column, Integer, String, Boolean
 from sqlalchemy import ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship
 
-from community_share.store import Base, session
+from community_share import Base, store
 from community_share.models.base import Serializable
 
 logger = logging.getLogger(__name__)
@@ -31,7 +31,7 @@ class InstitutionAssociation(Base, Serializable):
         name = data.get('name', None)
         institution = None
         if name:
-            self.institution = session.query(Institution).filter_by(name=name).first()
+            self.institution = store.session.query(Institution).filter_by(name=name).first()
         if not self.institution:
             self.institution = Institution.admin_deserialize_add(data)
 

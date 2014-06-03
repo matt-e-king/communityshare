@@ -3,7 +3,7 @@ import string, random, json
 
 from sqlalchemy import Column, String, DateTime, Boolean
 
-from community_share.store import Base, session
+from community_share import store, Base
 
 class Secret(Base):
     __tablename__ = 'secret'
@@ -39,13 +39,13 @@ class Secret(Base):
     @classmethod
     def create_secret(cls, info, hours_duration):
         secret = Secret.make(info, hours_duration)
-        session.add(secret)
-        session.commit()
+        store.session.add(secret)
+        store.session.commit()
         return secret
 
     @classmethod
     def lookup_secret(cls, key):
         current_time = datetime.utcnow()
-        secret = session.query(Secret).filter_by(key=key, used=False).filter(
+        secret = store.session.query(Secret).filter_by(key=key, used=False).filter(
             Secret.expiration>current_time).first()
         return secret

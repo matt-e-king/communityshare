@@ -4,14 +4,15 @@ from datetime import datetime
 
 from community_share.models.user import User
 from community_share.models.secret import Secret
-from community_share.store import session
-from community_share import mail, settings
+from community_share import mail, settings, config, store
 
 logger = logging.getLogger(__name__)
 
 def send_message(message):
+    error_message = ''
     sender_user = message.sender_user
     conversation = message.conversation
+    all_messages = conversation.messages
     receiver_user = None
     if (conversation.userA_id == message.sender_user_id):
         receiver_user = conversation.userA
@@ -22,8 +23,23 @@ def send_message(message):
         subject = message.title
     else:
         subject = conversation.title
+    from_address = 'message{message_id}@{mailgun_domain}'.format(
+        message_id=message.id,
+        mailgun_domain=config.MAILGUN_DOMAIN
+    )
+    to_address = receiver_user.confirmed_email
     content = message.content
-    
+    if not to_address:
+        error_message = 'Recipient has not confirmed their email address'
+    else:
+        email = mail.Email(
+            from_address=from_address,
+            to_address=to_address,
+            subject='subject',
+            content=content
+        )
+        error_message = mail.get_mailer().send(email)
+    return error_message
 
 def request_signup_email_confirmation(user):
     secret_info = {
@@ -41,14 +57,14 @@ To confirm that you created the account, please click on the following link.
 
 If you did not create this account, simply ignore this email.
 '''
-    content = content.format(BASEURL=settings.BASEURL, secret_key=secret.key)
+    content = content.format(BASEURL=config.BASEURL, secret_key=secret.key)
     email = mail.Email(
-        from_address=settings.DONOTREPLY_EMAIL_ADDRESS,
+        from_address=config.DONOTREPLY_EMAIL_ADDRESS,
         to_address=user.email,
         subject='CommunityShare Account Creation',
         content=content
     )
-    error_message = mail.mailer.send(email)
+    error_message = mail.get_mailer().send(email)
     return error_message
     
 
@@ -67,17 +83,17 @@ To reset your password please click on the following link and follow the instruc
     
 If you cannot click on the link copy it into the addressbar of your browser.
 '''
-    content = content.format(BASEURL=settings.BASEURL, secret_key=secret.key)
+    content = content.format(BASEURL=config.BASEURL, secret_key=secret.key)
     if not user.email_confirmed:
         error_message = 'The email address is not confirmed.'
     else:
         email = mail.Email(
-            from_address=settings.DONOTREPLY_EMAIL_ADDRESS,
+            from_address=config.DONOTREPLY_EMAIL_ADDRESS,
             to_address=user.confirmed_email,
             subject='CommunityShare Password Reset Request',
             content=content
         )
-        error_message = mail.mailer.send(email)
+        error_message = mail.get_mailer().send(email)
     return error_message
 
 def process_password_reset(secret_key, new_password):
@@ -91,14 +107,14 @@ def process_password_reset(secret_key, new_password):
             userId = secret_info.get('userId', None)
             action = secret_info.get('action', None)
             if action == 'password_reset' and userId is not None:
-                user = session.query(User).filter_by(id=userId).first()
+                user = store.session.query(User).filter_by(id=userId).first()
                 if user is not None:
                     error_messages += user.set_password(new_password)
                     if not error_messages:
                         secret.used = True
-                        session.add(user)
-                        session.add(secret)
-                        session.commit()
+                        store.session.add(user)
+                        store.session.add(secret)
+                        store.session.commit()
         else:
             error_messages.append('Authorization for this action is invalid or expired.')
     return (user, error_messages)
@@ -112,13 +128,13 @@ def process_confirm_email(secret_key):
         userId = secret_info.get('userId', None)
         action = secret_info.get('action', None)
         if action == 'email_confirmation' and userId is not None:
-            user = session.query(User).filter_by(id=userId).first()
+            user = store.session.query(User).filter_by(id=userId).first()
             if user is not None:
                 user.email_confirmed = True
                 secret.used = True
-                session.add(user)
-                session.add(secret)
-                session.commit()
+                store.session.add(user)
+                store.session.add(secret)
+                store.session.commit()
             else:
                 error_messages.append('Authorization is for an unknown user.')
         else:

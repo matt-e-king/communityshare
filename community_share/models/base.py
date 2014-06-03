@@ -6,7 +6,7 @@ from dateutil import parser
 
 from sqlalchemy import Column, String, DateTime, Boolean
 
-from community_share.store import Base, session
+from community_share import Base, store
 
 logger = logging.getLogger(__name__)
 
@@ -155,7 +155,7 @@ class Serializable(object):
     @classmethod
     def _args_to_query(cls, args, requester=None):
         filter_args = cls._args_to_filter_params(args)
-        query = session.query(cls).filter(*filter_args)
+        query = store.session.query(cls).filter(*filter_args)
         return query
 
     @classmethod

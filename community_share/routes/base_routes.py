@@ -1,12 +1,12 @@
 import logging
 
-from flask import session, jsonify, request, Blueprint
+from flask import jsonify, request, Blueprint
 
 from sqlalchemy import Boolean
 from sqlalchemy.exc import IntegrityError, InvalidRequestError
 from sqlalchemy.orm.attributes import instance_state
 
-from community_share.store import session
+from community_share import store
 from community_share.utils import StatusCodes, is_integer
 from community_share.authorization import get_requesting_user
 from community_share.models.base import ValidationException
@@ -143,7 +143,7 @@ def make_blueprint(Item, resourceName):
         elif not is_integer(id):
             response = make_bad_request_user()
         else:
-            item = session.query(Item).filter_by(id=id).first()
+            item = store.session.query(Item).filter_by(id=id).first()
             if item is None:
                 response = make_not_found_response()
             else:
@@ -172,9 +172,9 @@ def make_blueprint(Item, resourceName):
             logger.debug('data send is {0}'.format(data))
             try:
                 item = Item.admin_deserialize_add(data)
-                session.add(item)
+                store.session.add(item)
                 item.on_edit(requester, unchanged=False)
-                session.commit()
+                store.session.commit()
                 if item.has_admin_rights(requester):
                     response = make_admin_single_response(
                         item, include_user=requester)
@@ -203,16 +203,16 @@ def make_blueprint(Item, resourceName):
                 if id is None:
                     item = None
                 else:
-                    item = session.query(Item).filter_by(id=id).first()
+                    item = store.session.query(Item).filter_by(id=id).first()
                 if item is None:
                     response = make_not_found_response()
                 else:
                     if item.has_admin_rights(requester):
                         item.admin_deserialize_update(data)
-                        session.add(item)
+                        store.session.add(item)
                         logger.debug('calling on_edit on {0}'.format(item))
-                        item.on_edit(requester, unchanged = not session.dirty)
-                        session.commit()
+                        item.on_edit(requester, unchanged = not store.session.dirty)
+                        store.session.commit()
                         response = make_admin_single_response(item)
                     else:
                         response = make_forbidden_response()
@@ -227,17 +227,17 @@ def make_blueprint(Item, resourceName):
             response = make_bad_request_response()
         else:
             id = int(id)
-            item = session.query(Item).filter_by(id=id).first()
+            item = store.session.query(Item).filter_by(id=id).first()
             if item is None:
                 response = make_not_found_response()
             else:
                 if item.has_admin_rights(requester):
                     previously_deleted = not item.active
                     item.active = False
-                    session.add(item)
+                    store.session.add(item)
                     if not previously_deleted:
                         item.on_edit(requester, unchanged=False)
-                    session.commit()
+                    store.session.commit()
                     response = make_admin_single_response(item)
                 else:
                     response = make_forbidden_response()
