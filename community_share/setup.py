@@ -239,24 +239,29 @@ def make_questions(creator):
         session.rollback()
 
 def setup():
+    logger.info('Starting setup script.')
     first_admin = None
     Base.metadata.reflect(engine)
+    logger.info('Dropping all tables.')
     Base.metadata.drop_all(engine);
+    logger.info('Creating all tables.')
     Base.metadata.create_all(engine);
+    logger.info('Making lables.')
     make_labels()
     import os
     from community_share.models.secret import Secret
     admin_emails = os.environ.get('COMMUNITYSHARE_ADMIN_EMAILS', '').split(',')
     admin_emails = [x.strip() for x in admin_emails]
     logger.info('admin_emails is {0}'.format(admin_emails))
+    logger.info('Making Admin Users')
     for email in admin_emails:
         if email:
             user = make_admin_user(email, email, Secret.make_key(20))
             if user is not None and first_admin is None:
                 first_admin = user
-    logger.info('made admin users')
+    logger.info('Making questions')
     make_questions(first_admin)
-    # Make 100 random users
+    logger.info('Making 100 random users')
     for i in range(100):
         make_random_user()
     session.commit()
