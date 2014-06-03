@@ -53,7 +53,6 @@ class Search(Base, Serializable):
     distance = Column(Float, nullable=True)
 
     labels = relationship('Label', secondary=search_label_table)
-    searcher_user = relationship('User', primaryjoin='Search.searcher_user_id == User.id')
 
     @classmethod
     def has_add_rights(cls, data, user):
