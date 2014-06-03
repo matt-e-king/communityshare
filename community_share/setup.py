@@ -8,6 +8,7 @@ from community_share.models.user import User
 from community_share.models.secret import Secret
 from community_share.models.survey import Question, SuggestedAnswer
 from community_share.models.conversation import Conversation, Message
+from community_share.models.institution import InstitutionAssociation, Institution
 from community_share.store import session, Base, engine
 from community_share import settings
 
