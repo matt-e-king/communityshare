@@ -3,7 +3,8 @@ import hashlib, hmac
 
 from flask import request
 
-from community_share import settings, base_routes
+from community_share import settings
+from community_share.routes import base_routes
 
 logger = logging.getLogger(__name__)
 
