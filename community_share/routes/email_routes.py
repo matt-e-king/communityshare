@@ -11,8 +11,8 @@ logger = logging.getLogger(__name__)
 
 def verify(api_key, token, timestamp, signature):
     return signature == hmac.new(
-        key=api_key,
-        msg='{}{}'.format(timestamp, token),
+        key=bytearray(api_key, 'utf8'),
+        msg=bytearray('{}{}'.format(timestamp, token), 'utf8'),
         digestmod=hashlib.sha256).hexdigest()
 
 def register_email_routes(app):
