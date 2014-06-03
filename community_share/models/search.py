@@ -52,7 +52,8 @@ class Search(Base, Serializable):
     longitude = Column(Float)
     distance = Column(Float, nullable=True)
 
-    labels = relationship("Label", secondary=search_label_table)
+    labels = relationship('Label', secondary=search_label_table)
+    searcher_user = relationship('User', primaryjoin='Search.searcher_user_id == User.id')
 
     @classmethod
     def has_add_rights(cls, data, user):
@@ -71,6 +72,8 @@ class Search(Base, Serializable):
         query = query.filter(Search.active==True)
         query = query.filter(Search.searcher_role==searcher_role)
         query = query.filter(Search.searching_for_role==searching_for_role)
+        query = query.join(Search.searcher_user)
+        query = query.join(User.email_confirmed==True)
         query = query.group_by(Search.id)
         query = query.order_by('matches DESC')
         searches_and_count = query.limit(max_number)

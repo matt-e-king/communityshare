@@ -9,6 +9,22 @@ from community_share import mail, settings
 
 logger = logging.getLogger(__name__)
 
+def send_message(message):
+    sender_user = message.sender_user
+    conversation = message.conversation
+    receiver_user = None
+    if (conversation.userA_id == message.sender_user_id):
+        receiver_user = conversation.userA
+    elif (conversation.userB_id == message.sender_user_id):
+        receiver_user = conversation.userB
+    subject = None
+    if message.title:
+        subject = message.title
+    else:
+        subject = conversation.title
+    content = message.content
+    
+
 def request_signup_email_confirmation(user):
     secret_info = {
         'userId': user.id,
@@ -52,13 +68,16 @@ To reset your password please click on the following link and follow the instruc
 If you cannot click on the link copy it into the addressbar of your browser.
 '''
     content = content.format(BASEURL=settings.BASEURL, secret_key=secret.key)
-    email = mail.Email(
-        from_address=settings.DONOTREPLY_EMAIL_ADDRESS,
-        to_address=user.email,
-        subject='CommunityShare Password Reset Request',
-        content=content
-    )
-    error_message = mail.mailer.send(email)
+    if not user.email_confirmed:
+        error_message = 'The email address is not confirmed.'
+    else:
+        email = mail.Email(
+            from_address=settings.DONOTREPLY_EMAIL_ADDRESS,
+            to_address=user.confirmed_email,
+            subject='CommunityShare Password Reset Request',
+            content=content
+        )
+        error_message = mail.mailer.send(email)
     return error_message
 
 def process_password_reset(secret_key, new_password):

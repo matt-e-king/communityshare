@@ -146,7 +146,7 @@ def make_random_user():
         bio = generate_expert_bio()
     new_user = User(name=name, email=email, password_hash=password_hash,
                     picture_filename=picture_filename, bio=bio,
-                    is_administrator=False)
+                    is_administrator=False, email_confirmed=True)
     session.add(new_user)
     session.commit()
     # Make the search

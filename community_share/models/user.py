@@ -74,6 +74,13 @@ class User(Base, Serializable):
         searches = session.query(Search).filter_by(
             searcher_user_id=self.id, searcher_role=role).all()
         return searches
+
+    @property
+    def confirmed_email(self):
+        output = None
+        if self.email_confirmed:
+            output = self.email
+        return output
         
     @property
     def is_educator(self):

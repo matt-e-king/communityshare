@@ -163,3 +163,7 @@ class Message(Base, Serializable):
             elif requester.id == self.receiver_user().id:
                 has_rights = True
         return has_rights
+
+    def on_edit(self, requester, unchanged=False):
+        if not unchanged:
+            mail_actions.send_conversation_message(self)
