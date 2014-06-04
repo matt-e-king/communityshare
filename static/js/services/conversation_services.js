@@ -10,6 +10,23 @@
     ])
 
   module.factory(
+    'conversationLoader',
+    function(Conversation, $q) {
+      return function(conversationId) {
+        var deferred = $q.defer()
+        var conversationPromise = Conversation.get(conversationId);
+        conversationPromise.then(
+          function(conversation) {
+            deferred.resolve(conversation);
+          },
+          function() {
+            deferred.resolve(undefined);
+          });
+        return deferred.promise;
+      }
+    });
+
+  module.factory(
     'Conversation',
     function(SessionBase, ItemFactory, UserBase, Message, Messages, Share, Evnt) {
       var Conversation = ItemFactory('conversation');

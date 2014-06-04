@@ -20,17 +20,18 @@
 
   module.controller(
     'ConversationController',
-    function($scope, $q, $location, $timeout, $routeParams, $modal, Session,
-             Conversation, Message, User, Share, makeDialog) {
-      var conversationId = $routeParams.conversationId;
-      var conversationPromise = Conversation.get(conversationId);
-      var sharesPromise = Share.get_many({conversation_id: conversationId});
+    function($scope, $q, $location, $timeout, $modal, Session,
+             Conversation, Message, User, Share, makeDialog, conversation) {
+      if (conversation === undefined) {
+        return;
+      }
+      var sharesPromise = Share.get_many({conversation_id: conversation.id});
       $scope.otherUser = undefined;
       $scope.conversation = undefined;
       $scope.newMessage = undefined;
       var makeNewMessage = function() {
         var newMessage = new Message({
-          conversation_id: conversationId,
+          conversation_id: conversation.id,
           sender_user_id: Session.activeUser.id,
           content: ''
         });
@@ -42,7 +43,7 @@
         $scope.errorMessage = msg;
       };
       var refreshConversation = function() {
-        var refreshedConversationPromise = Conversation.get(conversationId);
+        var refreshedConversationPromise = Conversation.get(conversation.id);
         refreshedConversationPromise.then(
           function(conversation) {
             $scope.conversation = conversation;
@@ -52,25 +53,17 @@
           showErrorMessage
         );
       };
-      conversationPromise.then(
-        function(conversation) {
-          conversation.markMessagesAsViewed();
-          if (conversation.userA.id === Session.activeUser.id) {
-            $scope.otherUser = conversation.userB;
-          } else {
-            $scope.otherUser = conversation.userA;
-          }
-          $scope.conversation = conversation;
-          $scope.newMessage = makeNewMessage();
-          $timeout(refreshConversation, 5000);
-        },
-        showErrorMessage
-      );
-      var bothPromise = $q.all([conversationPromise, sharesPromise]);
-      bothPromise.then(
-        function(both) {
-          var conversation = both[0];
-          var shares = both[1];
+      conversation.markMessagesAsViewed();
+      if (conversation.userA.id === Session.activeUser.id) {
+        $scope.otherUser = conversation.userB;
+      } else {
+        $scope.otherUser = conversation.userA;
+      }
+      $scope.conversation = conversation;
+      $scope.newMessage = makeNewMessage();
+      $timeout(refreshConversation, 5000);
+      sharesPromise.then(
+        function(shares) {
           shares.sort(function(a, b) { return a.id - b.id; });
           if (shares.length === 0) {
             $scope.share = conversation.makeShare();

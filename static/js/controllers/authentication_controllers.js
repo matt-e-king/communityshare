@@ -93,6 +93,7 @@
   module.controller(
     'LoginController',
     function($scope, $location, Authenticator) {
+      var nextLocation = $location.search()['goto'];
       $scope.email = undefined;
       $scope.password = undefined;
       $scope.errorMessage = '';
@@ -101,7 +102,11 @@
           $scope.email, $scope.password);
         userPromise.then(
           function(user) {
-            $location.path("/home")
+            if (nextLocation) {
+              $location.path(nextLocation);
+            } else {
+              $location.path("/home")
+            }
           },
           function(message) {
             var msg = ''

@@ -148,6 +148,9 @@
       resolve: {
         activeUser: function(activeUserLoader) {
           return activeUserLoader();
+        },
+        conversation: function(conversationLoader, $routeParams) {
+          return conversationLoader($routeParams.conversationId);
         }
       }
     });

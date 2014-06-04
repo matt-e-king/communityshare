@@ -7,7 +7,7 @@
 
   module.directive(
     'csMainView',
-     function($compile, Session) {
+     function($compile, Session, $location) {
        var noPermission = function(el, scope) {
          var children = el[0].childNodes;
          var l = children.length;
@@ -15,8 +15,9 @@
            var c = children[i];
            c.parentNode.removeChild(c);
          }
+         var url = $location.url();
          var nodetext1 = '<div id="content-header"><h1>Forbidden</h1></div><div id="content-container"><div class="row"><div class="col-lg-12"><h4 class="heading">You do not have permission to view this page</h4>'
-         var nodetext2 = '<p>Try <a href="/#/login">logging in</a></p>'
+         var nodetext2 = '<p ng-show="!Session.activeUser">Try <a ng-href="/#/login?goto='+url+'">logging in</a></p>'
          var nodetext3 = '</div></div></div'
          var nodetext;
          if (Session.activeUser) {
