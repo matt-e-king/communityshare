@@ -119,7 +119,8 @@ class Message(Base, Serializable):
         'conversation_id', 'sender_user_id', 'content',
     ]
     WRITEABLE_FIELDS = ['viewed']
-    STANDARD_READABLE_FIELDS = []
+    STANDARD_READABLE_FIELDS = ['id', 'conversation_id', 'sender_user_id',
+                                'content', 'date_created', 'viewed']
     ADMIN_READABLE_FIELDS = [
         'id', 'conversation_id', 'sender_user_id', 'content', 'date_created', 'viewed'
     ]
@@ -155,6 +156,17 @@ class Message(Base, Serializable):
         else:
             receiver_user = self.conversation.userA
         return receiver_user
+
+    def has_standard_rights(self, requester):
+        has_rights = False
+        if requester is not None:
+            if requester.is_administrator:
+                has_rights = True
+            elif requester.id == self.sender_user_id:
+                has_rights = True
+            elif requester.id == self.receiver_user().id:
+                has_rights = True
+        return has_rights
 
     def has_admin_rights(self, requester):
         has_rights = False

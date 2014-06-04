@@ -161,12 +161,47 @@ class CommunityShareTestCase(unittest.TestCase):
         serialized = json.dumps(message_data)
         rv = self.app.post(
             '/api/message', headers=headers, data=serialized)
-        data = json.loads(rv.data.decode('utf8'))
-        print(data)
         assert(rv.status_code == 200)
-        
-        
-            
+        data = json.loads(rv.data.decode('utf8'))
+        message_id = data['data']['id']
+        mailer = mail.get_mailer()
+        # We should have one email in queue (email about new message)
+        assert(len(mailer.queue) == 1)
+        email = mailer.pop()
+        assert(email.subject == conversation_data['title'])
+        assert(email.content.startswith(message_data['content']))
+        assert(email.to_address == sample_userB['email'])
+        new_reply_content = 'Sure, sounds great!'
+        reply_email = email.make_reply(new_reply_content)
+        assert(reply_email.subject == conversation_data['title'])
+        assert(reply_email.content.startswith(new_reply_content))
+        assert(reply_email.from_address == email.to_address)
+        assert(reply_email.to_address == email.from_address)
+        # Send the reply email to our email API in the form of a Mailgun
+        # request.
+        rv = self.app.post(
+            '/api/email', data=reply_email.make_mailgun_data())
+        assert(rv.status_code==200)
+        # It should have been forwarded to the other user.
+        assert(len(mailer.queue) == 1)
+        email = mailer.pop()
+        assert(email.subject == conversation_data['title'])
+        assert(email.content.startswith(new_reply_content))
+        assert(email.to_address == sample_userA['email'])
+        # And we should now have two messages in the conversation
+        # We'll hit the conversation API to confirm this.
+        rv = self.app.get(
+            '/api/conversation/{0}'.format(conversation_id),
+            headers=headers)
+        rcvd_conversation_data = json.loads(rv.data.decode('utf8'))['data']
+        assert(rcvd_conversation_data['id'] == conversation_id)
+        assert(rcvd_conversation_data['title'] == conversation_data['title'])
+        messages_data = rcvd_conversation_data['messages']
+        assert(len(messages_data) == 2)
+        assert(messages_data[0]['content'] == message_data['content'])
+        assert(messages_data[0]['sender_user_id'] == userA_id)
+        assert(messages_data[1]['content'] == new_reply_content)
+        assert(messages_data[1]['sender_user_id'] == userB_id)
         
     def tearDown(self):
         #os.rmdir(self.SQLLITE_FILE)

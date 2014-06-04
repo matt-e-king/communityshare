@@ -8,32 +8,38 @@ from community_share import mail, settings, config, store
 
 logger = logging.getLogger(__name__)
 
+
+def append_conversation_link(content, conversation):
+    conversation_url = '{0}/api/conversation/{1}'.format(
+        config.BASEURL, conversation.id)
+    content = '{content}\n\nThe email is part of a Community Share Conversation.  To view the entire conversation go to {url}'.format(content=content, url=conversation_url)
+    return content
+
+
 def send_conversation_message(message):
     error_message = ''
     sender_user = message.sender_user
     conversation = message.get_conversation()
-    all_messages = conversation.messages
-    receiver_user = None
-    if (conversation.userA_id == message.sender_user_id):
-        receiver_user = conversation.userA
-    elif (conversation.userB_id == message.sender_user_id):
-        receiver_user = conversation.userB
     subject = None
     subject = conversation.title
-    from_address = 'message{message_id}@{mailgun_domain}'.format(
+    from_address = 'replytomessage{message_id}@{mailgun_domain}'.format(
         message_id=message.id,
         mailgun_domain=config.MAILGUN_DOMAIN
     )
-    to_address = receiver_user.confirmed_email
-    content = message.content
+    to_address = message.receiver_user().confirmed_email
+    conversation_url = '{0}/api/conversation/{1}'.format(
+        config.BASEURL, conversation.id)
+    content = append_conversation_link(message.content, conversation)
+
     if not to_address:
         error_message = 'Recipient has not confirmed their email address'
     else:
         email = mail.Email(
             from_address=from_address,
             to_address=to_address,
-            subject='subject',
-            content=content
+            subject=subject,
+            content=content,
+            new_content=content
         )
         error_message = mail.get_mailer().send(email)
     return error_message
@@ -59,7 +65,8 @@ If you did not create this account, simply ignore this email.
         from_address=config.DONOTREPLY_EMAIL_ADDRESS,
         to_address=user.email,
         subject='CommunityShare Account Creation',
-        content=content
+        content=content,
+        new_content=content
     )
     error_message = mail.get_mailer().send(email)
     return error_message

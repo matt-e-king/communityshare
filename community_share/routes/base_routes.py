@@ -175,11 +175,12 @@ def make_blueprint(Item, resourceName):
                 store.session.add(item)
                 item.on_edit(requester, unchanged=False)
                 store.session.commit()
-                if item.has_admin_rights(requester):
+                refreshed_item = store.session.query(Item).filter_by(id=item.id).first()
+                if refreshed_item.has_admin_rights(requester):
                     response = make_admin_single_response(
-                        item, include_user=requester)
+                        refreshed_item, include_user=requester)
                 else:
-                    response = make_standard_single_response(item)
+                    response = make_standard_single_response(refreshed_item)
             except ValidationException as e:
                 response = make_bad_request_response(str(e))
             except (IntegrityError, InvalidRequestError) as e:

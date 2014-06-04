@@ -18,23 +18,55 @@ content: {email.content}
 
 class Email(object):
 
-    def __init__(self, from_address, to_address, subject, content):
+    def __init__(self, from_address, to_address, subject, content, new_content):
         self.from_address = from_address
         self.to_address = to_address
         self.subject = subject
+        self.new_content = new_content
         self.content = content
 
-    def make_reply(self, content):
+    def make_reply(self, new_content):
         new_from_address = self.to_address
         new_to_address = self.from_address
-        new_lines = content
+        new_lines = [new_content, '']
         lines = self.content.splitlines()
-        new_lines += ['>'+line for line in lines]
-        new_content = '\n'.join(new_lines)
+        new_lines += ['>' + line for line in lines]
+        combined_content = '\n'.join(new_lines)
         new_email = Email(new_from_address, new_to_address, self.subject,
-                          new_content)
+                          combined_content, new_content)
         return new_email
         
+    def make_mailgun_data(self):
+        data = {
+            'recipient': self.to_address,
+            'stripped-text': self.new_content,
+            'body-plain': self.content,
+            'sender': self.from_address,
+            'subject': self.subject,
+        }
+        return data
+
+    @classmethod
+    def from_mailgun_data(cls, data, verify=True):
+        recipient = data.get('recipient', None)
+        body_plain = data.get('body-plain', None)
+        stripped_text = data.get('stripped-text', None)
+        sender = data.get('sender', None)
+        subject = data.get('subject', None)
+        headers = data.get('message-headers', [])
+        signature = data.get('signature', None)
+        token = data.get('token', None)
+        timestamp = data.get('timestamp', None)
+        if verify:
+            verified = verify(config.MAILGUN_API_KEY, token, timestamp, signature)
+        else:
+            verified = True
+        if verified:
+            email = Email(sender, recipient, subject, body_plain, stripped_text)
+        else:
+            email = None
+        return email
+
     def find_links(self):
         pattern = '\s+({}.*)\s+'.format(config.BASEURL)
         match = re.search(pattern, self.content)
