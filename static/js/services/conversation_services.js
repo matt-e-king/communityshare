@@ -43,10 +43,12 @@
         }
         SessionBase.getActiveUserPromise().then(
           function(activeUser) {
-            if (activeUser.id === _this.userA_id) {
-              _this.otherUser = _this.userB;
-            } else if (activeUser.id === _this.userB_id) {
-              _this.otherUser = _this.userA;
+            if (activeUser) {
+              if (activeUser.id === _this.userA_id) {
+                _this.otherUser = _this.userB;
+              } else if (activeUser.id === _this.userB_id) {
+                _this.otherUser = _this.userA;
+              }
             }
           })
         this.datetime_last_message = undefined;
