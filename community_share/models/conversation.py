@@ -117,8 +117,11 @@ class Conversation(Base, Serializable):
                         query = query.join(Message)
                         query = query.filter(
                             Message.date_created > messages_date_created_greaterthan)
-            except ValueError:
-                query = None
+            except ValueError as e:
+                logger.error('Value error {0}'.format(e))
+                raise
+        else:
+            raise ValueError('user_id was not defined')
         logger.debug('query is {0}'.format(query))
         return query
 

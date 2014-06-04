@@ -121,18 +121,23 @@ def make_blueprint(Item, resourceName):
             if requester is None or not requester.is_administrator:
                 if (Item.PERMISSIONS.get('standard_can_read_many', False) or 
                     Item.PERMISSIONS.get('all_can_read_many', False)):
-                    query = Item.args_to_query(request.args, requester)
-                    if query is None:
-                        response = make_forbidden_response()
-                    else:                        
+                    try:
+                        query = Item.args_to_query(request.args, requester)
                         items = query.all()
                         response = make_mixed_many_response(items, requester)
+                    except ValueError as e:
+                        error_message = ', '.join(e.args)
+                        response = make_bad_request_response(e.args[0])
                 else:
                     response = make_forbidden_response()
             else:
-                query = Item.args_to_query(request.args, requester)
-                items = query.all()
-                response = make_admin_many_response(items)
+                try:
+                    query = Item.args_to_query(request.args, requester)
+                    items = query.all()
+                    response = make_admin_many_response(items)
+                except ValueError as e:
+                    error_message = ', '.join(e.args)
+                    response = make_bad_request_response(e.args[0])
         return response
 
     @api.route(API_SINGLE_FORMAT.format(resourceName), methods=['GET'])
