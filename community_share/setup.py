@@ -10,7 +10,7 @@ from community_share.models.survey import Question, SuggestedAnswer
 from community_share.models.conversation import Conversation, Message
 from community_share.models.institution import InstitutionAssociation, Institution
 from community_share.models.share import Share, Event
-from community_share import settings, store, Base
+from community_share import store, Base, config
 
 logger = logging.getLogger(__name__)
 
@@ -177,7 +177,7 @@ def make_labels():
 def make_admin_user(name, email, password):
     password_hash = User.pwd_context.encrypt(password)
     new_user = User(name=name, email=email, password_hash=password_hash,
-                    is_administrator=True)
+                    is_administrator=True, email_confirmed=True)
     store.session.add(new_user)
     try:
         store.session.commit()
@@ -250,7 +250,7 @@ def setup(n_random_users=100):
     logger.info('Starting setup script.')
     init_db()
     first_admin = None
-    logger.info('Making lables.')
+    logger.info('Making labels.')
     make_labels()
     import os
     from community_share.models.secret import Secret
@@ -271,6 +271,8 @@ def setup(n_random_users=100):
     store.session.commit()
     
 if __name__ == '__main__':
-    settings.setup_logging(logging.DEBUG)
+    logger.info('Loading settings from environment')    
+    config.load_from_environment()
+    logger.info('Finished loading settings')
     setup(n_random_users=100)
               

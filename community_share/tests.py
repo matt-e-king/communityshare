@@ -6,7 +6,7 @@ import json
 
 from flask import jsonify
 
-from community_share import settings, setup, app, mail, config
+from community_share import setup, app, mail, config
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +16,7 @@ sample_userA = {
     'bio': 'I am Charles.',
     'zipcode' :'12345',
     'email': "charlies@notarealemail.com",
+    'password': 'booooooo'
 }
 
 sample_userB = {
@@ -24,6 +25,7 @@ sample_userB = {
     'bio': 'I am Rob.',
     'zipcode' :'12345',
     'email': "rob@notarealemail.com",
+    'password': 'oiuh298n[;w',
 }
 
 def chop_link(link):
@@ -33,14 +35,21 @@ def chop_link(link):
     chopped_link = chopped_link.split('#')[0]
     return chopped_link
 
-def compare_user_data(userA, userB):
+def compare_data(userA, userB, exclusions=set([])):
     for key, value in userA.items():
-        assert(userA[key] == userB[key])
+        if key not in exclusions:
+            assert(userA[key] == userB[key])
 
-def make_headers(api_key):
-    authorization_header = 'Basic:api:{0}'.format(api_key)
-    headers = [('Authorization', authorization_header),
-               ('Content-Type', 'application/json')]
+def make_headers(api_key=None, email=None, password=None):
+    headers = [('Content-Type', 'application/json')]
+    if api_key:
+        authorization_header = 'Basic:api:{0}'.format(api_key)
+    elif email and password:
+        authorization_header = 'Basic:{0}:{1}'.format(email, password)
+    else:
+        authorization_header = None
+    if authorization_header:
+        headers.append(('Authorization', authorization_header))
     return headers
 
 class CommunityShareTestCase(unittest.TestCase):
@@ -64,11 +73,15 @@ class CommunityShareTestCase(unittest.TestCase):
         }
         config.load_from_dict(data)
         setup.init_db()
+        # Clear mail queue
+        mailer = mail.get_mailer()
+        while len(mailer.queue):
+            mailer.pop()
         self.app = app.make_app().test_client()
 
     def sign_up(self, user_data):
         data = {
-            'password': 'aaaaaaaa',
+            'password': user_data['password'],
             'user': user_data,
             }
         serialized = json.dumps(data)
@@ -86,7 +99,7 @@ class CommunityShareTestCase(unittest.TestCase):
         assert(rv.status_code == 200)
         data = json.loads(rv.data.decode('utf8'))
         # User details should match
-        compare_user_data(user_data, data['data'])
+        compare_data(user_data, data['data'], exclusions=['password'])
         mailer = mail.get_mailer()
         # We should have one email in queue (email confimation from signup)
         assert(len(mailer.queue) == 1)
@@ -103,6 +116,7 @@ class CommunityShareTestCase(unittest.TestCase):
         rv = self.app.post('/api/confirmemail', data=data,
                            headers=headers)
         assert(rv.status_code == 200)
+        
 
     def save_search(self, user_id, api_key,
                     searcher_role, searching_for_role, labels):
@@ -133,6 +147,42 @@ class CommunityShareTestCase(unittest.TestCase):
             '/api/message', headers=headers, data=serialized)
         assert(rv.status_code == 200)
         return rv
+
+    def test_password_reset(self):
+        # Signup userA
+        userA_id, userA_api_key, userA_email_key = self.sign_up(sample_userA)
+        self.confirm_email(userA_email_key)
+        rv = self.app.get('/api/requestresetpassword/{0}'.format(
+            sample_userA['email']))
+        assert(rv.status_code == 200)
+        mailer = mail.get_mailer()
+        # Check that we can authenticate with email and password
+        headers = make_headers(email=sample_userA['email'], password=sample_userA['password'])
+        rv = self.app.get('/api/requestapikey/', headers=headers)
+        assert(rv.status_code == 200)
+        # We should have one email in queue (email from password reset request)
+        assert(len(mailer.queue) == 1)
+        email = mailer.pop()
+        links = email.find_links()
+        assert(len(links)==1)
+        email_key = re.search('key=(.*)', links[0]).groups()[0]
+        logger.debug('email key is {0}'.format(email_key))
+        # Now try to reset password
+        new_password = 'mynewpassword'
+        headers = make_headers()
+        rv = self.app.post(
+            '/api/resetpassword',
+            data=json.dumps({'key': email_key, 'password': new_password}),
+            headers=headers)
+        assert(rv.status_code==200)
+        # Check that we can't authenticate with email and old password
+        headers = make_headers(email=sample_userA['email'], password=sample_userA['password'])
+        rv = self.app.get('/api/requestapikey/', headers=headers)
+        assert(rv.status_code == 401)
+        # Check that we can authenticate with email and new password
+        headers = make_headers(email=sample_userA['email'], password=new_password)
+        rv = self.app.get('/api/requestapikey/', headers=headers)
+        assert(rv.status_code == 200)
 
     def test_two(self):
         # Now sign up 2 new users but don't confirm their email addresses
@@ -183,7 +233,6 @@ class CommunityShareTestCase(unittest.TestCase):
         rv = self.app.post(
             '/api/conversation', headers=headers, data=serialized)
         assert(rv.status_code == 200)
-        
 
     def test_one(self):
         # Make sure we get an OK when requesting index.
@@ -305,8 +354,6 @@ class CommunityShareTestCase(unittest.TestCase):
         pass
 
 if __name__ == '__main__':
-    settings.setup_logging(logging.DEBUG)
-    logger.debug('la la la')
     unittest.main()
     
         

@@ -3,7 +3,7 @@ import os
 
 from flask import Flask, send_from_directory, render_template
 
-from community_share import config, settings, store
+from community_share import config, store
 from community_share.routes.user_routes import register_user_routes
 from community_share.routes.search_routes import register_search_routes
 from community_share.routes.conversation_routes import register_conversation_routes
@@ -53,8 +53,10 @@ def make_app():
     return app
 
 if __name__ == '__main__':
+    logger.info('Loading settings from environment')
     config.load_from_environment()
-    settings.setup_logging(config.LOGGING_LEVEL)
+    logger.info('Making application')
     app = make_app()
     app.debug = True
+    logger.info('Running application - debug={0}'.format(app.debug))
     app.run()

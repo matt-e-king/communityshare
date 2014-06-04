@@ -1,4 +1,5 @@
 import os
+import logging
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
@@ -6,12 +7,35 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
+logger = logging.getLogger(__name__)
+
+def setup_logging(level):
+    "Utility function for setting up logging."
+    ch = logging.StreamHandler()
+    ch.setLevel(level)
+    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    ch.setFormatter(formatter)
+    # Which packages do we want to log from.
+    packages = ('__main__', 'community_share',)
+    for package in packages:
+        logger = logging.getLogger(package)
+        logger.handlers = []
+        logger.addHandler(ch)
+        logger.setLevel(level)
+    # Warning only packages
+    packages = []
+    for package in packages:
+        logger = logging.getLogger(package)
+        logger.addHandler(ch)
+        logger.setLevel(logging.WARNING)
+    
 class Store(object):
 
     def __init__(self):
         pass
 
     def set_config(self, config):
+        logger.info('Creating database engine with {0}'.format(config.DB_CONNECTION))
         self._engine = create_engine(config.DB_CONNECTION)
         self._session = scoped_session(sessionmaker(bind=self._engine))
 
@@ -46,6 +70,8 @@ class Config(object):
         assert(set(d.keys()) == set(self.NAMES))
         for key, value in d.items():
             setattr(self, key, value)
+        setup_logging(self.LOGGING_LEVEL)
+        logger.info('Setup logging with level {0}'.format(self.LOGGING_LEVEL))
         store.set_config(self)
 
     def load_from_environment(self):

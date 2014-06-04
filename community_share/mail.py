@@ -2,7 +2,7 @@ import re
 import logging
 import requests
 
-from community_share import settings, config
+from community_share import config
 
 logger = logging.getLogger(__name__)
 

@@ -4,7 +4,7 @@ from datetime import datetime
 
 from community_share.models.user import User
 from community_share.models.secret import Secret
-from community_share import mail, settings, config, store
+from community_share import mail, config, store
 
 logger = logging.getLogger(__name__)
 
@@ -95,7 +95,8 @@ If you cannot click on the link copy it into the addressbar of your browser.
             from_address=config.DONOTREPLY_EMAIL_ADDRESS,
             to_address=user.confirmed_email,
             subject='CommunityShare Password Reset Request',
-            content=content
+            content=content,
+            new_content=content,
         )
         error_message = mail.get_mailer().send(email)
     return error_message
