@@ -149,8 +149,8 @@
         activeUser: function(activeUserLoader) {
           return activeUserLoader();
         },
-        conversation: function(conversationLoader, $routeParams) {
-          return conversationLoader($routeParams.conversationId);
+        conversation: function(conversationLoader, $route) {
+          return conversationLoader($route.current.params.conversationId);
         }
       }
     });
