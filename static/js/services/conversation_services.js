@@ -70,11 +70,13 @@
       };
       Conversation.prototype.getUnviewedMessages = function() {
         var unviewedMessages = [];
-        for (var i=0; i<this.messages.length; i++) {
-          var message = this.messages[i];
-          if ((message.sender_user.id === this.otherUser.id) &&
-              !(message.viewed)) {
-            unviewedMessages.push(message);
+        if (this.otherUser) {
+          for (var i=0; i<this.messages.length; i++) {
+            var message = this.messages[i];
+            if ((message.sender_user_id === this.otherUser.id) &&
+                !(message.viewed)) {
+              unviewedMessages.push(message);
+            }
           }
         }
         return unviewedMessages;

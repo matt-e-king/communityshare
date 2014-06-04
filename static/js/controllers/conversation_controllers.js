@@ -23,7 +23,7 @@
     function($scope, $q, $location, $timeout, $modal, Session,
              Conversation, Message, User, Share, makeDialog, conversation) {
       $scope.Session = Session;
-      if (conversation === undefined) {
+      if ((conversation === undefined) || (Session.activeUser === undefined)) {
         return;
       }
       var sharesPromise = Share.get_many({conversation_id: conversation.id});
