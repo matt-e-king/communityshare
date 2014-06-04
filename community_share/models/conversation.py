@@ -3,10 +3,12 @@ from datetime import datetime
 
 from sqlalchemy import Column, Integer, Boolean, DateTime, Table, ForeignKey
 from sqlalchemy import String, or_, and_
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, validates
 
 from community_share import store, Base, mail_actions
 from community_share.models.base import Serializable
+from community_share.models.user import User
+from community_share.models.base import ValidationException
 
 conversation_user_table = Table('conversation_user', Base.metadata,
     Column('conversation_id', Integer, ForeignKey('conversation.id')),
@@ -45,6 +47,15 @@ class Conversation(Base, Serializable):
     messages = relationship('Message', order_by="Message.date_created")
     userA = relationship('User', primaryjoin='Conversation.userA_id == User.id')
     userB = relationship('User', primaryjoin='Conversation.userB_id == User.id')
+
+    @validates('userA_id', 'userB_id')
+    def validate_(self, key, user_id):
+        user = store.session.query(User).filter_by(id=user_id).first()
+        if user is None:
+            raise ValidationException('User id is unknown.')
+        elif not user.email_confirmed:
+            raise ValidationException('Cannot create conversation with {username} because they have not confirmed their email'.format(username=user.name))
+        return user_id
 
     @classmethod
     def has_add_rights(cls, data, user):
@@ -147,7 +158,8 @@ class Message(Base, Serializable):
             conversation = store.session.query(Conversation).filter(
                 Conversation.id==conversation_id).first()
             if (conversation.userA_id == user.id) or (conversation.userB_id == user.id):
-                has_rights = True
+                if conversation.userA.email_confirmed and conversation.userB.email_confirmed:
+                    has_rights = True
         return has_rights
 
     def receiver_user(self):

@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 def append_conversation_link(content, conversation):
-    conversation_url = '{0}/api/conversation/{1}'.format(
+    conversation_url = '{0}/#/conversation/{1}'.format(
         config.BASEURL, conversation.id)
     content = '{content}\n\nThe email is part of a Community Share Conversation.  To view the entire conversation go to {url}'.format(content=content, url=conversation_url)
     return content

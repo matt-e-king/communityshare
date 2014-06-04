@@ -26,9 +26,22 @@ sample_userB = {
     'email': "rob@notarealemail.com",
 }
 
+def chop_link(link):
+    start = config.BASEURL
+    assert(link.startswith(start))
+    chopped_link = link[len(start):]
+    chopped_link = chopped_link.split('#')[0]
+    return chopped_link
+
 def compare_user_data(userA, userB):
     for key, value in userA.items():
         assert(userA[key] == userB[key])
+
+def make_headers(api_key):
+    authorization_header = 'Basic:api:{0}'.format(api_key)
+    headers = [('Authorization', authorization_header),
+               ('Content-Type', 'application/json')]
+    return headers
 
 class CommunityShareTestCase(unittest.TestCase):
     
@@ -80,14 +93,16 @@ class CommunityShareTestCase(unittest.TestCase):
         email = mailer.pop()
         links = email.find_links()
         assert(len(links)==1)
-        key = re.search('key=(.*)', links[0]).groups()[0]
+        email_key = re.search('key=(.*)', links[0]).groups()[0]
+        return user_id, api_key, email_key
+
+    def confirm_email(self, key):
         # Confirm email for new user
         headers = [('Content-Type', 'application/json')]
         data = json.dumps({'key': key})
         rv = self.app.post('/api/confirmemail', data=data,
                            headers=headers)
         assert(rv.status_code == 200)
-        return user_id, api_key
 
     def save_search(self, user_id, api_key,
                     searcher_role, searching_for_role, labels):
@@ -99,26 +114,30 @@ class CommunityShareTestCase(unittest.TestCase):
             'zipcode': 12345
         }
         serialized = json.dumps(data)
-        authorization_header = 'Basic:api:{0}'.format(api_key)
-        headers = [('Authorization', authorization_header),
-                   ('Content-Type', 'application/json')]
+        headers = make_headers(api_key)
         rv = self.app.post('/api/search', data=serialized, headers=headers)
         assert(rv.status_code == 200)
         data = json.loads(rv.data.decode('utf8'))
         search_id = data['data']['id']
         return search_id
 
-    def test_empty_db(self):
-        # Make sure we get an OK when requesting index.
-        rv = self.app.get('/')
+    def send_message(self, conversation_id, sender_user_id, content, api_key):
+        message_data = {
+            'conversation_id': conversation_id,
+            'sender_user_id': sender_user_id,
+            'content': content,
+        }
+        serialized = json.dumps(message_data)
+        headers = make_headers(api_key)
+        rv = self.app.post(
+            '/api/message', headers=headers, data=serialized)
         assert(rv.status_code == 200)
-        # Now try to get user from API
-        # Expect forbidden (401)
-        rv = self.app.get('/api/user/1')
-        assert(rv.status_code == 401)
-        # Now sign up 2 new users
-        userA_id, userA_api_key = self.sign_up(sample_userA)
-        userB_id, userB_api_key = self.sign_up(sample_userB)
+        return rv
+
+    def test_two(self):
+        # Now sign up 2 new users but don't confirm their email addresses
+        userA_id, userA_api_key, userA_email_key = self.sign_up(sample_userA)
+        userB_id, userB_api_key, userB_email_key = self.sign_up(sample_userB)
         # userA creates a search of educator for partner
         searchA_id = self.save_search(
             userA_id, userA_api_key, 'educator', 'partner',
@@ -130,9 +149,80 @@ class CommunityShareTestCase(unittest.TestCase):
             ['robot dogs', 'walks on the beach'])
         assert(searchB_id >= 0)
         # Get all the results for userA's search
-        authorization_header = 'Basic:api:{0}'.format(userA_api_key)
-        headers = [('Authorization', authorization_header),
-                   ('Content-Type', 'application/json')]
+        headers = make_headers(userA_api_key)
+        rv = self.app.get('/api/search/{0}/results'.format(searchA_id),
+                          headers=headers)
+        data = json.loads(rv.data.decode('utf8'))
+        searches = data['data']
+        assert(len(searches) == 0)
+        # Now userB will confirm their email.
+        self.confirm_email(userB_email_key)
+        # So that they should appear in userA's search.
+        headers = make_headers(userA_api_key)
+        rv = self.app.get('/api/search/{0}/results'.format(searchA_id),
+                          headers=headers)
+        data = json.loads(rv.data.decode('utf8'))
+        searches = data['data']
+        assert(len(searches) == 1)
+        # But userA shouldn't be able to start a conversation until they have
+        # confirmed their email
+        headers = make_headers(userA_api_key)
+        conversation_data = {
+            'search_id': searchA_id,
+            'title': 'Trip to moon',
+            'userA_id': userA_id,
+            'userB_id': userB_id,
+        }
+        serialized = json.dumps(conversation_data)
+        rv = self.app.post(
+            '/api/conversation', headers=headers, data=serialized)
+        assert(rv.status_code == 400)
+        # Now userA will confirm their email.
+        self.confirm_email(userA_email_key)
+        # And try to save the conversation again.
+        rv = self.app.post(
+            '/api/conversation', headers=headers, data=serialized)
+        assert(rv.status_code == 200)
+        
+
+    def test_one(self):
+        # Make sure we get an OK when requesting index.
+        rv = self.app.get('/')
+        assert(rv.status_code == 200)
+        # Now try to get user from API
+        # Expect forbidden (401)
+        rv = self.app.get('/api/user/1')
+        assert(rv.status_code == 401)
+        # Now sign up UserA
+        userA_id, userA_api_key, userA_email_key = self.sign_up(sample_userA)
+        # Get userA and check that email is not confirmed
+        headers = make_headers(userA_api_key)
+        rv = self.app.get('/api/user/1', headers=headers)
+        assert(rv.status_code == 200)
+        data = json.loads(rv.data.decode('utf8'))['data']
+        assert(data['email_confirmed'] == False)
+        # Confirm email
+        self.confirm_email(userA_email_key)
+        # Get userA and check that email is confirmed
+        rv = self.app.get('/api/user/1', headers=headers)
+        assert(rv.status_code == 200)
+        data = json.loads(rv.data.decode('utf8'))['data']
+        assert(data['email_confirmed'] == True)
+        # Sign up UserB
+        userB_id, userB_api_key, userB_email_key = self.sign_up(sample_userB)
+        self.confirm_email(userB_email_key)
+        # userA creates a search of educator for partner
+        searchA_id = self.save_search(
+            userA_id, userA_api_key, 'educator', 'partner',
+            ['robot dogs', 'walks on the beach'])
+        assert(searchA_id >= 0)
+        # userB creates a search of partner to educator
+        searchB_id = self.save_search(
+            userB_id, userB_api_key, 'partner', 'educator',
+            ['robot dogs', 'walks on the beach'])
+        assert(searchB_id >= 0)
+        # Get all the results for userA's search
+        headers = make_headers(userA_api_key)
         rv = self.app.get('/api/search/{0}/results'.format(searchA_id),
                           headers=headers)
         data = json.loads(rv.data.decode('utf8'))
@@ -153,15 +243,12 @@ class CommunityShareTestCase(unittest.TestCase):
         data = json.loads(rv.data.decode('utf8'))
         conversation_id = data['data']['id']
         # And send the first message
-        message_data = {
-            'conversation_id': conversation_id,
-            'sender_user_id': userA_id,
-            'content': 'Are you interested in going to the moon?',
-        }
-        serialized = json.dumps(message_data)
-        rv = self.app.post(
-            '/api/message', headers=headers, data=serialized)
-        assert(rv.status_code == 200)
+        message_content = 'Are you interested in going to the moon?'
+        rv = self.send_message(
+            conversation_id=conversation_id,
+            sender_user_id=userA_id,
+            content=message_content,
+            api_key=userA_api_key)
         data = json.loads(rv.data.decode('utf8'))
         message_id = data['data']['id']
         mailer = mail.get_mailer()
@@ -169,7 +256,7 @@ class CommunityShareTestCase(unittest.TestCase):
         assert(len(mailer.queue) == 1)
         email = mailer.pop()
         assert(email.subject == conversation_data['title'])
-        assert(email.content.startswith(message_data['content']))
+        assert(email.content.startswith(message_content))
         assert(email.to_address == sample_userB['email'])
         new_reply_content = 'Sure, sounds great!'
         reply_email = email.make_reply(new_reply_content)
@@ -177,6 +264,13 @@ class CommunityShareTestCase(unittest.TestCase):
         assert(reply_email.content.startswith(new_reply_content))
         assert(reply_email.from_address == email.to_address)
         assert(reply_email.to_address == email.from_address)
+        # That email should contain a link to the conversation
+        # We're not running the javascript so we can't test it properly.
+        links = email.find_links()
+        assert(len(links) == 1)
+        chopped_link = chop_link(links[0])
+        rv = self.app.get(chopped_link)
+        assert(rv.status_code==200)
         # Send the reply email to our email API in the form of a Mailgun
         # request.
         rv = self.app.post(
@@ -198,10 +292,13 @@ class CommunityShareTestCase(unittest.TestCase):
         assert(rcvd_conversation_data['title'] == conversation_data['title'])
         messages_data = rcvd_conversation_data['messages']
         assert(len(messages_data) == 2)
-        assert(messages_data[0]['content'] == message_data['content'])
+        assert(messages_data[0]['content'] == message_content)
         assert(messages_data[0]['sender_user_id'] == userA_id)
         assert(messages_data[1]['content'] == new_reply_content)
         assert(messages_data[1]['sender_user_id'] == userB_id)
+
+        # To do:
+        # Make sure that conversation link works in email
         
     def tearDown(self):
         #os.rmdir(self.SQLLITE_FILE)

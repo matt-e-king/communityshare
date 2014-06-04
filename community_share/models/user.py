@@ -28,7 +28,8 @@ class User(Base, Serializable):
         'id', 'name', 'is_administrator', 'last_active', 'is_educator',
         'is_community_partner', 'institution_associations',
         'zipcode', 'website', 'twitter_handle', 'linkedin_link',
-        'year_of_birth', 'gender', 'ethnicity', 'bio', 'picture_url']
+        'year_of_birth', 'gender', 'ethnicity', 'bio', 'picture_url',
+        'email_confirmed']
 
     ADMIN_READABLE_FIELDS = [
         'id', 'name', 'email' , 'date_created', 'last_active',

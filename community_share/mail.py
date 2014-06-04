@@ -68,9 +68,12 @@ class Email(object):
         return email
 
     def find_links(self):
-        pattern = '\s+({}.*)\s+'.format(config.BASEURL)
+        links = []
+        pattern = '\s+({}.*)\s*'.format(config.BASEURL)
         match = re.search(pattern, self.content)
-        return match.groups()
+        if match:
+            links = match.groups()
+        return links
 
 class QueueMailer(object):
     def __init__(self):
