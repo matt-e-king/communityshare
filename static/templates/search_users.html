@@ -1,4 +1,7 @@
-<div cs-main-view has-permission="{{Session.activeUser.is_administrator}}">
+<div cs-forbidden ng-if="Session.activeUser === undefined">
+</div>
+
+<div ng-if="Session.activeUser !== undefined">
 
   <h4>Search For Users</h4>
 

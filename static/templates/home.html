@@ -1,4 +1,7 @@
-<div cs-main-view has-permission="{{(!(Session.activeUser === undefined))}}">
+<div cs-forbidden ng-if="Session.activeUser === undefined">
+</div>
+
+<div ng-if="Session.activeUser !== undefined">
   <h4>Home</h4>
 
   <div class="alert alert-danger" ng-show="errorMessage">{{errorMessage}}</div>

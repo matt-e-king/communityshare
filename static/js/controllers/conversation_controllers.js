@@ -22,12 +22,13 @@
     'ConversationController',
     function($scope, $q, $location, $timeout, $modal, Session,
              Conversation, Message, User, Share, makeDialog, conversation) {
+      $scope.Session = Session;
       if (conversation === undefined) {
         return;
       }
       var sharesPromise = Share.get_many({conversation_id: conversation.id});
       $scope.otherUser = undefined;
-      $scope.conversation = undefined;
+      $scope.conversation = conversation;
       $scope.newMessage = undefined;
       var makeNewMessage = function() {
         var newMessage = new Message({
@@ -59,7 +60,6 @@
       } else {
         $scope.otherUser = conversation.userA;
       }
-      $scope.conversation = conversation;
       $scope.newMessage = makeNewMessage();
       $timeout(refreshConversation, 5000);
       sharesPromise.then(

@@ -64,6 +64,24 @@
     });
 
   module.factory(
+    'userLoader',
+    function(User, $q) {
+      return function(userId) {
+        var deferred = $q.defer()
+        var userPromise = User.get(userId);
+        userPromise.then(
+          function(user) {
+            deferred.resolve(user);
+          },
+          function() {
+            deferred.resolve(undefined);
+          });
+        return deferred.promise;
+      }
+    });
+    
+
+  module.factory(
     'User',
     function(UserBase, $q, $http, Search, Conversation, SessionBase, Evnt) {
 
