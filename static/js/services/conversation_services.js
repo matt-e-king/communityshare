@@ -31,6 +31,7 @@
     function(SessionBase, ItemFactory, UserBase, Message, Messages, Share, Evnt) {
       var Conversation = ItemFactory('conversation');
       Conversation.prototype.updateFromData = function(data) {
+        var _this = this;
         for (var key in data) {
           this[key] = data[key];
         }
@@ -40,11 +41,14 @@
         if (this.userB) {
           this.userB = UserBase.make(this.userB);
         }
-        if (SessionBase.activeUser.id === this.userA_id) {
-          this.otherUser = this.userB;
-        } else if (SessionBase.activeUser.id === this.userB_id) {
-          this.otherUser = this.userA;
-        }
+        SessionBase.getActiveUserPromise().then(
+          function(activeUser) {
+            if (activeUser.id === _this.userA_id) {
+              _this.otherUser = _this.userB;
+            } else if (activeUser.id === _this.userB_id) {
+              _this.otherUser = _this.userA;
+            }
+          })
         this.datetime_last_message = undefined;
         if (this.messages) {
           for (var i=0; i<this.messages.length; i++) {
