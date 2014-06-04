@@ -1,7 +1,7 @@
 from flask import jsonify
 
 from community_share.models.search import Search
-from community_share import search_matching, store
+from community_share import search_utils, store
 from community_share.routes import base_routes
 from community_share.authorization import get_requesting_user
 from community_share.utils import is_integer
@@ -24,7 +24,7 @@ def register_search_routes(app):
                 response = base_routes.make_not_found_response()
             else:
                 if search.has_admin_rights(requester):
-                    matching_searches = search_matching.find_matching_searches(search)
+                    matching_searches = search_utils.find_matching_searches(search)
 
                     serialized = [
                         search.standard_serialize(exclude=[])

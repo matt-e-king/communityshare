@@ -1,3 +1,4 @@
+import re
 import os
 import unittest
 import logging
@@ -9,13 +10,20 @@ from community_share import settings, setup, app, mail, config
 
 logger = logging.getLogger(__name__)
 
-sample_user = {
+sample_userA = {
     'institution_associations': [],
     'name': 'Charles',
     'bio': 'I am Charles.',
     'zipcode' :'12345',
     'email': "charlies@notarealemail.com",
-    'zipcode': '12345',
+}
+
+sample_userB = {
+    'institution_associations': [],
+    'name': 'Rob',
+    'bio': 'I am Rob.',
+    'zipcode' :'12345',
+    'email': "rob@notarealemail.com",
 }
 
 def compare_user_data(userA, userB):
@@ -53,7 +61,52 @@ class CommunityShareTestCase(unittest.TestCase):
         serialized = json.dumps(data)
         headers = [('Content-Type', 'application/json')]
         rv = self.app.post('/api/usersignup', data=serialized, headers=headers)
-        return rv
+        assert(rv.status_code == 200)
+        data = json.loads(rv.data.decode('utf8'))
+        user_id = data['data']['id']
+        api_key = data['apiKey']
+        authorization_header = 'Basic:api:{0}'.format(api_key)
+        headers = [('Authorization', authorization_header)]
+        # Create an authentication header
+        # And try to retrieve user
+        rv = self.app.get('/api/user/{0}'.format(user_id), headers=headers)
+        assert(rv.status_code == 200)
+        data = json.loads(rv.data.decode('utf8'))
+        # User details should match
+        compare_user_data(user_data, data['data'])
+        mailer = mail.get_mailer()
+        # We should have one email in queue (email confimation from signup)
+        assert(len(mailer.queue) == 1)
+        email = mailer.pop()
+        links = email.find_links()
+        assert(len(links)==1)
+        key = re.search('key=(.*)', links[0]).groups()[0]
+        # Confirm email for new user
+        headers = [('Content-Type', 'application/json')]
+        data = json.dumps({'key': key})
+        rv = self.app.post('/api/confirmemail', data=data,
+                           headers=headers)
+        assert(rv.status_code == 200)
+        return user_id, api_key
+
+    def save_search(self, user_id, api_key,
+                    searcher_role, searching_for_role, labels):
+        data = {
+            'searcher_user_id': user_id,
+            'searcher_role': searcher_role,
+            'searching_for_role': searching_for_role,
+            'labels': labels,
+            'zipcode': 12345
+        }
+        serialized = json.dumps(data)
+        authorization_header = 'Basic:api:{0}'.format(api_key)
+        headers = [('Authorization', authorization_header),
+                   ('Content-Type', 'application/json')]
+        rv = self.app.post('/api/search', data=serialized, headers=headers)
+        assert(rv.status_code == 200)
+        data = json.loads(rv.data.decode('utf8'))
+        search_id = data['data']['id']
+        return search_id
 
     def test_empty_db(self):
         # Make sure we get an OK when requesting index.
@@ -63,24 +116,57 @@ class CommunityShareTestCase(unittest.TestCase):
         # Expect forbidden (401)
         rv = self.app.get('/api/user/1')
         assert(rv.status_code == 401)
-        # Now sign up
-        rv = self.sign_up(sample_user)
+        # Now sign up 2 new users
+        userA_id, userA_api_key = self.sign_up(sample_userA)
+        userB_id, userB_api_key = self.sign_up(sample_userB)
+        # userA creates a search of educator for partner
+        searchA_id = self.save_search(
+            userA_id, userA_api_key, 'educator', 'partner',
+            ['robot dogs', 'walks on the beach'])
+        assert(searchA_id >= 0)
+        # userB creates a search of partner to educator
+        searchB_id = self.save_search(
+            userB_id, userB_api_key, 'partner', 'educator',
+            ['robot dogs', 'walks on the beach'])
+        assert(searchB_id >= 0)
+        # Get all the results for userA's search
+        authorization_header = 'Basic:api:{0}'.format(userA_api_key)
+        headers = [('Authorization', authorization_header),
+                   ('Content-Type', 'application/json')]
+        rv = self.app.get('/api/search/{0}/results'.format(searchA_id),
+                          headers=headers)
+        data = json.loads(rv.data.decode('utf8'))
+        searches = data['data']
+        assert(len(searches) == 1)
+        assert(searches[0]['searcher_user_id'] == userB_id)
+        # Now userA starts a conversation with userB
+        conversation_data = {
+            'search_id': searchA_id,
+            'title': 'Trip to moon',
+            'userA_id': userA_id,
+            'userB_id': userB_id,
+        }
+        serialized = json.dumps(conversation_data)
+        rv = self.app.post(
+            '/api/conversation', headers=headers, data=serialized)
         assert(rv.status_code == 200)
         data = json.loads(rv.data.decode('utf8'))
-        user_id = data['data']['id']
-        assert(user_id == 1)
-        api_key = data['apiKey']
-        authorization_header = 'Basic:api:{0}'.format(api_key)
-        headers = [('Authorization', authorization_header)]
-        # Create an authentication header
-        # And try to retrieve user
-        rv = self.app.get('/api/user/1', headers=headers)
-        assert(rv.status_code == 200)
+        conversation_id = data['data']['id']
+        # And send the first message
+        message_data = {
+            'conversation_id': conversation_id,
+            'sender_user_id': userA_id,
+            'content': 'Are you interested in going to the moon?',
+        }
+        serialized = json.dumps(message_data)
+        rv = self.app.post(
+            '/api/message', headers=headers, data=serialized)
         data = json.loads(rv.data.decode('utf8'))
-        # User details should match
-        compare_user_data(sample_user, data['data'])
-        # We should have one email in queue (email confimation from signup)
-        assert(len(mail.get_mailer().queue) == 1)
+        print(data)
+        assert(rv.status_code == 200)
+        
+        
+            
         
     def tearDown(self):
         #os.rmdir(self.SQLLITE_FILE)

@@ -8,10 +8,10 @@ from community_share import mail, settings, config, store
 
 logger = logging.getLogger(__name__)
 
-def send_message(message):
+def send_conversation_message(message):
     error_message = ''
     sender_user = message.sender_user
-    conversation = message.conversation
+    conversation = message.get_conversation()
     all_messages = conversation.messages
     receiver_user = None
     if (conversation.userA_id == message.sender_user_id):
@@ -19,10 +19,7 @@ def send_message(message):
     elif (conversation.userB_id == message.sender_user_id):
         receiver_user = conversation.userB
     subject = None
-    if message.title:
-        subject = message.title
-    else:
-        subject = conversation.title
+    subject = conversation.title
     from_address = 'message{message_id}@{mailgun_domain}'.format(
         message_id=message.id,
         mailgun_domain=config.MAILGUN_DOMAIN

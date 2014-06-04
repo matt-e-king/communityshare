@@ -1,3 +1,4 @@
+import re
 import logging
 import requests
 
@@ -16,19 +17,36 @@ content: {email.content}
 '''
 
 class Email(object):
+
     def __init__(self, from_address, to_address, subject, content):
         self.from_address = from_address
         self.to_address = to_address
         self.subject = subject
         self.content = content
 
+    def make_reply(self, content):
+        new_from_address = self.to_address
+        new_to_address = self.from_address
+        new_lines = content
+        lines = self.content.splitlines()
+        new_lines += ['>'+line for line in lines]
+        new_content = '\n'.join(new_lines)
+        new_email = Email(new_from_address, new_to_address, self.subject,
+                          new_content)
+        return new_email
+        
+    def find_links(self):
+        pattern = '\s+({}.*)\s+'.format(config.BASEURL)
+        match = re.search(pattern, self.content)
+        return match.groups()
+
 class QueueMailer(object):
     def __init__(self):
         self.queue = []
     def send(self, email):
         self.queue.append(email)
-    def pop():
-        self.queue.pop(0)
+    def pop(self):
+        return self.queue.pop(0)
 
 class DummyMailer(object):
     def send(email):

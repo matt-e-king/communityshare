@@ -5,7 +5,7 @@ from sqlalchemy import Column, Integer, Boolean, DateTime, Table, ForeignKey
 from sqlalchemy import String, or_, and_
 from sqlalchemy.orm import relationship
 
-from community_share import store, Base
+from community_share import store, Base, mail_actions
 from community_share.models.base import Serializable
 
 conversation_user_table = Table('conversation_user', Base.metadata,
@@ -42,7 +42,7 @@ class Conversation(Base, Serializable):
     userA_id = Column(Integer, ForeignKey('user.id'), nullable=False)
     userB_id = Column(Integer, ForeignKey('user.id'), nullable=False)
 
-    messages = relationship('Message', backref='conversation', order_by="Message.date_created")
+    messages = relationship('Message', order_by="Message.date_created")
     userA = relationship('User', primaryjoin='Conversation.userA_id == User.id')
     userB = relationship('User', primaryjoin='Conversation.userB_id == User.id')
 
@@ -132,6 +132,7 @@ class Message(Base, Serializable):
     date_created = Column(DateTime, nullable=False, default=datetime.utcnow)
 
     sender_user = relationship('User')
+    conversation = relationship('Conversation', primaryjoin='Message.conversation_id == Conversation.id')
 
     @classmethod
     def has_add_rights(cls, data, user):
@@ -167,3 +168,11 @@ class Message(Base, Serializable):
     def on_edit(self, requester, unchanged=False):
         if not unchanged:
             mail_actions.send_conversation_message(self)
+
+
+    def get_conversation(self):
+        '''
+        FIXME: This should just work through relationship.
+        '''
+        conversation = store.session.query(Conversation).filter_by(id=self.conversation_id).first()
+        return conversation
