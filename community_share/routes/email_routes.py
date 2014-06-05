@@ -24,11 +24,14 @@ def register_email_routes(app):
     @app.route('/api/email', methods=['POST'])
     def receive_email():
 
+        logger.debug('Received an email.')
+
         if config.MAILER_TYPE == 'MAILGUN':
             verify = True
         else:
             verify = False
         email = Email.from_mailgun_data(request.values, verify=verify)
+        logger.debug('Converted to an email object')
 
         address_pattern = '^replytomessage([0-9]+)@{mailgun_domain}$'.format(
             mailgun_domain=config.MAILGUN_DOMAIN)
@@ -40,6 +43,7 @@ def register_email_routes(app):
         if message is None:
             logger.warning('Received an email but did not find corresponding message.')
         else:
+            logger.debug('Creating a new email to send')
             # Create a new message
             new_message = Message(
                 conversation_id=message.conversation_id,
