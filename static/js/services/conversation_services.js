@@ -30,6 +30,15 @@
     'Conversation',
     function(SessionBase, ItemFactory, UserBase, Message, Messages, Share, Evnt) {
       var Conversation = ItemFactory('conversation');
+      Conversation.prototype.toData = function() {
+        var fields = ['id', 'title', 'search_id', 'userA_id', 'userB_id']
+        var d = {};
+        for (var i=0; i<fields.length; i++) {
+          var field = fields[i];
+          d[field] = this[field];
+        }
+        return d;
+      };
       Conversation.prototype.updateFromData = function(data) {
         var _this = this;
         for (var key in data) {
