@@ -60,6 +60,9 @@
       } else {
         $scope.otherUser = conversation.userA;
       }
+      $scope.messageHighlightClasses = {};
+      $scope.messageHighlightClasses[Session.activeUser.id] = 'highlight1';
+      $scope.messageHighlightClasses[$scope.otherUser.id] = 'highlight2';
       $scope.newMessage = makeNewMessage();
       $timeout(refreshConversation, 5000);
       sharesPromise.then(

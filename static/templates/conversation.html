@@ -55,7 +55,9 @@
 
   <div ng-repeat="message in conversation.messages" class="conversation-block">
     <div class="conversation-sender">{{message.sender_user.name}}</div>
-    <div class="conversation-message show-linebreaks">{{message.content}}</div>
+    <div class="conversation-message show-linebreaks"
+         ng-class="messageHighlightClasses[message.sender_user_id]"
+         >{{message.content}}</div>
   </div>
 
   <form novalidate login-with-auto-fill
@@ -70,6 +72,7 @@
                   name="content"
                   id="content"
                   class="form-control"
+                  ng-class="messageHighlightClasses[Session.activeUser.id]"
                   type="text">
         </textarea>
         <p ng-show="newConversationForm.content.$invalid && !newConversationForm.content.$pristine"
