@@ -1,14 +1,16 @@
 import logging
 from datetime import datetime
+import pytz
 
 from sqlalchemy import Table, ForeignKey, DateTime, Column
 from sqlalchemy import Integer, String, Boolean, Float
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, validates
 from sqlalchemy.sql.expression import func
 from sqlalchemy import or_
 
+from community_share import time_format
 from community_share import store, Base
-from community_share.models.base import Serializable
+from community_share.models.base import Serializable, ValidationException
 
 logger = logging.getLogger(__name__)
 
@@ -153,6 +155,14 @@ class Event(Base, Serializable):
     title = Column(String(100), nullable=True)
     description = Column(String, nullable=True)
     location = Column(String(100), nullable=False)
+    
+    @validates('datetime_start', 'datetime_stop')
+    def validate_datetime_start(self, key, datetime_start):
+        converted = time_format.from_iso8601(datetime_start)
+        converted = converted.replace(tzinfo=None)
+        if converted < datetime.utcnow():
+            raise ValidationException('Event cannot be in the past.')
+        return converted
 
     share = relationship('Share')
 
@@ -172,6 +182,9 @@ class Event(Base, Serializable):
 
     def on_edit(self, requester, unchanged=False):
         logger.debug('event: on_edit')
+        # Check that the duration is not negative
+        if self.datetime_stop < self.datetime_start:
+            raise ValidationException('Starting time of event must be before the ending time.')
         if not unchanged:
             share = self.share
             if share is None:

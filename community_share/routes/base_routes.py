@@ -214,12 +214,15 @@ def make_blueprint(Item, resourceName):
                     response = make_not_found_response()
                 else:
                     if item.has_admin_rights(requester):
-                        item.admin_deserialize_update(data)
-                        store.session.add(item)
-                        logger.debug('calling on_edit on {0}'.format(item))
-                        item.on_edit(requester, unchanged = not store.session.dirty)
-                        store.session.commit()
-                        response = make_admin_single_response(item)
+                        try:
+                            item.admin_deserialize_update(data)
+                            store.session.add(item)
+                            logger.debug('calling on_edit on {0}'.format(item))
+                            item.on_edit(requester, unchanged = not store.session.dirty)
+                            store.session.commit()
+                            response = make_admin_single_response(item)
+                        except ValidationException as e:
+                            response = make_bad_request_response(str(e))
                     else:
                         response = make_forbidden_response()
         return response
