@@ -74,12 +74,15 @@
           <label for="time_start"
                  class="control-label ">Starting Time</label>
           <div class="">
-            <input ng-model="event.time_start"
-                   required
-                   type="time"
-                   name="time_start"
-                   id="time_start"
-                   class="form-control"/>
+            <div timepicker
+                 ng-model="event.time_start"
+                 ng-change="changed()"
+                 hour-step="1"
+                 name="time_start"
+                 required
+                 minute-step="5"
+                 show-meridian="true">
+            </div>
             <p ng-show="shareForm.time_start.$invalid && !shareForm.time_start.$pristine" class="help-block">
               Enter a time for the share.
             </p>
@@ -90,12 +93,15 @@
           <label for="time_stop"
                  class="control-label ">Stopping Time</label>
           <div class="">
-            <input ng-model="event.time_stop"
-                   required
-                   type="time"
-                   name="times_stop"
-                   id="time_stop"
-                   class="form-control"/>
+            <div timepicker
+                 ng-model="event.time_stop"
+                 ng-change="changed()"
+                 hour-step="1"
+                 name="time_stop"
+                 required
+                 minute-step="5"
+                 show-meridian="true">
+            </div>
             <p ng-show="shareForm.time_stop.$invalid && !shareForm.time_stop.$pristine" class="help-block">
               Enter a time for the share to end.
             </p>
