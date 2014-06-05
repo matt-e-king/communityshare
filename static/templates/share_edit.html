@@ -57,19 +57,15 @@
             </p>
           </div>
         </div>
-
+        
         <div class="form-group">
-          <label for="date"
-                 class="control-label">Date</label>
-          <div class="">
-            <input ng-model="event.date"
-                   required
-                   type="date"
-                   name="date"
-                   id="date"
-                   class="form-control"/>
+          <label for="location"
+                 class="control-label ">Date</label>
+          <div>
+            <div cs-datepicker ng-model="event.date">
+            </div>
             <p ng-show="shareForm.date.$invalid && !shareForm.date.$pristine" class="help-block">
-              Enter a date for the share.
+              Enter a valid date.
             </p>
           </div>
         </div>

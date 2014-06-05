@@ -10,7 +10,10 @@
       <h5 class="panel-title">Share Details</h5>
     </div>
     <div class="panel-body">
-      <table>
+      <div ng-show="share.id === undefined">
+        No Share arranged yet.
+      </div>
+      <table ng-show="share.id >= 0">
         <tbody>
           <tr><th>Title of Share</th><td>{{share.title}}</td></tr>
           <tr><th>Description of Share</th><td>{{share.description}}</td></tr>
@@ -33,9 +36,12 @@
           </tr>
         </tbody>
       </table>
-      <button class="btn" type="submit" ng-click="editShare()">
+      <button class="btn" type="submit" ng-click="editShare()" ng-show="share.id !== undefined">
         Edit Share Details
       </button>
+      <button class="btn" type="submit" ng-click="editShare()" ng-show="share.id === undefined">
+        Create Share Details
+      </button>      
       <button class="btn" type="submit" ng-click="confirmShare()" ng-show="share.canApprove">
         Confirm Share Details
       </button>
