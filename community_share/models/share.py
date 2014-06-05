@@ -109,7 +109,7 @@ class Share(Base, Serializable):
             self.educator_approved = True
         if requester.id == self.community_partner_user_id:
             self.community_partner_approved = True
-        session.add(self)
+        store.session.add(self)
 
     @classmethod
     def args_to_query(cls, args, requester):
@@ -161,7 +161,7 @@ class Event(Base, Serializable):
         has_rights = False
         share_id = int(data.get('share_id', -1))
         if share_id >= 0:
-            query = session.query(Share).filter(Share.id==share_id)
+            query = store.session.query(Share).filter(Share.id==share_id)
             share = query.first()
             if share is not None:
                 if user.id == share.educator_user_id:
@@ -175,7 +175,7 @@ class Event(Base, Serializable):
         if not unchanged:
             share = self.share
             if share is None:
-                share = session.query(Share).filter_by(id=self.share_id).first()
+                share = store.session.query(Share).filter_by(id=self.share_id).first()
             share.educator_approved = False
             share.community_partner_approved = False
             if requester.id == share.educator_user_id:
@@ -184,7 +184,7 @@ class Event(Base, Serializable):
                 share.community_partner_approved = True
             logger.debug('ed {0} cp {1}'.format(
                 share.educator_approved, share.community_partner_approved))
-            session.add(share)
+            store.session.add(share)
 
     def has_standard_rights(self, requester):
         has_rights = False
@@ -197,7 +197,7 @@ class Event(Base, Serializable):
         if user.is_administrator:
             has_rights = True
         else:
-            share = session.query(Share).filter(Share.id==self.share_id).first()
+            share = store.session.query(Share).filter(Share.id==self.share_id).first()
             if share is not None:
                 if user.id == share.educator_user_id:
                     has_rights = True
