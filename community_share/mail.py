@@ -1,4 +1,6 @@
 import re
+import logging
+import hmac, hashlib
 
 import requests
 
