@@ -17,6 +17,7 @@ def append_conversation_link(content, conversation):
 
 
 def send_conversation_message(message):
+    logger.debug('send_conversation_email begins')
     error_message = ''
     sender_user = message.sender_user
     conversation = message.get_conversation()
