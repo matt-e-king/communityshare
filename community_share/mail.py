@@ -1,5 +1,5 @@
 import re
-import logging
+
 import requests
 
 from community_share import config
@@ -15,6 +15,13 @@ to: {email.to_address}
 subject: {email.subject}
 content: {email.content}
 '''
+
+def verify_email(api_key, token, timestamp, signature):
+    return signature == hmac.new(
+        key=bytearray(api_key, 'utf8'),
+        msg=bytearray('{}{}'.format(timestamp, token), 'utf8'),
+        digestmod=hashlib.sha256).hexdigest()
+
 
 class Email(object):
 
@@ -58,7 +65,7 @@ class Email(object):
         token = data.get('token', None)
         timestamp = data.get('timestamp', None)
         if verify:
-            verified = verify(config.MAILGUN_API_KEY, token, timestamp, signature)
+            verified = verify_email(config.MAILGUN_API_KEY, token, timestamp, signature)
         else:
             verified = True
         if verified:
