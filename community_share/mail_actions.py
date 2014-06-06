@@ -75,7 +75,7 @@ def send_event_reminder_message(event):
     other_users = [share.conversation.userB, share.conversation.userA]
     from_address = config.DONOTREPLY_EMAIL_ADDRESS
     event_details = EVENT_EDIT_TEMPLATE.format(event=event)
-    url = share.get_url()
+    url = share.conversation.get_url()
     subject = 'Reminder for Share on {}'.format(
         time_format.to_pretty(event.datetime_start))
     error_messages = []
@@ -111,8 +111,7 @@ def send_share_message(share, editer, new_share=False, is_confirmation=False,
     from_address = config.DONOTREPLY_EMAIL_ADDRESS
     event_details = ''.join([EVENT_EDIT_TEMPLATE.format(event=event)
                              for event in share.events])
-    url = share.get_url()
-    conversation_url = share.conversation.get_url()
+    url = share.conversation.get_url()
     if is_confirmation:
         subject = 'Share Details Confirmed: {0}'.format(share.title)
         content = SHARE_CONFIRMATION_TEMPLATE.format(
@@ -120,7 +119,7 @@ def send_share_message(share, editer, new_share=False, is_confirmation=False,
     elif is_delete:
         subject = 'Share Canceled: {0}'.format(share.title)
         content = SHARE_DELETION_TEMPLATE.format(
-            share=share, eventdetails=event_details, url=conversation_url,
+            share=share, eventdetails=event_details, url=url,
             editer=editer)
     elif new_share:
         subject = 'Share Details Suggested: {0}'.format(share.title)
