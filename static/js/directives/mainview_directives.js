@@ -26,7 +26,6 @@
           $scope.today = function() {
             $scope.ngModel = new Date();
           };
-          $scope.today();
 
           $scope.clear = function () {
             $scope.ngModel = null;
