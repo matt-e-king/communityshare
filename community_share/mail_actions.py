@@ -23,7 +23,7 @@ Description: {share.description}
 Educator: {share.educator.name}
 Community Partner: {share.community_partner.name}
 
-{{eventdetails}}
+{eventdetails}
 
 Go to {url} for more details.
 '''
