@@ -108,12 +108,13 @@ class Serializable(object):
                     setattr(self, fieldname, data[fieldname])
             
     @classmethod
-    def admin_deserialize(self, data):
+    def admin_deserialize(cls, data):
         if 'id' in data:
-            item = self.get(data['id'])
-            item.admin_deserialize_update(data)
+            item = store.session.query(cls).filter(cls.id==data['id']).first()
+            if item is not None:
+                item.admin_deserialize_update(data)
         else:
-            item = self.admin_deserialize_add(data)
+            item = cls.admin_deserialize_add(data)
         return item
 
     CONDITION_MAPPING = {

@@ -116,7 +116,7 @@ class Share(Base, Serializable):
         'events': {
             'standard': standard_serialize_events,
             'admin': admin_serialize_events,
-        }
+        },
     }
 
     def on_edit(self, requester, unchanged=False, is_delete=False, is_add=False):
@@ -289,7 +289,15 @@ class Event(Base, Serializable):
                 exclude=['events']),
             'admin': lambda self: self.share.admin_serialize(
                 exclude=['events']),
-        }
+        },
+        'datetime_start': {
+            'standard': lambda self: time_format.to_iso8601(self.datetime_start),
+            'admin': lambda self: time_format.to_iso8601(self.datetime_start),
+        },
+        'datetime_stop': {
+            'standard': lambda self: time_format.to_iso8601(self.datetime_stop),
+            'admin': lambda self: time_format.to_iso8601(self.datetime_stop),
+        },
     }
 
     @classmethod

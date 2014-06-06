@@ -265,6 +265,27 @@ class CommunityShareTestCase(unittest.TestCase):
         data = json.loads(rv.data.decode('utf8'))['data']
         # There should still be one event there.
         assert(len(data['events']) == 1)
+        event_id = data['events'][0]['id']
+        # This should send an email to userA that a share has been edited.
+        mailer = mail.get_mailer()
+        assert(len(mailer.queue) == 1)
+        email = mailer.pop()
+        assert(email.to_address == sample_userA['email'])
+        # User B edits it and adds an additional event
+        existing_event = data['events'][0]
+        data['events'].append(
+            {'location': 'Somewhere Else',
+             'datetime_start': time_format.to_iso8601(starting),
+             'datetime_stop': time_format.to_iso8601(ending),}
+        )
+        serialized = json.dumps(data)
+        rv = self.app.put(
+            '/api/share/{0}'.format(share_id), headers=userB_headers, data=serialized)
+        data = json.loads(rv.data.decode('utf8'))['data']
+        ids = set([e['id'] for e in data['events']])
+        assert(event_id in ids)
+        assert(len(ids) == 2)
+        assert(rv.status_code == 200)
         # This should send an email to userA that a share has been edited.
         mailer = mail.get_mailer()
         assert(len(mailer.queue) == 1)
@@ -274,6 +295,7 @@ class CommunityShareTestCase(unittest.TestCase):
         assert(data['educator_approved'] == False)
         assert(data['community_partner_approved'] == True)
         # User A can do a put with no changes to approve.
+        serialized = json.dumps(data)
         rv = self.app.put(
             '/api/share/{0}'.format(share_id), headers=userA_headers, data=serialized)
         assert(rv.status_code == 200)
