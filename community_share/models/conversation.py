@@ -192,7 +192,7 @@ class Message(Base, Serializable):
                 has_rights = True
         return has_rights
 
-    def on_edit(self, requester, unchanged=False):
+    def on_edit(self, requester, unchanged=False, is_add=False, is_delete=False):
         if not unchanged:
             mail_actions.send_conversation_message(self)
 

@@ -69,7 +69,7 @@ class Serializable(object):
     def admin_serialize(self, exclude=[]):
         return self._base_admin_serialize(exclude)
 
-    def on_edit(self, requester, unchanged=False):
+    def on_edit(self, requester, unchanged=False, is_add=False, is_delete=False):
         pass
 
     custom_deserializers = {}
@@ -84,11 +84,13 @@ class Serializable(object):
         return item
 
     def admin_deserialize_update(self, data, add=False):
+        logger.debug('admin_deserialize_update')
         if add:
             fieldnames = set(self.MANDATORY_FIELDS) | set(self.WRITEABLE_FIELDS)
         else:
             fieldnames = self.WRITEABLE_FIELDS
         for fieldname in data.keys():
+            logger.debug('fieldname is {}'.format(fieldname))
             if fieldname in self.custom_deserializers:
                 value = data.get(fieldname, None)
                 self.custom_deserializers[fieldname](self, value)

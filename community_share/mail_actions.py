@@ -15,6 +15,81 @@ def append_conversation_link(content, conversation):
     content = '{content}\n\nThe email is part of a Community Share Conversation.  To view the entire conversation go to {url}'.format(content=content, url=conversation_url)
     return content
 
+SHARE_CONFIRMATION_TEMPLATE = '''{editer.name} has confirmed the details of a share.
+
+To view the share details go to {url}.
+'''
+
+SHARE_CREATION_TEMPLATE = '''{editer.name} has proposed a share with you.  The details are:
+
+Title: {share.title}
+Description: {share.description}
+
+Educator: {share.educator.name}
+Community Partner: {share.community_partner.name}
+
+{{eventdetails}}
+
+To confirm this suggestion please go to {url} and click the confirm share button.
+'''
+
+SHARE_EDIT_TEMPLATE = '''{editer.name} has edited the details of a share which you are involved in or have been invited to.  The new share details suggested are:
+
+Title: {share.title}
+Description: {share.description}
+
+Educator: {share.educator.name}
+Community Partner: {share.community_partner.name}
+
+{{eventdetails}}
+
+To confirm these changes please go to {url} and click the confirm share button.
+'''
+
+EVENT_EDIT_TEMPLATE = '''Location: {event.location}
+Starting: {event.formatted_datetime_start}
+Stopping: {event.formatted_datetime_stop}
+'''
+
+def send_share_message(share, editer, new_share=False, is_confirmation=False):
+    receivers = [share.conversation.userA, share.conversation.userB]
+    receivers = [r for r in receivers if (editer.id != r.id)]
+    from_address = config.DONOTREPLY_EMAIL_ADDRESS
+    event_details = ''.join([EVENT_EDIT_TEMPLATE.format(event=event)
+                             for event in share.events])
+    url = share.get_url()
+    if is_confirmation:
+        subject = 'Share Details Confirmed: {0}'.format(share.title)
+        content = SHARE_CONFIRMATION_TEMPLATE.format(
+            share=share, eventdetails=event_details, url=url, editer=editer)
+    elif new_share:
+        subject = 'Share Details Suggested: {0}'.format(share.title)
+        content = SHARE_CREATION_TEMPLATE.format(
+            share=share, eventdetails=event_details, url=url, editer=editer)
+    else:
+        subject = 'Share Details Edited: {0}'.format(share.title)
+        content = SHARE_EDIT_TEMPLATE.format(
+            share=share, eventdetails=event_details, url=url, editer=editer)
+    error_messages = []
+    for receiver in receivers:
+        to_address = receiver.confirmed_email
+        if not to_address:
+            error_message = '{0} is not a confirmed email address'.format(
+                receiver.email)
+        else:
+            email = mail.Email(
+                from_address=from_address,
+                to_address=to_address,
+                subject=subject,
+                content=content,
+                new_content=content
+            )
+            error_message = mail.get_mailer().send(email)
+        error_messages.append(error_message)
+    combined_error_message = ', '.join(
+        [e for e in error_messages if e is not None])
+    return combined_error_message
+
 
 def send_conversation_message(message):
     logger.debug('send_conversation_email begins')

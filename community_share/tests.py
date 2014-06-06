@@ -3,10 +3,11 @@ import os
 import unittest
 import logging
 import json
+import datetime
 
 from flask import jsonify
 
-from community_share import setup, app, mail, config
+from community_share import setup, app, mail, config, time_format
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +27,15 @@ sample_userB = {
     'zipcode' :'12345',
     'email': "rob@notarealemail.com",
     'password': 'oiuh298n[;w',
+}
+
+sample_userC = {
+    'institution_associations': [],
+    'name': 'Charlie',
+    'bio': 'AAAAAAAAAAAAAhhhhhhhhhhh!!!!',
+    'zipcode' :'12345',
+    'email': "charlie@notarealemail.com",
+    'password': 'oiuh298n[;wbosijdfkow',
 }
 
 def chop_link(link):
@@ -147,6 +157,146 @@ class CommunityShareTestCase(unittest.TestCase):
             '/api/message', headers=headers, data=serialized)
         assert(rv.status_code == 200)
         return rv
+        
+    def test_share(self):
+        # Signup users and confirm emails
+        userA_id, userA_api_key, userA_email_key = self.sign_up(sample_userA)
+        self.confirm_email(userA_email_key)
+        userB_id, userB_api_key, userB_email_key = self.sign_up(sample_userB)
+        self.confirm_email(userB_email_key)
+        userC_id, userC_api_key, userC_email_key = self.sign_up(sample_userC)
+        self.confirm_email(userC_email_key)
+        noone_headers = make_headers()
+        userA_headers = make_headers(api_key=userA_api_key)
+        userB_headers = make_headers(api_key=userB_api_key)
+        userC_headers = make_headers(api_key=userC_api_key)
+        # userA creates a search of educator for partner
+        searchA_id = self.save_search(
+            userA_id, userA_api_key, 'educator', 'partner',
+            ['robot dogs', 'walks on the beach'])
+        assert(searchA_id >= 0)
+        # userB creates a search of partner to educator
+        searchB_id = self.save_search(
+            userB_id, userB_api_key, 'partner', 'educator',
+            ['robot dogs', 'walks on the beach'])
+        assert(searchB_id >= 0)
+        # userA starts a conversation
+        conversation_data = {
+            'search_id': searchA_id,
+            'title': 'Trip to moon',
+            'userA_id': userA_id,
+            'userB_id': userB_id,
+        }
+        serialized = json.dumps(conversation_data)
+        rv = self.app.post(
+            '/api/conversation', headers=userA_headers, data=serialized)
+        assert(rv.status_code == 200)
+        data = json.loads(rv.data.decode('utf8'))
+        conversation_id = data['data']['id']
+        # userA creates a share
+        headers = make_headers(userA_api_key)
+        now = datetime.datetime.now()
+        starting = now + datetime.timedelta(hours=100)
+        ending = now + datetime.timedelta(hours=101)
+        share_data = {
+            'title': 'Trip to moon Still',
+            'description': 'Is the moon made of Cheese?',
+            'conversation_id': conversation_id,
+            'educator_user_id': userA_id,
+            'community_partner_user_id': userB_id,
+            'events': [
+                {'location': 'Somewhere',
+                 'datetime_start': time_format.to_iso8601(starting),
+                 'datetime_stop': time_format.to_iso8601(ending),},
+            ]
+        }
+        serialized = json.dumps(share_data)
+        rv = self.app.post(
+            '/api/share', headers=userA_headers, data=serialized)
+        assert(rv.status_code == 200)
+        data = json.loads(rv.data.decode('utf8'))
+        share_id = data['data']['id']
+        assert(len(data['data']['events']) == 1)
+        # This should send an email to userB that a share has been created.
+        mailer = mail.get_mailer()
+        assert(len(mailer.queue) == 1)
+        email = mailer.pop()
+        assert(email.to_address == sample_userB['email'])
+        # Check link is valid
+        links = email.find_links()
+        assert(len(links) == 1)
+        chopped_link = chop_link(links[0])
+        rv = self.app.get(chopped_link)
+        assert(rv.status_code==200)
+        # We should not be able to get this share if unauthenticated
+        rv = self.app.get(
+            '/api/share/{0}'.format(share_id), headers=noone_headers)
+        assert(rv.status_code == 401)
+        # Logged on users can access share info
+        # FIXME: Need to check if this should be more private.
+        rv = self.app.get(
+            '/api/share/{0}'.format(share_id), headers=userC_headers)
+        assert(rv.status_code == 200)
+        # User B should be able to access it.
+        rv = self.app.get(
+            '/api/share/{0}'.format(share_id), headers=userB_headers)
+        assert(rv.status_code == 200)
+        share_data = json.loads(rv.data.decode('utf8'))['data']
+        assert(share_data['id'] == share_id)
+        assert(share_data['educator_approved'] == True)
+        assert(share_data['community_partner_approved'] == False)
+        # Now let's edit the share.
+        share_data = {
+            'description': 'Is the moon made of Cheese?  There is only one way to find out!',
+        }
+        serialized = json.dumps(share_data)
+        # Unauthenticated person should not be able to edit it.
+        rv = self.app.put(
+            '/api/share/{0}'.format(share_id), headers=noone_headers, data=serialized)
+        assert(rv.status_code == 401)
+        # User C should not be able to edit it.
+        rv = self.app.put(
+            '/api/share/{0}'.format(share_id), headers=userC_headers, data=serialized)
+        assert(rv.status_code == 403)
+        # User B should be able to edit it.
+        rv = self.app.put(
+            '/api/share/{0}'.format(share_id), headers=userB_headers, data=serialized)
+        assert(rv.status_code == 200)
+        data = json.loads(rv.data.decode('utf8'))['data']
+        # There should still be one event there.
+        assert(len(data['events']) == 1)
+        # This should send an email to userA that a share has been edited.
+        mailer = mail.get_mailer()
+        assert(len(mailer.queue) == 1)
+        email = mailer.pop()
+        assert(email.to_address == sample_userA['email'])
+        # And who has given approval is switched.
+        assert(data['educator_approved'] == False)
+        assert(data['community_partner_approved'] == True)
+        # User A can do a put with no changes to approve.
+        rv = self.app.put(
+            '/api/share/{0}'.format(share_id), headers=userA_headers, data=serialized)
+        assert(rv.status_code == 200)
+        data = json.loads(rv.data.decode('utf8'))['data']
+        assert(data['educator_approved'] == True)
+        assert(data['community_partner_approved'] == True)
+        # This should send an email to userB that changes have been approved.
+        mailer = mail.get_mailer()
+        assert(len(mailer.queue) == 1)
+        email = mailer.pop()
+        assert(email.to_address == sample_userB['email'])
+        # Now userB deletes the events
+        share_data = {
+            'events': []
+        }
+        serialized = json.dumps(share_data)
+        # Unauthenticated person should not be able to edit it.
+        rv = self.app.put(
+            '/api/share/{0}'.format(share_id), headers=userB_headers, data=serialized)
+        assert(rv.status_code == 200)
+        data = json.loads(rv.data.decode('utf8'))['data']
+        assert(len(data['events']) == 0)
+
 
     def test_password_reset(self):
         # Signup userA

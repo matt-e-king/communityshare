@@ -6,10 +6,10 @@ from sqlalchemy import Table, ForeignKey, DateTime, Column
 from sqlalchemy import Integer, String, Boolean, Float
 from sqlalchemy.orm import relationship, validates
 from sqlalchemy.sql.expression import func
-from sqlalchemy import or_
+from sqlalchemy import or_, and_
 
-from community_share import time_format
-from community_share import store, Base
+from community_share import time_format, mail_actions
+from community_share import store, Base, config
 from community_share.models.base import Serializable, ValidationException
 
 logger = logging.getLogger(__name__)
@@ -21,10 +21,10 @@ class Share(Base, Serializable):
         'educator_user_id', 'community_partner_user_id', 'conversation_id',
         'title', 'description']
     WRITEABLE_FIELDS = [
-        'educator_approved', 'community_partner_approved', 'title', 'description']
+        'educator_approved', 'community_partner_approved', 'title', 'description', 'events']
     STANDARD_READABLE_FIELDS = [
         'id', 'educator_user_id', 'community_partner_user_id', 'title' ,
-        'description', 'conversation_id', 'active', 'event', 'educator',
+        'description', 'conversation_id', 'active', 'events', 'educator',
         'community_partner'
     ]
     ADMIN_READABLE_FIELDS = [
@@ -48,17 +48,19 @@ class Share(Base, Serializable):
     description = Column(String, nullable=False)
     date_created = Column(DateTime, nullable=False, default=datetime.utcnow)
 
-    events = relationship("Event")
+    events = relationship('Event', primaryjoin='and_(Event.share_id == Share.id, Event.active == True)')
     educator = relationship('User', primaryjoin='Share.educator_user_id == User.id')
     community_partner = relationship('User', primaryjoin='Share.community_partner_user_id == User.id')
+    conversation = relationship('Conversation')
 
     @classmethod
     def has_add_rights(cls, data, user):
         has_rights = False
-        if int(data.get('educator_user_id', -1)) == user.id:
-            has_rights = True
-        elif int(data.get('community_partner_user_id', -1)) == user.id:
-            has_rights = True
+        if user is not None:
+            if int(data.get('educator_user_id', -1)) == user.id:
+                has_rights = True
+            elif int(data.get('community_partner_user_id', -1)) == user.id:
+                has_rights = True
         return has_rights
 
     def has_standard_rights(self, requester):
@@ -87,6 +89,21 @@ class Share(Base, Serializable):
                       for e in self.events if e.active]
         return serialized
 
+    def deserialize_events(self, data_list):
+        logger.debug('deserialize_events')
+        if data_list is None:
+            data_list = []
+        for e in data_list:
+            e['share_id'] = self.id
+        # Don't set it to self.events because sqlalchemy's automatic
+        # updating doesn't work for us.
+        self.new_events = [
+            Event.admin_deserialize(e) for e in data_list]
+
+    custom_deserializers = {
+        'events': deserialize_events,
+    }
+
     custom_serializers = {
         'educator': {
             'standard': lambda self: self.educator.standard_serialize(),
@@ -102,14 +119,44 @@ class Share(Base, Serializable):
         }
     }
 
-    def on_edit(self, requester, unchanged=False):
-        logger.debug('share: on_edit')
+    def on_edit(self, requester, unchanged=False, is_delete=False, is_add=False):
+        if is_delete:
+            # Set all events to inactive
+            for e in self.events:
+                e.active = False
+                store.session.add(e)
+        if not hasattr(self, 'new_events'):
+            self.new_events = self.events
+        old_event_ids = set([e.id for e in self.events])
+        new_event_ids = set([e.id for e in self.new_events])
+        to_delete_event_ids = old_event_ids - new_event_ids
+        # Set unused events to inactive
+        for e in self.events:
+            if e.id in to_delete_event_ids:
+                e.active = False
+                store.session.add(e)
+            store.session.commit()
+        # Set self.events to the new events but put the deleted ones in as well
+        # otherwise sqlalchemy will try to set share_id to None which we don't
+        # want.
+        combined_events = self.new_events
+        for e in self.events:
+            if e.id not in new_event_ids:
+                combined_events.append(e)
+        self.events = combined_events
         if not unchanged:
             self.educator_approved = False
             self.community_partner_approved = False
+            mail_actions.send_share_message(self, requester, new_share=is_add)
         if requester.id == self.educator_user_id:
+            if (not self.educator_approved) and unchanged:
+                mail_actions.send_share_message(
+                    self, requester, is_confirmation=True)
             self.educator_approved = True
         if requester.id == self.community_partner_user_id:
+            if (not self.community_partner) and unchanged:
+                mail_actions.send_share_message(
+                    self, requester, is_confirmation=True)
             self.community_partner_approved = True
         store.session.add(self)
 
@@ -127,6 +174,10 @@ class Share(Base, Serializable):
             except ValueError:
                 pass
         return query
+
+    def get_url(self):
+        url = '{0}/#/share/{1}'.format(config.BASEURL, self.id)
+        return url
 
 
 class Event(Base, Serializable):
@@ -164,7 +215,17 @@ class Event(Base, Serializable):
             raise ValidationException('Event cannot be in the past.')
         return converted
 
+    # FIXME: Not checking if duration is negative.
+
     share = relationship('Share')
+
+    @property
+    def formatted_datetime_start(self):
+        return time_format.to_pretty(self.datetime_start)
+
+    @property
+    def formatted_datetime_stop(self):
+        return time_format.to_pretty(self.datetime_stop)
 
     @classmethod
     def has_add_rights(cls, data, user):
@@ -180,24 +241,21 @@ class Event(Base, Serializable):
                     has_rights = True
         return has_rights
 
-    def on_edit(self, requester, unchanged=False):
+    def on_edit(self, requester, unchanged=False, is_delete=False, is_add=False):
         logger.debug('event: on_edit')
-        # Check that the duration is not negative
-        if self.datetime_stop < self.datetime_start:
-            raise ValidationException('Starting time of event must be before the ending time.')
         if not unchanged:
             share = self.share
             if share is None:
                 share = store.session.query(Share).filter_by(id=self.share_id).first()
             share.educator_approved = False
             share.community_partner_approved = False
-            if requester.id == share.educator_user_id:
-                share.educator_approved = True
-            if requester.id == share.community_partner_user_id:
-                share.community_partner_approved = True
-            logger.debug('ed {0} cp {1}'.format(
-                share.educator_approved, share.community_partner_approved))
-            store.session.add(share)
+        if requester.id == share.educator_user_id:
+            share.educator_approved = True
+        if requester.id == share.community_partner_user_id:
+            share.community_partner_approved = True
+        logger.debug('ed {0} cp {1}'.format(
+            share.educator_approved, share.community_partner_approved))
+        store.session.add(share)
 
     def has_standard_rights(self, requester):
         has_rights = False

@@ -178,8 +178,12 @@ def make_blueprint(Item, resourceName):
             try:
                 item = Item.admin_deserialize_add(data)
                 store.session.add(item)
-                item.on_edit(requester, unchanged=False)
                 store.session.commit()
+                refreshed_item = store.session.query(Item).filter_by(id=item.id).first()
+                refreshed_item.on_edit(requester, unchanged=False, is_add=True)
+                # commit again in case on_edit changed it.
+                store.session.commit()
+                # and refresh again to update relationships
                 refreshed_item = store.session.query(Item).filter_by(id=item.id).first()
                 if refreshed_item.has_admin_rights(requester):
                     response = make_admin_single_response(
@@ -245,7 +249,7 @@ def make_blueprint(Item, resourceName):
                     item.active = False
                     store.session.add(item)
                     if not previously_deleted:
-                        item.on_edit(requester, unchanged=False)
+                        item.on_edit(requester, unchanged=False, is_delete=True)
                     store.session.commit()
                     response = make_admin_single_response(item)
                 else:
