@@ -5,6 +5,7 @@ from community_share import reminder
 logger = logging.getLogger(__name__)
 
 def do_work():
+    logger.info('Running do_work')
     reminder.send_reminders()
     
 default_target_time = datetime.timedelta(seconds=600)

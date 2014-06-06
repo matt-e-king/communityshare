@@ -9,7 +9,7 @@ from community_share.models.secret import Secret
 from community_share.models.survey import Question, SuggestedAnswer
 from community_share.models.conversation import Conversation, Message
 from community_share.models.institution import InstitutionAssociation, Institution
-from community_share.models.share import Share, Event
+from community_share.models.share import Share, Event, EventReminder
 from community_share import store, Base, config
 
 logger = logging.getLogger(__name__)
