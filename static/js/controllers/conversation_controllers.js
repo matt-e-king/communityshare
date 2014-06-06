@@ -117,17 +117,11 @@
           function(result) {
             if (result === 'yes') {
               // FIXME: Send email to otherUser saying they want to cancel it.
-              var deletePromises = [];
-              for (var i=0; i<$scope.share.events.length; i++) {
-                var evnt = $scope.share.events[i];
-                if (evnt.id >= 0) {
-                  deletePromises.push(evnt.destroy());
-                }
-              }
-              var allPromise = $q.all(deletePromises)
-              allPromise.then(
+              deletePromise = $scope.share.destroy();
+              deletePromise.then(
                 function() {
-                  $scope.share.addNewEvent();
+                  $scope.share = conversation.makeShare();
+                  $scope.events = $scope.share.events;
                 },
                 function(message) {
                   var baseMessage = 'Failed to cancel share';

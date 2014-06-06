@@ -44,63 +44,17 @@
         }
         $scope.errorMessage = msg;
       }
-      var saveEvents = function() {
-        var eventPromises = [];
-        for (var i=0; i<$scope.events.length; i++) {
-          var evnt = $scope.events[i];
-          evnt.updateDateTimes();
-          evnt.share_id = $scope.share.id;
-          var eventPromise = evnt.save();
-          eventPromises.push(eventPromise);
-        }
-        var allEventsPromise = $q.all(eventPromises);
-        return allEventsPromise;
-      };
       var close = function() {
         $modalInstance.close($scope.share);
       };
       $scope.save = function() {
-        var saveEventsFirst = ($scope.share.id >= 0);
-        if (saveEventsFirst) {
-          var eventsPromise = saveEvents();
-          var shareDeferred = $q.defer();
-          eventsPromise.then(
-            function() {
-              var sharePromise = $scope.share.save();
-              sharePromise.then(
-                function(share) {
-                  shareDeferred.resolve(share);
-                },
-                function(message) {
-                  shareDeferred.reject(message);
-                });
-            },
-            function(message) {
-              shareDeferred.reject(message);
-            });
-          var finalPromise = shareDeferred.promise;
-          finalPromise.then(
-            close,
-            showErrorMessage);
-        } else {
-          var sharePromise = $scope.share.save();
-          sharePromise.then(
-            function(share) {
-              var eventsPromise = saveEvents();
-              eventsPromise.then(
-                function(events) {
-                  for (var i=0; i<events.length; i++) {
-                    var evnt = events[i];
-                    var index = share.events.indexOf(evnt);
-                    if (index === -1) {
-                      share.events.push(evnt);
-                    }
-                  }
-                  close();
-                },
-                showErrorMessage);
-            });
+        for (var i=0; i<$scope.share.events.length; i++) {
+          $scope.share.events[i].updateDateTimes();
         }
+        var sharePromise = $scope.share.save();
+        sharePromise.then(
+          close,
+          showErrorMessage);
       };
     });
   
