@@ -4,7 +4,7 @@ from datetime import datetime
 
 from community_share.models.user import User
 from community_share.models.secret import Secret
-from community_share import mail, config, store
+from community_share import mail, config, store, time_format
 
 logger = logging.getLogger(__name__)
 
@@ -14,6 +14,19 @@ def append_conversation_link(content, conversation):
         config.BASEURL, conversation.id)
     content = '{content}\n\nThe email is part of a Community Share Conversation.  To view the entire conversation go to {url}'.format(content=content, url=conversation_url)
     return content
+
+EVENT_REMINDER_TEMPLATE = '''You have a share soon with {other_user.name}.  The share details are:
+
+Title: {share.title}
+Description: {share.description}
+
+Educator: {share.educator.name}
+Community Partner: {share.community_partner.name}
+
+{{eventdetails}}
+
+Go to {url} for more details.
+'''
 
 SHARE_DELETION_TEMPLATE = '''{editer.name} has canceled the share '{share.title}'.
 
@@ -55,6 +68,41 @@ EVENT_EDIT_TEMPLATE = '''Location: {event.location}
 Starting: {event.formatted_datetime_start}
 Stopping: {event.formatted_datetime_stop}
 '''
+
+def send_event_reminder_message(event):
+    share = event.share
+    receivers = [share.conversation.userA, share.conversation.userB]
+    other_users = [share.conversation.userB, share.conversation.userA]
+    from_address = config.DONOTREPLY_EMAIL_ADDRESS
+    event_details = EVENT_EDIT_TEMPLATE.format(event=event)
+    url = share.get_url()
+    subject = 'Reminder for Share on {}'.format(
+        time_format.to_pretty(event.datetime_start))
+    error_messages = []
+    for receiver, other_user in zip(receivers, other_users):
+        content = EVENT_REMINDER_TEMPLATE.format(
+            share=share, eventdetails=event_details, url=url,
+            other_user=other_user)
+        to_address = receiver.confirmed_email
+        if not to_address:
+            error_message = '{0} is not a confirmed email address'.format(
+                receiver.email)
+        else:
+            email = mail.Email(
+                from_address=from_address,
+                to_address=to_address,
+                subject=subject,
+                content=content,
+                new_content=content
+            )
+            error_message = mail.get_mailer().send(email)
+        error_messages.append(error_message)
+    combined_error_message = ', '.join(
+        [e for e in error_messages if e is not None])
+    return combined_error_message
+
+        
+    
 
 def send_share_message(share, editer, new_share=False, is_confirmation=False,
                        is_delete=False):

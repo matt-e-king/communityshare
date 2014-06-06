@@ -1,2 +1,2 @@
 web: gunicorn community_share_app:app
-clock: python clock.py
+clock: python community_share_worker.py

@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 
 from sqlalchemy import Table, ForeignKey, DateTime, Column
@@ -225,6 +225,7 @@ class Event(Base, Serializable):
     # FIXME: Not checking if duration is negative.
 
     share = relationship('Share')
+    reminders = relationship('EventReminder')
 
     @property
     def formatted_datetime_start(self):
@@ -316,3 +317,30 @@ class Event(Base, Serializable):
                 logger.warning('Error trying to get user_id: {0}'.format(e))
         
         return query
+
+
+class EventReminder(Base):
+    __tablename__ = 'eventreminder'
+
+    id = Column(Integer, primary_key=True)
+    event_id = Column(Integer, ForeignKey('event.id'), nullable=True)
+    date_created = Column(DateTime, nullable=False, default=datetime.utcnow)
+    typ = Column(String(20), nullable=False)
+    
+    @classmethod
+    def get_oneday_reminder_events(cls):
+        typ = 'oneday_before'
+        # Get all events starting in the next day.
+        now = datetime.utcnow()
+        one_day_in_future = now + timedelta(hours=24)
+        query = store.session.query(Event)
+        query = store.session.query(Event)
+        query = query.filter(Event.datetime_start < one_day_in_future)
+        query = query.filter(Event.datetime_start > now)
+        events = query.all()
+        unreminded_events = []
+        for event in events:
+            oneday_before_reminders = [r for r in event.reminders if r.typ == typ]
+            if not oneday_before_reminders:
+                unreminded_events.append(event)
+        return unreminded_events
