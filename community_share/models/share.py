@@ -130,11 +130,15 @@ class Share(Base, Serializable):
         old_event_ids = set([e.id for e in self.events])
         new_event_ids = set([e.id for e in self.new_events])
         to_delete_event_ids = old_event_ids - new_event_ids
+        to_add_event_ids = new_event_ids - old_event_ids
+        if len(to_add_event_ids) > 0:
+            unchanged = False
         # Set unused events to inactive
         for e in self.events:
             if e.id in to_delete_event_ids:
                 e.active = False
                 store.session.add(e)
+                unchanged = False
             store.session.commit()
         # Set self.events to the new events but put the deleted ones in as well
         # otherwise sqlalchemy will try to set share_id to None which we don't
@@ -144,20 +148,23 @@ class Share(Base, Serializable):
             if e.id not in new_event_ids:
                 combined_events.append(e)
         self.events = combined_events
-        if not unchanged:
-            self.educator_approved = False
-            self.community_partner_approved = False
-            mail_actions.send_share_message(self, requester, new_share=is_add)
-        if requester.id == self.educator_user_id:
-            if (not self.educator_approved) and unchanged:
-                mail_actions.send_share_message(
-                    self, requester, is_confirmation=True)
-            self.educator_approved = True
-        if requester.id == self.community_partner_user_id:
-            if (not self.community_partner) and unchanged:
-                mail_actions.send_share_message(
-                    self, requester, is_confirmation=True)
-            self.community_partner_approved = True
+        if is_delete:
+            mail_actions.send_share_message(self, requester, is_delete=True)
+        else:
+            if not unchanged:
+                self.educator_approved = False
+                self.community_partner_approved = False
+                mail_actions.send_share_message(self, requester, new_share=is_add)
+            if requester.id == self.educator_user_id:
+                if (not self.educator_approved) and unchanged:
+                    mail_actions.send_share_message(
+                        self, requester, is_confirmation=True)
+                self.educator_approved = True
+            if requester.id == self.community_partner_user_id:
+                if (not self.community_partner) and unchanged:
+                    mail_actions.send_share_message(
+                        self, requester, is_confirmation=True)
+                self.community_partner_approved = True
         store.session.add(self)
 
     @classmethod

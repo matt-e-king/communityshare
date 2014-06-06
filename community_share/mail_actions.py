@@ -15,6 +15,11 @@ def append_conversation_link(content, conversation):
     content = '{content}\n\nThe email is part of a Community Share Conversation.  To view the entire conversation go to {url}'.format(content=content, url=conversation_url)
     return content
 
+SHARE_DELETION_TEMPLATE = '''{editer.name} has canceled the share '{share.title}'.
+
+To view the conversation go to {url}.
+'''
+
 SHARE_CONFIRMATION_TEMPLATE = '''{editer.name} has confirmed the details of a share.
 
 To view the share details go to {url}.
@@ -51,17 +56,24 @@ Starting: {event.formatted_datetime_start}
 Stopping: {event.formatted_datetime_stop}
 '''
 
-def send_share_message(share, editer, new_share=False, is_confirmation=False):
+def send_share_message(share, editer, new_share=False, is_confirmation=False,
+                       is_delete=False):
     receivers = [share.conversation.userA, share.conversation.userB]
     receivers = [r for r in receivers if (editer.id != r.id)]
     from_address = config.DONOTREPLY_EMAIL_ADDRESS
     event_details = ''.join([EVENT_EDIT_TEMPLATE.format(event=event)
                              for event in share.events])
     url = share.get_url()
+    conversation_url = share.conversation.get_url()
     if is_confirmation:
         subject = 'Share Details Confirmed: {0}'.format(share.title)
         content = SHARE_CONFIRMATION_TEMPLATE.format(
             share=share, eventdetails=event_details, url=url, editer=editer)
+    elif is_delete:
+        subject = 'Share Canceled: {0}'.format(share.title)
+        content = SHARE_DELETION_TEMPLATE.format(
+            share=share, eventdetails=event_details, url=conversation_url,
+            editer=editer)
     elif new_share:
         subject = 'Share Details Suggested: {0}'.format(share.title)
         content = SHARE_CREATION_TEMPLATE.format(

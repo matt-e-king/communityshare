@@ -290,13 +290,25 @@ class CommunityShareTestCase(unittest.TestCase):
             'events': []
         }
         serialized = json.dumps(share_data)
-        # Unauthenticated person should not be able to edit it.
         rv = self.app.put(
             '/api/share/{0}'.format(share_id), headers=userB_headers, data=serialized)
         assert(rv.status_code == 200)
         data = json.loads(rv.data.decode('utf8'))['data']
         assert(len(data['events']) == 0)
-
+        # User A should have received an email
+        mailer = mail.get_mailer()
+        assert(len(mailer.queue) == 1)
+        email = mailer.pop()
+        assert(email.to_address == sample_userA['email'])        
+        # UserA cancels the share
+        rv = self.app.delete(
+            'api/share/{0}'.format(share_id), headers=userA_headers)
+        assert(rv.status_code == 200)
+        # User B should have received an email.
+        mailer = mail.get_mailer()
+        assert(len(mailer.queue) == 1)
+        email = mailer.pop()
+        assert(email.to_address == sample_userB['email'])        
 
     def test_password_reset(self):
         # Signup userA

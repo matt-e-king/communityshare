@@ -5,7 +5,7 @@ from sqlalchemy import Column, Integer, Boolean, DateTime, Table, ForeignKey
 from sqlalchemy import String, or_, and_
 from sqlalchemy.orm import relationship, validates
 
-from community_share import store, Base, mail_actions
+from community_share import store, Base, mail_actions, config
 from community_share.models.base import Serializable
 from community_share.models.user import User
 from community_share.models.base import ValidationException
@@ -47,6 +47,10 @@ class Conversation(Base, Serializable):
     messages = relationship('Message', order_by="Message.date_created")
     userA = relationship('User', primaryjoin='Conversation.userA_id == User.id')
     userB = relationship('User', primaryjoin='Conversation.userB_id == User.id')
+
+    def get_url(self):
+        url = '{0}/#/conversation/{1}'.format(config.BASEURL, self.id)
+        return url
 
     @validates('userA_id', 'userB_id')
     def validate_(self, key, user_id):

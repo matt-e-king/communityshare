@@ -125,7 +125,7 @@ class Serializable(object):
 
     @classmethod
     def _args_to_filter_params(cls, args):
-        filter_args = []
+        filter_args = [(cls.active == True)]
         for key in args.keys():
             bits = key.split('.')
             if hasattr(cls, bits[0]):
