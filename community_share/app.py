@@ -48,7 +48,9 @@ def make_app():
     @app.route('/')
     def index():
         logger.debug('rendering index')
-        return render_template('index.html', COMMIT_HASH=config.COMMIT_HASH)
+        return render_template('index.html', COMMIT_HASH=config.COMMIT_HASH,
+                               config=config
+        )
         
     return app
 
