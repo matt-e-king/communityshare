@@ -134,7 +134,7 @@
   module.controller(
     'SettingsController',
     function($scope, $location, Session, Messages, $q, CommunityPartnerUtils,
-             Question, Answer, $fileUploader, $http) {
+             Question, Answer, $fileUploader, $http, makeDialog, Authenticator) {
       $scope.Session = Session;
       if (!Session.activeUser) {
         return;
@@ -226,6 +226,28 @@
           uploader.queue.splice(0, uploader.queue.length-1);
         }
       });
+
+      $scope.deleteAccount = function() {
+        var title = 'Delete Account';
+          var msg = 'Do you really want to delete your Community Share account?';
+        var btns = [{result:'yes', label: 'Yes'},
+                    {result:'no', label: 'No', cssClass: 'btn-primary'}];
+        var d = makeDialog(title, msg, btns);
+        d.result.then(
+          function(result) {
+            if (result === 'yes') {
+              var deletePromise = Session.activeUser.destroy();
+              deletePromise.then(
+                function() {
+                  Authenticator.clean();
+                  $location.path('/');
+                },
+                function(message) {
+                    Messages.error(message);
+                });
+            }
+          });
+      };
 
       $scope.save = function() {
         var saveUserPromise = $scope.editedUser.save();
