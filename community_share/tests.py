@@ -76,6 +76,7 @@ class CommunityShareTestCase(unittest.TestCase):
             'MAILGUN_DOMAIN': 'whatever',
             'LOGGING_LEVEL': 'DEBUG',
             'DONOTREPLY_EMAIL_ADDRESS': 'whatever@communityshare.us',
+            'SUPPORT_EMAIL_ADDRESS': 'whatever@communityshare.us',
             'BASEURL': 'localhost:5000/',
             'S3_BUCKETNAME': os.environ['COMMUNITYSHARE_S3_BUCKETNAME'],
             'S3_KEY': os.environ['COMMUNITYSHARE_S3_KEY'],
@@ -224,6 +225,48 @@ class CommunityShareTestCase(unittest.TestCase):
         assert(rv.status_code == 200)
         data = json.loads(rv.data.decode('utf8'))['data']
         return data
+
+    def test_account_deletion(self):
+        user_datas = {
+            'userA': sample_userA,
+            'userB': sample_userB,
+        }
+        user_ids, user_headers = self.create_users(user_datas)
+        searchA_id, searchB_id = self.create_searches(user_ids, user_headers)
+        conversation_data = self.make_conversation(
+            user_headers['userA'], search_id=searchA_id, title='Trip to moon.',
+            userA_id=user_ids['userA'], userB_id=user_ids['userB'])
+        conversation_id = conversation_data['id']
+        share_data = self.make_share(
+            user_headers['userA'], conversation_id,
+            educator_user_id=user_ids['userA'],
+            community_partner_user_id=user_ids['userB'],
+            starting_in_hours=0.5)
+        mailer = mail.get_mailer()
+        while mailer.queue:
+            mailer.pop()
+        # userB is deleting their account
+        rv = self.app.delete(
+            '/api/user/{0}'.format(user_ids['userB']), headers=user_headers['userB'])
+        assert(rv.status_code == 200)
+        # Emails should have been sent to userB (confirming deletion)
+        # and UserA since they had an event scheduled.
+        assert(len(mailer.queue) == 2)
+        # userB should not longer be able to do things.
+        data = {
+            'searcher_user_id': user_ids['userB'],
+            'searcher_role': 'educator',
+            'searching_for_role': 'partner',
+            'labels': 'Whatever',
+            'zipcode': 12345
+        }
+        serialized = json.dumps(data)
+        rv = self.app.post('/api/search', data=serialized, headers=user_headers['userB'])
+        assert(rv.status_code == 401)
+        # And we shouldn't be able to login anymore
+        headers = make_headers(email=sample_userB['email'], password=sample_userB['password'])
+        rv = self.app.get('/api/requestapikey/', headers=headers)
+        assert(rv.status_code == 401)
         
     def test_reminders(self):
         user_datas = {

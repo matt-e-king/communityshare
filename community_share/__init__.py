@@ -56,7 +56,7 @@ class Config(object):
         'DB_CONNECTION',
         # Email 
         'MAILER_TYPE', # Can be 'MAILGUN' or 'DUMMY' or 'QUEUE'
-        'MAILGUN_API_KEY', 'MAILGUN_DOMAIN', 'DONOTREPLY_EMAIL_ADDRESS',
+        'MAILGUN_API_KEY', 'MAILGUN_DOMAIN', 'DONOTREPLY_EMAIL_ADDRESS', 'SUPPORT_EMAIL_ADDRESS',
         # Location
         'BASEURL',
         # Logging
@@ -82,6 +82,7 @@ class Config(object):
             'MAILGUN_DOMAIN': os.environ['MAILGUN_DOMAIN'],
             'LOGGING_LEVEL': os.environ['COMMUNITYSHARE_LOGGING_LEVEL'],
             'DONOTREPLY_EMAIL_ADDRESS': os.environ['COMMUNITYSHARE_DONOTREPLY_EMAIL_ADDRESS'],
+            'SUPPORT_EMAIL_ADDRESS': os.environ['COMMUNITYSHARE_SUPPORT_EMAIL_ADDRESS'],
             'BASEURL': os.environ['COMMUNITYSHARE_BASEURL'],
             'S3_BUCKETNAME': os.environ['COMMUNITYSHARE_S3_BUCKETNAME'],
             'S3_KEY': os.environ['COMMUNITYSHARE_S3_KEY'],

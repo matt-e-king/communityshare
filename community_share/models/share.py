@@ -34,7 +34,9 @@ class Share(Base, Serializable):
     ]
 
     PERMISSIONS = {
-        'standard_can_read_many': True
+        'all_can_read_many': False,
+        'standard_can_read_many': True,
+        'admin_can_delete': True
     }
 
     id = Column(Integer, primary_key=True)
@@ -119,12 +121,16 @@ class Share(Base, Serializable):
         },
     }
 
-    def on_edit(self, requester, unchanged=False, is_delete=False, is_add=False):
-        if is_delete:
-            # Set all events to inactive
-            for e in self.events:
-                e.active = False
-                store.session.add(e)
+    def on_delete(self, requester):
+        for e in self.events:
+            e.delete()
+        mail_actions.send_share_message(self, requester, is_delete=True)
+        
+    def on_add(self, requester):
+        logger.debug('in share on_add')
+        self.on_edit(requester, unchanged=False, is_add=True)
+    
+    def on_edit(self, requester, unchanged=False, is_add=False):
         if not hasattr(self, 'new_events'):
             self.new_events = self.events
         old_event_ids = set([e.id for e in self.events])
@@ -136,10 +142,9 @@ class Share(Base, Serializable):
         # Set unused events to inactive
         for e in self.events:
             if e.id in to_delete_event_ids:
-                e.active = False
-                store.session.add(e)
+                e.delete(requester)
                 unchanged = False
-            store.session.commit()
+        #store.session.commit()
         # Set self.events to the new events but put the deleted ones in as well
         # otherwise sqlalchemy will try to set share_id to None which we don't
         # want.
@@ -147,24 +152,21 @@ class Share(Base, Serializable):
         for e in self.events:
             if e.id not in new_event_ids:
                 combined_events.append(e)
-        self.events = combined_events
-        if is_delete:
-            mail_actions.send_share_message(self, requester, is_delete=True)
-        else:
-            if not unchanged:
-                self.educator_approved = False
-                self.community_partner_approved = False
-                mail_actions.send_share_message(self, requester, new_share=is_add)
-            if requester.id == self.educator_user_id:
-                if (not self.educator_approved) and unchanged:
-                    mail_actions.send_share_message(
-                        self, requester, is_confirmation=True)
-                self.educator_approved = True
-            if requester.id == self.community_partner_user_id:
-                if (not self.community_partner) and unchanged:
-                    mail_actions.send_share_message(
-                        self, requester, is_confirmation=True)
-                self.community_partner_approved = True
+        self.events = combined_events        
+        if not unchanged:
+            self.educator_approved = False
+            self.community_partner_approved = False
+            mail_actions.send_share_message(self, requester, new_share=is_add)
+        if requester.id == self.educator_user_id:
+            if (not self.educator_approved) and unchanged:
+                mail_actions.send_share_message(
+                    self, requester, is_confirmation=True)
+            self.educator_approved = True
+        if requester.id == self.community_partner_user_id:
+            if (not self.community_partner) and unchanged:
+                mail_actions.send_share_message(
+                    self, requester, is_confirmation=True)
+            self.community_partner_approved = True
         store.session.add(self)
 
     @classmethod
@@ -202,7 +204,9 @@ class Event(Base, Serializable):
         'description', 'location', 'active', 'share']
 
     PERMISSIONS = {
-        'standard_can_read_many': True
+        'all_can_read_many': False,
+        'standard_can_read_many': True,
+        'admin_can_delete': True
     }
 
     id = Column(Integer, primary_key=True)
@@ -249,7 +253,10 @@ class Event(Base, Serializable):
                     has_rights = True
         return has_rights
 
-    def on_edit(self, requester, unchanged=False, is_delete=False, is_add=False):
+    def on_add(self, requester):
+        self.on_edit(requester, unchanged=False)
+
+    def on_edit(self, requester, unchanged=False):
         logger.debug('event: on_edit')
         if not unchanged:
             share = self.share

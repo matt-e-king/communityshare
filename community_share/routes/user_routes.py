@@ -64,7 +64,13 @@ def register_user_routes(app):
         elif requester.email != email:
             response = base_routes.make_forbidden_response()
         else:
-            user = store.session.query(User).filter_by(email=email).first()
+            users = store.session.query(User).filter(
+                User.email==email, User.active==True).all()
+            if len(users) > 1:
+                logger.error('More than one active user with the same email - {}'.format(email))
+                user = users[0]
+            elif len(users == 0):
+                user = None
             if user is None:
                 response = base_routes.make_not_found_response()
             else:

@@ -33,7 +33,9 @@ class Search(Base, Serializable):
         'searcher_user',]
 
     PERMISSIONS = {
-        'standard_can_read_many': True
+        'all_can_read_many': False,
+        'standard_can_read_many': True,
+        'admin_can_delete': True
     }
 
     COMMUNITY_PARTNER_ROLE = 'partner'
@@ -56,8 +58,9 @@ class Search(Base, Serializable):
     @classmethod
     def has_add_rights(cls, data, user):
         has_rights = False
-        if int(data.get('searcher_user_id', -1)) == user.id:
-            has_rights = True
+        if user is not None:
+            if int(data.get('searcher_user_id', -1)) == user.id:
+                has_rights = True
         return has_rights
 
     def has_standard_rights(self, requester):

@@ -28,6 +28,17 @@ Community Partner: {share.community_partner.name}
 Go to {url} for more details.
 '''
 
+ACCOUNT_DELETION_TEMPLATE = '''You have requested to delete your Community Share account.
+If you did not make this request, or it was done erroneously please contact an administrator
+at {admin_email}.
+'''
+
+PARTNER_DELETION_TEMPLATE = '''{canceled_user.name} has just deleted their community share account.
+You have been notified because you have one upcoming event planned with them.
+
+To view your conversation with {canceled_user.name} go to {url}.
+'''
+
 SHARE_DELETION_TEMPLATE = '''{editer.name} has canceled the share '{share.title}'.
 
 To view the conversation go to {url}.
@@ -68,6 +79,47 @@ EVENT_EDIT_TEMPLATE = '''Location: {event.location}
 Starting: {event.formatted_datetime_start}
 Stopping: {event.formatted_datetime_stop}
 '''
+
+def send_partner_deletion_message(user, canceled_user, conversation):
+    subject = 'Community Share Account Deletion'
+    url = conversation.get_url()
+    content = PARTNER_DELETION_TEMPLATE.format(
+        canceled_user=canceled_user, url=url)
+    to_address = user.confirmed_email
+    from_address = config.DONOTREPLY_EMAIL_ADDRESS
+    if not to_address:
+        error_message = '{0} is not a confirmed email address'.format(
+            receiver.email)
+    else:
+        email = mail.Email(
+            from_address=from_address,
+            to_address=to_address,
+            subject=subject,
+            content=content,
+            new_content=content
+        )
+        error_message = mail.get_mailer().send(email)
+    return error_message
+
+def send_account_deletion_message(user):
+    admin_email = config.SUPPORT_EMAIL_ADDRESS
+    subject = 'Community Share Account Deletion'
+    content = ACCOUNT_DELETION_TEMPLATE.format(admin_email=admin_email)
+    to_address = user.confirmed_email
+    from_address = config.SUPPORT_EMAIL_ADDRESS
+    if not to_address:
+        error_message = '{0} is not a confirmed email address'.format(
+            receiver.email)
+    else:
+        email = mail.Email(
+            from_address=from_address,
+            to_address=to_address,
+            subject=subject,
+            content=content,
+            new_content=content
+        )
+        error_message = mail.get_mailer().send(email)
+    return error_message
 
 def send_event_reminder_message(event):
     share = event.share

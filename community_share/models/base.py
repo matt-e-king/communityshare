@@ -25,7 +25,8 @@ class Serializable(object):
 
     PERMISSIONS = {
         'all_can_read_many': False,
-        'standard_can_read_many': False
+        'standard_can_read_many': False,
+        'admin_can_delete': False
     }
 
     @classmethod
@@ -40,6 +41,16 @@ class Serializable(object):
 
     def has_admin_rights(self, requester):
         return (requester is not None and requester.is_administrator)
+
+    def has_delete_rights(self, requester):
+        has_rights = False
+        if requester is not None:
+            if requester.is_administrator:
+                has_rights = True
+            elif (self.PERMISSIONS['admin_can_delete'] and 
+                  self.has_admin_rights(requester)):
+                has_rights = True
+        return has_rights
 
     custom_serializers = {}
 
@@ -69,7 +80,20 @@ class Serializable(object):
     def admin_serialize(self, exclude=[]):
         return self._base_admin_serialize(exclude)
 
-    def on_edit(self, requester, unchanged=False, is_add=False, is_delete=False):
+    def delete(self, requester):
+        previously_deleted = not self.active
+        if not previously_deleted:
+            self.active = False
+            store.session.add(self)
+            self.on_delete(requester)
+
+    def on_delete(self, requester):
+        pass
+
+    def on_add(self, requester):
+        pass
+
+    def on_edit(self, requester, unchanged=False):
         pass
 
     custom_deserializers = {}

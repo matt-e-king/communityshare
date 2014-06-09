@@ -29,5 +29,8 @@ def get_requesting_user():
                 if user is not None:
                     if user.is_password_correct(password):
                         authorized_user = user
+    if authorized_user is not None:
+        if not authorized_user.active:
+            authorized_user = None
     return authorized_user
 

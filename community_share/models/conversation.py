@@ -33,8 +33,10 @@ class Conversation(Base, Serializable):
     ]
 
     PERMISSIONS = {
-        'standard_can_read_many': True
-    }    
+        'all_can_read_many': False,
+        'standard_can_read_many': True,
+        'admin_can_delete': False
+    }
 
     id = Column(Integer, primary_key=True)
     active = Column(Boolean, default=True, nullable=False)
@@ -143,6 +145,12 @@ class Message(Base, Serializable):
         'id', 'conversation_id', 'sender_user_id', 'content', 'date_created', 'viewed'
     ]
 
+    PERMISSIONS = {
+        'all_can_read_many': False,
+        'standard_can_read_many': False,
+        'admin_can_delete': False
+    }
+
     id = Column(Integer, primary_key=True)
     conversation_id = Column(Integer, ForeignKey('conversation.id'))
     sender_user_id = Column(Integer, ForeignKey('user.id'))
@@ -200,6 +208,8 @@ class Message(Base, Serializable):
         if not unchanged:
             mail_actions.send_conversation_message(self)
 
+    def on_add(self, requester):
+        mail_actions.send_conversation_message(self)
 
     def get_conversation(self):
         '''

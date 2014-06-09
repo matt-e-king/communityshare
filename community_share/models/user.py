@@ -1,7 +1,7 @@
 from datetime import datetime
 import logging
 
-from sqlalchemy import Column, Integer, String, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, and_, or_
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship, backref
 
@@ -39,6 +39,12 @@ class User(Base, Serializable):
         'year_of_birth', 'gender', 'ethnicity', 'bio', 'picture_url',
         'email_confirmed',
     ]
+
+    PERMISSIONS = {
+        'all_can_read_many': False,
+        'standard_can_read_many': False,
+        'admin_can_delete': True
+    }
     
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False)
@@ -191,3 +197,25 @@ class User(Base, Serializable):
             user = None
         return user
 
+    def on_delete(self, requester):
+        # Importing here to prevent circular reference
+        from community_share import mail_actions
+        from community_share.models.share import Event, Share
+        mail_actions.send_account_deletion_message(self)
+        # Delete all upcoming events.
+        upcoming_events = store.session.query(Event).filter(
+            and_(Event.active==True,
+                 or_(Share.educator_user_id==self.id,
+                     Share.community_partner_user_id==self.id)))
+        shares = set([])
+        for event in upcoming_events:
+            event.delete(requester)
+            shares.add(event.share)
+        for share in shares:
+            other_user = None
+            if share.educator_user_id == self.id:
+                other_user = share.community_partner
+            elif share.community_partner_user_id == self.id:
+                other_user = share.educator
+            mail_actions.send_partner_deletion_message(
+                other_user, self, share.conversation)

@@ -180,8 +180,8 @@ def make_blueprint(Item, resourceName):
                 store.session.add(item)
                 store.session.commit()
                 refreshed_item = store.session.query(Item).filter_by(id=item.id).first()
-                refreshed_item.on_edit(requester, unchanged=False, is_add=True)
-                # commit again in case on_edit changed it.
+                refreshed_item.on_add(requester)
+                # commit again in case on_add changed it.
                 store.session.commit()
                 # and refresh again to update relationships
                 refreshed_item = store.session.query(Item).filter_by(id=item.id).first()
@@ -244,12 +244,8 @@ def make_blueprint(Item, resourceName):
             if item is None:
                 response = make_not_found_response()
             else:
-                if item.has_admin_rights(requester):
-                    previously_deleted = not item.active
-                    item.active = False
-                    store.session.add(item)
-                    if not previously_deleted:
-                        item.on_edit(requester, unchanged=False, is_delete=True)
+                if item.has_delete_rights(requester):
+                    item.delete(requester)
                     store.session.commit()
                     response = make_admin_single_response(item)
                 else:
