@@ -131,6 +131,19 @@ def register_user_routes(app):
                 response = base_routes.make_admin_single_response(user)
         return response
 
+    @app.route('/api/requestconfirmemail', methods=['GET'])
+    def request_confirm_email():
+        requester = get_requesting_user()
+        if requester is None:
+            response = base_routes.make_not_authorized_response()
+        else:
+            error_message = mail_actions.request_signup_email_confirmation(requester)
+            if error_message:
+                response = base_routes.make_server_error_response(error_message)
+            else:
+                response = base_routes.make_OK_response()
+        return response
+
     @app.route('/api/confirmemail', methods=['POST'])
     def confirm_email():
         data = request.json
