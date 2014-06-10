@@ -109,7 +109,7 @@ def send_account_deletion_message(user):
     from_address = config.SUPPORT_EMAIL_ADDRESS
     if not to_address:
         error_message = '{0} is not a confirmed email address'.format(
-            receiver.email)
+            user.email)
     else:
         email = mail.Email(
             from_address=from_address,

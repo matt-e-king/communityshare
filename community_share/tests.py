@@ -80,6 +80,7 @@ class CommunityShareTestCase(unittest.TestCase):
             'SUPPORT_EMAIL_ADDRESS': 'whatever@communityshare.us',
             'BUG_EMAIL_ADDRESS': 'whatever@communityshare.us',
             'ABUSE_EMAIL_ADDRESS': 'whatever@communityshare.us',
+            'ADMIN_EMAIL_ADDRESSES': 'whatever@communityshare.us',
             'BASEURL': 'localhost:5000/',
             'S3_BUCKETNAME': os.environ['COMMUNITYSHARE_S3_BUCKETNAME'],
             'S3_KEY': os.environ['COMMUNITYSHARE_S3_KEY'],

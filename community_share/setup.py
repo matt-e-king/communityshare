@@ -210,7 +210,7 @@ def init_db():
 def update_db():
     Base.metadata.reflect(store.engine)
     logger.info('Creating all tables.')
-    Base.metadata.create_all(store.engine);    
+    Base.metadata.create_all(store.engine, checkfirst=True);    
     logger.info('Created all tables.')
 
 def get_creator():
