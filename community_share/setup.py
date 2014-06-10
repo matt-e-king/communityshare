@@ -208,8 +208,10 @@ def init_db():
     Base.metadata.create_all(store.engine);    
 
 def update_db():
+    Base.metadata.reflect(store.engine)
     logger.info('Creating all tables.')
     Base.metadata.create_all(store.engine);    
+    logger.info('Created all tables.')
 
 def get_creator():
     admin_emails = config.ADMIN_EMAIL_ADDRESSES.split(',')
