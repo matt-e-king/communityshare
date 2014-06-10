@@ -207,6 +207,10 @@ def init_db():
     logger.info('Creating all tables.')
     Base.metadata.create_all(store.engine);    
 
+def update_db():
+    logger.info('Creating all tables.')
+    Base.metadata.create_all(store.engine);    
+
 def get_creator():
     admin_emails = config.ADMIN_EMAIL_ADDRESSES.split(',')
     admin_emails = [x.strip() for x in admin_emails]
