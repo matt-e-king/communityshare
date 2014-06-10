@@ -249,6 +249,17 @@
           });
       };
 
+      $scope.resendEmailConfirmation = function() {
+        var emailConfirmPromise = Authenticator.requestConfirmEmail();
+        emailConfirmPromise.then(
+          function() {
+            Messages.info('Sent email confirmation email.');
+          },
+          function(errorMessage) {
+            Messages.error(errorMessage);
+          });
+      };
+
       $scope.save = function() {
         var saveUserPromise = $scope.editedUser.save();
         var savedImages = uploader.uploadAll();

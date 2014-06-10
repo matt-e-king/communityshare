@@ -140,7 +140,7 @@
   module.controller(
     'NewConversationController',
     function (Session, $scope, $modalInstance, userId, searchId, User,
-              Conversation, Message) {
+              Conversation, Message, Authenticator, Messages) {
       var userPromise = User.get(userId);
       $scope.errorMessage = '';
       $scope.conversation = new Conversation({
@@ -149,6 +149,16 @@
         userA_id: Session.activeUser.id,
         userB_id: userId
       });
+      $scope.resendEmailConfirmation = function() {
+        var emailConfirmPromise = Authenticator.requestConfirmEmail();
+        emailConfirmPromise.then(
+          function() {
+            Messages.info('Sent email confirmation email.');
+          },
+          function(errorMessage) {
+            Messages.error(errorMessage);
+          });
+      };
       $scope.message = new Message({
         conversation_id: undefined,
         sender_user_id: Session.activeUser.id,

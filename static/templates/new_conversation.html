@@ -5,7 +5,15 @@
             ng-click="cancel()">
       &times;</button>
   </div>
+
   <div class="modal-body">
+
+    <div class="alert alert-danger"
+         ng-show="!Session.activeUser.email_confirmed">
+      You cannot start a conversation until you have confirmed your email address.
+      <a ng-click="resendEmailConfirmation()">Resend email confirmation email</a>
+    </div>
+
     <form novalidate login-with-auto-fill
           action="" role="form" name="newConversationForm" class="form-horizontal">
       

@@ -6,10 +6,16 @@
            required
            name="email"
            id="email"
+           disabled
            class="form-control"
            type="email"/>
     <p ng-show="accountSettingsForm.email.$invalid && !accountSettingsForm.email.$pristine" class="help-block">
       Please enter a valid email.
+    </p>
+    <p ng-show="!editedUser.email_confirmed">
+      Email not confirmed.<br/>
+      <a class="clickable" ng-click="resendEmailConfirmation()">
+        Send email confirmation email.</a>
     </p>
   </div>
 </div>

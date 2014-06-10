@@ -139,6 +139,27 @@
         return deferred.promise;
       };
 
+      Authenticator.requestConfirmEmail = function() {
+        var deferred = $q.defer();
+        var url = 'api/requestconfirmemail';
+        var promise = $http({
+          url: url,
+          method: 'GET'
+        });
+        promise.then(
+          function(response) {
+            deferred.resolve(undefined);
+          },
+          function(response) {
+            var message = 'Failed to send email confirmation email'
+            if (response.data && response.data.message) {
+              message += ': ' + response.data.message;
+            }
+            respose.reject(message);
+          });
+        return deferred.promise;
+      };
+
       Authenticator.confirmEmail = function(key) {
         var deferred = $q.defer();
         var url = 'api/confirmemail';
