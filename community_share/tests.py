@@ -1,6 +1,7 @@
 import re
 import os
 import unittest
+from unittest import mock
 import logging
 import json
 import datetime
@@ -8,7 +9,7 @@ import datetime
 from flask import jsonify
 
 from community_share import setup, app, mail, config, time_format
-from community_share.models.share import EventReminder
+from community_share.models.share import EventReminder, Event
 from community_share import reminder, worker
 
 logger = logging.getLogger(__name__)
@@ -77,6 +78,8 @@ class CommunityShareTestCase(unittest.TestCase):
             'LOGGING_LEVEL': 'DEBUG',
             'DONOTREPLY_EMAIL_ADDRESS': 'whatever@communityshare.us',
             'SUPPORT_EMAIL_ADDRESS': 'whatever@communityshare.us',
+            'BUG_EMAIL_ADDRESS': 'whatever@communityshare.us',
+            'ABUSE_EMAIL_ADDRESS': 'whatever@communityshare.us',
             'BASEURL': 'localhost:5000/',
             'S3_BUCKETNAME': os.environ['COMMUNITYSHARE_S3_BUCKETNAME'],
             'S3_KEY': os.environ['COMMUNITYSHARE_S3_KEY'],
@@ -197,13 +200,30 @@ class CommunityShareTestCase(unittest.TestCase):
         data = json.loads(rv.data.decode('utf8'))['data']
         return data
 
+    FAKE_TIME_SHIFT = 0
+
+    class FakeDateTime():
+        def utcnow():
+            logger.debug('Getting fake utcnow')
+            fake_time =  datetime.datetime.utcnow() - datetime.timedelta(
+                hours=CommunityShareTestCase.FAKE_TIME_SHIFT)
+            logger.debug('shift is {} fake now is {}'.format(
+                CommunityShareTestCase.FAKE_TIME_SHIFT, fake_time))
+            return fake_time
+
+    @mock.patch('community_share.models.share.datetime', FakeDateTime)
     def make_share(
             self, headers, conversation_id,
             educator_user_id, community_partner_user_id,
             starting_in_hours=24,
             location='Somewhere', duration=1,
             title='Trip to moon',
-            description='Is the moon made of Cheese?'):
+            description='Is the moon made of Cheese?',
+            force_past_events=False):
+        if force_past_events:
+            CommunityShareTestCase.FAKE_TIME_SHIFT = 1000
+        else:
+            CommunityShareTestCase.FAKE_TIME_SHIFT = 0
         now = datetime.datetime.utcnow()
         starting = now + datetime.timedelta(hours=starting_in_hours)
         ending = now + datetime.timedelta(hours=starting_in_hours + duration)
@@ -267,6 +287,108 @@ class CommunityShareTestCase(unittest.TestCase):
         headers = make_headers(email=sample_userB['email'], password=sample_userB['password'])
         rv = self.app.get('/api/requestapikey/', headers=headers)
         assert(rv.status_code == 401)
+
+    def test_user_review(self):
+        user_datas = {
+            'userA': sample_userA,
+            'userB': sample_userB,
+            'userC': sample_userC,
+        }
+        user_ids, user_headers = self.create_users(user_datas)
+        searchA_id, searchB_id = self.create_searches(user_ids, user_headers)
+        conversation_data = self.make_conversation(
+            user_headers['userA'], search_id=searchA_id, title='Trip to moon.',
+            userA_id=user_ids['userA'], userB_id=user_ids['userB'])
+        conversation_id = conversation_data['id']
+        share_data = self.make_share(
+            user_headers['userA'], conversation_id,
+            educator_user_id=user_ids['userA'],
+            community_partner_user_id=user_ids['userB'],
+            starting_in_hours=0.5, force_past_events=False)
+        # We shouldn't be able to save a review for the current event
+        # because it is in the future
+        share_id = share_data['id']
+        eventA_id = share_data['events'][0]['id']
+        review_data = {
+            'event_id': eventA_id,
+            'user_id': user_ids['userA'],
+            'rating': 3,
+        }
+        serialized = json.dumps(review_data)
+        rv = self.app.post('/api/user_review', data=serialized, headers=user_headers['userB'])
+        assert(rv.status_code == 403)
+        # Let's make another conversation and share this time but put event in past.
+        conversation_data = self.make_conversation(
+            user_headers['userA'], search_id=searchA_id, title='Trip to moon.',
+            userA_id=user_ids['userA'], userB_id=user_ids['userB'])
+        conversation_id = conversation_data['id']
+        share_data = self.make_share(
+            user_headers['userA'], conversation_id,
+            educator_user_id=user_ids['userA'],
+            community_partner_user_id=user_ids['userB'],
+            starting_in_hours=-0.5, force_past_events=True)
+        eventA_id = share_data['events'][0]['id']
+        # Now try to make a review for the wrong user
+        review_data = {
+            'event_id': eventA_id,
+            'user_id': user_ids['userC'],
+            'rating': 3,
+            'review': 'Was really super'
+        }
+        serialized = json.dumps(review_data)
+        rv = self.app.post('/api/user_review', data=serialized, headers=user_headers['userB'])
+        assert(rv.status_code == 403)
+        # Now try to make a review for oneself
+        review_data = {
+            'event_id': eventA_id,
+            'user_id': user_ids['userB'],
+            'rating': 3,
+            'review': 'Was really super'
+        }
+        serialized = json.dumps(review_data)
+        rv = self.app.post('/api/user_review', data=serialized, headers=user_headers['userB'])
+        assert(rv.status_code == 403)
+        # Now try to make a review with invalid rating
+        review_data = {
+            'event_id': eventA_id,
+            'user_id': user_ids['userA'],
+            'rating': 6,
+            'review': 'Was really super'
+        }
+        serialized = json.dumps(review_data)
+        rv = self.app.post('/api/user_review', data=serialized, headers=user_headers['userB'])
+        assert(rv.status_code == 400)
+        # Now try to make a review with invalid rating again
+        review_data = {
+            'event_id': eventA_id,
+            'user_id': user_ids['userA'],
+            'rating': -1,
+            'review': 'Was really super'
+        }
+        serialized = json.dumps(review_data)
+        rv = self.app.post('/api/user_review', data=serialized, headers=user_headers['userB'])
+        assert(rv.status_code == 400)
+        # Make a valid review
+        review_data = {
+            'event_id': eventA_id,
+            'user_id': user_ids['userA'],
+            'rating': 3,
+            'review': 'Was really super'
+        }
+        serialized = json.dumps(review_data)
+        rv = self.app.post('/api/user_review', data=serialized, headers=user_headers['userB'])
+        assert(rv.status_code == 200)
+        # We can't make a second review based off the same event
+        review_data = {
+            'event_id': eventA_id,
+            'user_id': user_ids['userA'],
+            'rating': 3,
+            'review': 'Was really super'
+        }
+        serialized = json.dumps(review_data)
+        rv = self.app.post('/api/user_review', data=serialized, headers=user_headers['userB'])
+        assert(rv.status_code == 403)
+        
         
     def test_reminders(self):
         user_datas = {

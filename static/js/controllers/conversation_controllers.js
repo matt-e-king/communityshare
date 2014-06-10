@@ -102,6 +102,10 @@
         };
         var m = $modal.open(opts);
       };
+      $scope.now = new Date()
+      $scope.reviewEvent = function(event) {
+        $location.path('/event/' + event.id);
+      };
       $scope.confirmShare = function() {
         // Saving with no changes acts as an approve.
         $scope.share.save();

@@ -12,7 +12,8 @@
       'communityshare.controllers.search',
       'communityshare.controllers.message',
       'communityshare.controllers.share',
-      'communityshare.directives.labels'
+      'communityshare.directives.labels',
+      'communityshare.services.share'
     ]);
   
   app.config(function($routeProvider) {
@@ -138,6 +139,19 @@
       resolve: {
         activeUser: function(activeUserLoader) {
           return activeUserLoader();
+        }
+      }
+    });
+
+    $routeProvider.when('/event/:eventId', {
+      templateUrl: './static/templates/event_view.html',
+      controller: 'EventController',
+      resolve: {
+        activeUser: function(activeUserLoader) {
+          return activeUserLoader();
+        },
+        evnt: function(eventLoader, $route) {
+          return eventLoader($route.current.params.eventId);
         }
       }
     });

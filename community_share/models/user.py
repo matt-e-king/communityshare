@@ -2,7 +2,7 @@ from datetime import datetime
 import logging
 
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, and_, or_
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, CheckConstraint
 from sqlalchemy.orm import relationship, backref
 
 import passlib
@@ -219,3 +219,66 @@ class User(Base, Serializable):
                 other_user = share.educator
             mail_actions.send_partner_deletion_message(
                 other_user, self, share.conversation)
+
+class UserReview(Base, Serializable):
+    __tablename__ = 'userreview'
+    
+    MANDATORY_FIELDS = [
+        'user_id', 'rating', 'creator_user_id', 'event_id']
+    WRITEABLE_FIELDS = [
+        'review']
+    STANDARD_READABLE_FIELDS = [
+        'id', 'user_id', 'rating', 'review'
+    ]
+    ADMIN_READABLE_FIELDS = [
+        'id', 'user_id', 'rating', 'review'
+    ]
+
+    PERMISSIONS = {
+        'all_can_read_many': False,
+        'standard_can_read_many': False,
+        'admin_can_delete': False
+    }
+    
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    event_id = Column(Integer, ForeignKey('event.id'))
+    rating = Column(Integer, nullable=False)
+    active = Column(Boolean, nullable=False, default=True)
+    date_created = Column(DateTime, nullable=False, default=datetime.utcnow)
+    creator_user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    review = Column(String(5000))
+
+    __table_args__ = (
+        CheckConstraint('rating>=0', 'Rating is negative'),
+        CheckConstraint('rating<=5', 'Rating is greater than 5'),
+    )
+
+    event = relationship('Event')
+    user = relationship('User', primaryjoin='UserReview.user_id == User.id')
+    creator_user = relationship('User', primaryjoin='UserReview.creator_user_id == User.id')
+
+
+    @classmethod
+    def has_add_rights(cls, data, requester):
+        from community_share.models.share import Event
+        has_rights = False
+        data['creator_user_id'] = requester.id
+        event_id = int(data.get('event_id', -1))
+        user_id = int(data.get('user_id', -1))
+        event = store.session.query(Event).filter(Event.id==event_id).first()
+        now = datetime.utcnow()
+        if event.active and event.datetime_start < now:
+            event_users = set([event.share.educator_user_id,
+                               event.share.community_partner_user_id])
+            request_users = set([requester.id, user_id])
+            if event_users == request_users:
+                already_exists = store.session.query(UserReview).filter(and_(
+                    UserReview.user_id==user_id,
+                    UserReview.creator_user_id==requester.id,
+                    UserReview.event_id==event_id)).count()
+                total = store.session.query(UserReview).count()
+                logger.debug('Review already existing = {} total={}'.format(already_exists, total))
+                if not already_exists:
+                    has_rights = True
+        return has_rights

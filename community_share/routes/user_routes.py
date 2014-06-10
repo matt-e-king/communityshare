@@ -5,7 +5,7 @@ import tinys3
 from flask import request, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
 
-from community_share.models.user import User
+from community_share.models.user import User, UserReview
 from community_share.models.institution import Institution
 from community_share.authorization import get_requesting_user
 from community_share import mail_actions
@@ -18,6 +18,9 @@ def register_user_routes(app):
 
     user_blueprint = base_routes.make_blueprint(User, 'user')
     app.register_blueprint(user_blueprint)
+
+    user_review_blueprint = base_routes.make_blueprint(UserReview, 'user_review')
+    app.register_blueprint(user_review_blueprint)
 
     institution_blueprint = base_routes.make_blueprint(Institution, 'institution')
     app.register_blueprint(institution_blueprint)
@@ -69,8 +72,10 @@ def register_user_routes(app):
             if len(users) > 1:
                 logger.error('More than one active user with the same email - {}'.format(email))
                 user = users[0]
-            elif len(users == 0):
+            elif len(users) == 0:
                 user = None
+            else:
+                user = users[0]
             if user is None:
                 response = base_routes.make_not_found_response()
             else:

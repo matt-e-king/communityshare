@@ -18,6 +18,7 @@
       var Question = ItemFactory('question');
       Question.get_many_with_answers = function(
         user_id, searchParams, forceRefresh) {
+        var deferred = $q.defer();
         var questionsPromise = Question.get_many(searchParams, forceRefresh);
         // FIXME: Not scalable. Grabbing all answers for a given user.
         var answersPromise = Answer.get_many({responder_id: user_id});
@@ -49,8 +50,13 @@
                 question.answer = new Answer({question_id: question.id});
               }
             }
-          });
-        return questionsPromise;
+            deferred.resolve(questions);
+          },
+          function(message) {
+            deferred.reject(message);
+          }
+        );
+        return deferred.promise;
       }
       return Question;
     });

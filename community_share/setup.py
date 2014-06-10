@@ -4,7 +4,7 @@ import random
 from sqlalchemy.exc import IntegrityError, InvalidRequestError
 
 from community_share.models.search import Label, Search
-from community_share.models.user import User
+from community_share.models.user import User, UserReview
 from community_share.models.secret import Secret
 from community_share.models.survey import Question, SuggestedAnswer
 from community_share.models.conversation import Conversation, Message
@@ -186,58 +186,19 @@ def make_admin_user(name, email, password):
         new_user = None
     return new_user
 
-def make_questions(creator):
-    logger.debug('creator is {0}'.format(creator))
-    question_one = Question(
-        text='To what extent have you worked with educators/educational institutions before?',
-        creator=creator,
-        question_type='signup_community_partner',
-        public=True,
-        only_suggested_answers=False,
-        order=0,
-        suggested_answers=[
-            SuggestedAnswer(creator=creator,
-                            text='Never'),
-            SuggestedAnswer(creator=creator,
-                            text='A few times'),
-            SuggestedAnswer(creator=creator,
-                            text='6+ times'),
-            SuggestedAnswer(creator=creator,
-                            text='Dozens'),
-        ]
-    )
-    question_two = Question(
-        text='If you have worked with educators/educational institutions before, please list them here.',
-        creator=creator,
-        question_type='signup_community_partner',
-        public=True,
-        only_suggested_answers=False,
-        order=1,
-    )
-    question_three = Question(
-        text='How did you hear about Community Share?',
-        creator=creator,
-        question_type='signup',
-        public=True,
-        only_suggested_answers=False,
-        order=2,
-        suggested_answers=[
-            SuggestedAnswer(creator=creator,
-                            text='Colleague'),
-            SuggestedAnswer(creator=creator,
-                            text='Friend'),
-            SuggestedAnswer(creator=creator,
-                            text='Media'),
-            SuggestedAnswer(creator=creator,
-                            text='Web search'),
-        ],
-    )
-    store.session.add(question_one)
-    store.session.add(question_two)
-    try:
-        store.session.commit()
-    except (IntegrityError, InvalidRequestError):
-        store.session.rollback()
+def update_questions(questions):
+    new_hashs = set([question.make_hash() for question in questions])
+    existing_questions = store.session.query(Question)
+    old_hashs = set([question.make_hash() for question in existing_questions])
+    hashs_to_add = new_hashs - old_hashs
+    hashs_to_delete = old_hashs - new_hashs
+    for question in existing_questions:
+        if question.make_hash() in hashs_to_delete:
+            question.active = False
+            store.session.add(question)
+    for question in questions:
+        if question.make_hash() in hashs_to_add:
+            store.session.add(question)
 
 def init_db():
     Base.metadata.reflect(store.engine)
@@ -245,6 +206,17 @@ def init_db():
     Base.metadata.drop_all(store.engine);
     logger.info('Creating all tables.')
     Base.metadata.create_all(store.engine);    
+
+def get_creator():
+    admin_emails = config.ADMIN_EMAIL_ADDRESSES.split(',')
+    admin_emails = [x.strip() for x in admin_emails]
+    admin_user = None
+    for admin_email in admin_emails:
+        admin_user = store.session.query(User).filter(
+            User.active==True, User.email==admin_email).first()
+        if admin_user is not None:
+            break
+    return admin_user
 
 def setup(n_random_users=100):
     logger.info('Starting setup script.')
@@ -263,8 +235,6 @@ def setup(n_random_users=100):
             user = make_admin_user(email, email, Secret.make_key(20))
             if user is not None and first_admin is None:
                 first_admin = user
-    logger.info('Making questions')
-    make_questions(first_admin)
     logger.info('Making {0} random users'.format(n_random_users))
     for i in range(n_random_users):
         make_random_user()

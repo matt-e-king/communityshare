@@ -173,7 +173,6 @@ def make_blueprint(Item, resourceName):
                 logger.debug('forbidden')
                 response = make_forbidden_response()
         else:
-            data = request.json
             logger.debug('data send is {0}'.format(data))
             try:
                 item = Item.admin_deserialize_add(data)
@@ -193,7 +192,11 @@ def make_blueprint(Item, resourceName):
             except ValidationException as e:
                 response = make_bad_request_response(str(e))
             except (IntegrityError, InvalidRequestError) as e:
-                response = make_server_error_response()
+                if len(e.args) > 0:
+                    message = e.args[0]
+                else:
+                    message = ''
+                response = make_bad_request_response(message)
         return response
         
     @api.route(API_SINGLE_FORMAT.format(resourceName), methods=['PATCH', 'PUT'])

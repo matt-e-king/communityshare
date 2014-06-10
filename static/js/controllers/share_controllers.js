@@ -57,5 +57,48 @@
           showErrorMessage);
       };
     });
+
+  module.controller(
+    'EventController',
+    function($scope, Session, evnt, Question, Answer) {
+      $scope.Session = Session;
+      $scope.evnt = evnt;
+      $scope.questions = [];
+      var questionsPromise = Question.get_many_with_answers(
+        Session.activeUser.id,
+        {question_type: 'post_event'}
+      );
+      questionsPromise.then(
+        function(questions) {
+          $scope.questions = [];
+          // We only show the unanswered questions.
+          for (var i=0; i<questions.length; i++) {
+            var question = questions[i];
+            if (!question.answer.text) {
+              $scope.questions.push(question);
+            }
+          }
+        });
+      $scope.questions = [];
+      $scope.save = function() {
+        var allPromises = [];
+        var saveAnswerPromises = [];
+        for (var i=0; i<$scope.questions.length; i++) {
+          var question = $scope.questions[i];
+          var answer = question.answer;
+          if (answer.text) {
+            var saveAnswerPromise = answer.save();
+            saveAnswerPromise.then(
+              function() {
+                var index = $scope.questions.indexOf(question);
+                $scope.questions.splice(index, 1);
+              }
+            );
+            saveAnswerPromises.push(saveAnswerPromise);
+            allPromises.push(saveAnswerPromise);
+          }
+        }
+      };
+    });
   
 })();

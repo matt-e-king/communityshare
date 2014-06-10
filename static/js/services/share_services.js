@@ -100,6 +100,24 @@
   };
 
   module.factory(
+    'eventLoader',
+    function(Evnt, $q) {
+      return function(eventId) {
+        var deferred = $q.defer()
+        var eventPromise = Evnt.get(eventId);
+        eventPromise.then(
+          function(event) {
+            deferred.resolve(event);
+          },
+          function() {
+            deferred.resolve(undefined);
+          });
+        return deferred.promise;
+      }
+      
+    });
+
+  module.factory(
     'Evnt',
     function(ItemFactory, EvntBase, Share) {
       EvntBase.prototype.updateFromData = function(eventData) {

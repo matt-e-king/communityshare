@@ -20,9 +20,14 @@
                type="text"/>
       </div>
       <div ng-if="question.suggested_answers.length === 0">
-        <input type="text" ng-model="question.answer.text"
+        <input ng-if="!question.long_answer"
+               type="text" ng-model="question.answer.text"
                class="form-control"
                />
+        <textarea ng-if="question.long_answer"
+                  ng-model="question.answer.text"
+                  class="form-control"
+                  ></textarea>
       </div>
     </div>
   </div>

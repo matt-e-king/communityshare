@@ -1,5 +1,6 @@
 from datetime import datetime
 import logging
+import json
 
 from sqlalchemy import Column, Integer, String, DateTime, Boolean
 from sqlalchemy import ForeignKey, CheckConstraint
@@ -15,18 +16,19 @@ class Question(Base, Serializable):
     __tablename__ = 'question'
 
     MANDATORY_FIELDS = ['text', 'question_type', 'public']
-    WRITEABLE_FIELDS = ['public', 'order', 'only_suggested_answers', 'suggested_answers']
+    WRITEABLE_FIELDS = ['public', 'order', 'only_suggested_answers', 'suggested_answers', 'long_answer']
     STANDARD_READABLE_FIELDS = [
         'id', 'text', 'question_type', 'public', 'only_suggested_answers', 'order',
-        'suggested_answers']
+        'suggested_answers', 'long_answer']
     ADMIN_READABLE_FIELDS = [
         'id', 'text', 'creator', 'date_created', 'question_type', 'public',
-        'only_suggested_answers', 'order', 'suggested_answers']
+        'only_suggested_answers', 'order', 'suggested_answers', 'long_answer']
     
     id = Column(Integer, primary_key=True)
     text = Column(String, nullable=True)
     creator_id = Column(Integer, ForeignKey('user.id'), nullable=False)
     active = Column(Boolean, nullable=False, default=True)
+    long_answer = Column(Boolean, nullable=False, default=False)
     date_created = Column(DateTime, nullable=False, default=datetime.utcnow)
     question_type = Column(String(50), nullable=False)
     public = Column(Boolean, nullable=False)
@@ -51,6 +53,11 @@ class Question(Base, Serializable):
         serialized = [sa.text for sa in self.suggested_answers if sa.active]
         return serialized
 
+    def make_hash(self):
+        hash_data = [self.text, self.question_type, self.only_suggested_answers,
+                     self.long_answer, self.serialize_suggested_answers()]
+        return json.dumps(hash_data)
+        
     @classmethod
     def args_to_query(cls, args, requester=None):
         query = cls._args_to_query(args, requester)

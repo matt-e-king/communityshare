@@ -57,7 +57,7 @@ class Config(object):
         # Email 
         'MAILER_TYPE', # Can be 'MAILGUN' or 'DUMMY' or 'QUEUE'
         'MAILGUN_API_KEY', 'MAILGUN_DOMAIN', 'DONOTREPLY_EMAIL_ADDRESS', 'SUPPORT_EMAIL_ADDRESS',
-        'BUG_EMAIL_ADDRESS', 'ABUSE_EMAIL_ADDRESS',
+        'BUG_EMAIL_ADDRESS', 'ABUSE_EMAIL_ADDRESS', 'ADMIN_EMAIL_ADDRESSES',
         # Location
         'BASEURL',
         # Logging
@@ -90,6 +90,7 @@ class Config(object):
             'SUPPORT_EMAIL_ADDRESS': os.environ['COMMUNITYSHARE_SUPPORT_EMAIL_ADDRESS'],
             'BUG_EMAIL_ADDRESS': os.environ['COMMUNITYSHARE_BUG_EMAIL_ADDRESS'],
             'ABUSE_EMAIL_ADDRESS': os.environ['COMMUNITYSHARE_ABUSE_EMAIL_ADDRESS'],
+            'ADMIN_EMAIL_ADDRESSES': os.environ['COMMUNITYSHARE_ADMIN_EMAIL_ADDRESSES'],
             'BASEURL': os.environ['COMMUNITYSHARE_BASEURL'],
             'S3_BUCKETNAME': os.environ['COMMUNITYSHARE_S3_BUCKETNAME'],
             'S3_KEY': os.environ['COMMUNITYSHARE_S3_KEY'],
