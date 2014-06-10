@@ -1,8 +1,7 @@
 import logging
 
 from community_share import setup, config, store
-
-from questions import questions
+from community_share.setup_data import get_questions
 
 logger = logging.getLogger(__name__)
 
