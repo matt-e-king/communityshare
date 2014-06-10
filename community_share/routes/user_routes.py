@@ -32,7 +32,8 @@ def register_user_routes(app):
         email = user.get('email', '')
         password = data.get('password', None)
         # Check that the email isn't in use.
-        existing_user = store.session.query(User).filter_by(email=email).first()
+        existing_user = store.session.query(User).filter(
+            User.email==email, User.active==True).first()
         if existing_user is not None:
             response = base_routes.make_bad_request_response(
                 'That email address is already associated with an account.')

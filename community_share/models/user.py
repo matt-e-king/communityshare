@@ -48,7 +48,7 @@ class User(Base, Serializable):
     
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False)
-    email = Column(String(50), nullable=False, unique=True)
+    email = Column(String(50), nullable=False)
     email_confirmed = Column(Boolean, nullable=False, default=False)
     active = Column(Boolean, default=True)
     password_hash = Column(String(120), nullable=True)
