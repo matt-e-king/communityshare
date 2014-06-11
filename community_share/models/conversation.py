@@ -222,7 +222,7 @@ class Message(Base, Serializable):
     def generate_from_address(self):
         text = 'message-{}'.format(self.id)
         encodedtext = config.crypt_helper.encrypt(text)
-        from_address = '{}<{}@{}>'.format(
+        from_address = '{} (via CommunityShare)<{}@{}>'.format(
             self.sender_user.name, encodedtext, config.MAILGUN_DOMAIN)
         return from_address
 
