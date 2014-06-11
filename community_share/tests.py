@@ -5,6 +5,7 @@ from unittest import mock
 import logging
 import json
 import datetime
+from cryptography.fernet import Fernet
 
 from flask import jsonify
 
@@ -87,6 +88,7 @@ class CommunityShareTestCase(unittest.TestCase):
             'S3_USERNAME': os.environ['COMMUNITYSHARE_S3_USERNAME'],
             'UPLOAD_LOCATION': os.environ['COMMUNITYSHARE_UPLOAD_LOCATION'],
             'COMMIT_HASH': 'dummy123',
+            'ENCRYPTION_KEY': Fernet.generate_key(),
         }
         config.load_from_dict(data)
         setup.init_db()
@@ -512,7 +514,6 @@ class CommunityShareTestCase(unittest.TestCase):
         serialized = json.dumps(data)
         rv = self.app.put(
             '/api/share/{0}'.format(share_id), headers=user_headers['userB'], data=serialized)
-        print(rv.data)
         data = json.loads(rv.data.decode('utf8'))['data']
         ids = set([e['id'] for e in data['events']])
         assert(event_id in ids)

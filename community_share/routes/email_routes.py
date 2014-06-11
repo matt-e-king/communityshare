@@ -27,12 +27,9 @@ def register_email_routes(app):
         email = Email.from_mailgun_data(request.values, verify=verify)
         logger.debug('Converted to an email object')
 
-        address_pattern = '^replytomessage([0-9]+)@{mailgun_domain}$'.format(
-            mailgun_domain=config.MAILGUN_DOMAIN)
-        match = re.search(address_pattern, email.to_address)
         message = None
-        if match:
-            message_id = int(match.groups()[0])
+        message_id = Message.process_from_address(email.to_address)
+        if message_id is not None:
             message = store.session.query(Message).filter_by(id=message_id).first()
         if message is None:
             logger.warning('Received an email but did not find corresponding message.')
@@ -47,8 +44,7 @@ def register_email_routes(app):
             store.session.commit()
             # Create an email to send to the recipient
             forward_to_address = message.sender_user.email
-            forward_from_address = 'replytomessage{0}@{mailgun_domain}'.format(
-                new_message.id, mailgun_domain=config.MAILGUN_DOMAIN)
+            forward_from_address = new_message.generate_from_address
             forward_content = append_conversation_link(
                 email.content, message.conversation)
             forward_new_content = append_conversation_link(

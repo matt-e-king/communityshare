@@ -209,10 +209,7 @@ def send_conversation_message(message):
     conversation = message.get_conversation()
     subject = None
     subject = conversation.title
-    from_address = 'replytomessage{message_id}@{mailgun_domain}'.format(
-        message_id=message.id,
-        mailgun_domain=config.MAILGUN_DOMAIN
-    )
+    from_address = message.generate_from_address()
     to_address = message.receiver_user().confirmed_email
     conversation_url = '{0}/api/conversation/{1}'.format(
         config.BASEURL, conversation.id)

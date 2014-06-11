@@ -1,6 +1,8 @@
 import logging
 from datetime import datetime
 
+from cryptography import fernet
+
 from sqlalchemy import Column, Integer, Boolean, DateTime, Table, ForeignKey
 from sqlalchemy import String, or_, and_
 from sqlalchemy.orm import relationship, validates
@@ -217,3 +219,28 @@ class Message(Base, Serializable):
         '''
         conversation = store.session.query(Conversation).filter_by(id=self.conversation_id).first()
         return conversation
+
+    def generate_from_address(self):
+        text = 'message-{}'.format(self.id).encode('utf8')
+        encodedtext = config.fernet.encrypt(text).decode('utf8')
+        from_address = '{}@{}'.format(encodedtext, config.MAILGUN_DOMAIN)
+        return from_address
+
+    @classmethod
+    def process_from_address(cls, from_address):
+        bits = from_address.split('@')
+        encodedtext = bits[0].encode('utf8')
+        try:
+            text = config.fernet.decrypt(encodedtext).decode('utf8')
+        except fernet.InvalidToken as e:
+            logger.error('Email address is not valid token - {}'.format(from_address))
+            text = ''
+        message_id = None
+        key = 'message-'
+        if text.startswith(key):
+            message_id_str = text[len(key):]
+            try:
+                message_id = int(message_id_str)
+            except ValueError:
+                pass
+        return message_id

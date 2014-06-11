@@ -1,6 +1,8 @@
 import os
 import logging
 
+from cryptography.fernet import Fernet
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
@@ -66,6 +68,8 @@ class Config(object):
         'S3_BUCKETNAME', 'S3_KEY', 'S3_USERNAME', 'UPLOAD_LOCATION',
         # Version
         'COMMIT_HASH',
+        # Cryptography
+        'ENCRYPTION_KEY',
     )
     def load_from_dict(self, d):
         if set(d.keys()) != set(self.NAMES):
@@ -78,6 +82,7 @@ class Config(object):
         setup_logging(self.LOGGING_LEVEL)
         logger.info('Setup logging with level {0}'.format(self.LOGGING_LEVEL))
         store.set_config(self)
+        self.fernet = Fernet(config.ENCRYPTION_KEY)
 
     def load_from_environment(self):
         data = {
@@ -97,6 +102,7 @@ class Config(object):
             'S3_USERNAME': os.environ['COMMUNITYSHARE_S3_USERNAME'],
             'UPLOAD_LOCATION': os.environ['COMMUNITYSHARE_UPLOAD_LOCATION'],
             'COMMIT_HASH': os.environ['COMMIT_HASH'],
+            'ENCRYPTION_KEY': os.environ['COMMUNITYSHARE_ENCRYPTION_KEY'],
         }
         self.load_from_dict(data)
 
