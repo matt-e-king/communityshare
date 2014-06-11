@@ -142,6 +142,7 @@
     function (Session, $scope, $modalInstance, userId, searchId, User,
               Conversation, Message, Authenticator, Messages) {
       var userPromise = User.get(userId);
+      $scope.Session = Session
       $scope.errorMessage = '';
       $scope.conversation = new Conversation({
         title: undefined,
