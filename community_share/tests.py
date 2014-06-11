@@ -5,13 +5,13 @@ from unittest import mock
 import logging
 import json
 import datetime
-from cryptography.fernet import Fernet
 
 from flask import jsonify
 
 from community_share import setup, app, mail, config, time_format
 from community_share.models.share import EventReminder, Event
 from community_share import reminder, worker
+from community_share.crypt import CryptHelper
 
 logger = logging.getLogger(__name__)
 
@@ -88,7 +88,7 @@ class CommunityShareTestCase(unittest.TestCase):
             'S3_USERNAME': os.environ['COMMUNITYSHARE_S3_USERNAME'],
             'UPLOAD_LOCATION': os.environ['COMMUNITYSHARE_UPLOAD_LOCATION'],
             'COMMIT_HASH': 'dummy123',
-            'ENCRYPTION_KEY': Fernet.generate_key(),
+            'ENCRYPTION_KEY': CryptHelper.generate_key(),
         }
         config.load_from_dict(data)
         setup.init_db()

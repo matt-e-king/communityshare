@@ -1,11 +1,11 @@
 import os
 import logging
 
-from cryptography.fernet import Fernet
-
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
+
+from community_share.crypt import CryptHelper
 
 Base = declarative_base()
 
@@ -82,7 +82,7 @@ class Config(object):
         setup_logging(self.LOGGING_LEVEL)
         logger.info('Setup logging with level {0}'.format(self.LOGGING_LEVEL))
         store.set_config(self)
-        self.fernet = Fernet(config.ENCRYPTION_KEY)
+        self.crypt_helper = CryptHelper(config.ENCRYPTION_KEY)
 
     def load_from_environment(self):
         data = {
