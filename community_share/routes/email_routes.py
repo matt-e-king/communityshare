@@ -25,7 +25,7 @@ def register_email_routes(app):
         else:
             verify = False
         email = Email.from_mailgun_data(request.values, verify=verify)
-        logger.debug('Converted to an email object')
+        logger.info('Received an email with content "{}"'.format(email.content))
 
         message = None
         message_id = Message.process_from_address(email.to_address)

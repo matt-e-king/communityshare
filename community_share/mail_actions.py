@@ -214,7 +214,7 @@ def send_conversation_message(message):
     conversation_url = '{0}/api/conversation/{1}'.format(
         config.BASEURL, conversation.id)
     content = append_conversation_link(message.content, conversation)
-
+    logger.info('Sending conversation message with content - {}'.format(content))
     if not to_address:
         error_message = 'Recipient has not confirmed their email address'
     else:
