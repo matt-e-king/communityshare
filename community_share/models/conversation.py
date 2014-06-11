@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+import re
 
 from sqlalchemy import Column, Integer, Boolean, DateTime, Table, ForeignKey
 from sqlalchemy import String, or_, and_
@@ -221,18 +222,28 @@ class Message(Base, Serializable):
     def generate_from_address(self):
         text = 'message-{}'.format(self.id)
         encodedtext = config.crypt_helper.encrypt(text)
-        from_address = '{}@{}'.format(encodedtext, config.MAILGUN_DOMAIN)
+        from_address = '{}<{}@{}>'.format(
+            self.sender_user.name, encodedtext, config.MAILGUN_DOMAIN)
         return from_address
 
     @classmethod
     def process_from_address(cls, from_address):
-        bits = from_address.split('@')
-        encodedtext = bits[0]
-        try:
-            text = config.crypt_helper.decrypt(encodedtext)
-        except (ValueError, UnicodeDecodeError) as e:
-            logger.error('Email address is not valid token - {}'.format(from_address))
-            text = ''
+        pattern1 = '.*<(.*)@.*>'
+        pattern2 = '(.*)@.*'
+        matches1 = re.match(pattern1, from_address)
+        matches2 = re.match(pattern2, from_address)
+        if matches1:
+            encrypted = matches1.groups()[0]
+        elif matches2:
+            encrypted = matches2.groups()[0]
+        else:
+            encrypted = ''
+        text = ''
+        if encrypted:
+            try:
+                text = config.crypt_helper.decrypt(encrypted)
+            except (ValueError, UnicodeDecodeError) as e:
+                logger.error('Email address is not valid token - {}'.format(from_address))
         message_id = None
         key = 'message-'
         if text.startswith(key):
