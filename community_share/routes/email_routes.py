@@ -44,7 +44,7 @@ def register_email_routes(app):
             store.session.commit()
             # Create an email to send to the recipient
             forward_to_address = message.sender_user.email
-            forward_from_address = new_message.generate_from_address
+            forward_from_address = new_message.generate_from_address()
             forward_content = append_conversation_link(
                 email.content, message.conversation)
             forward_new_content = append_conversation_link(
