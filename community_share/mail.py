@@ -107,6 +107,7 @@ class MailgunMailer(object):
                 'subject': email.subject,
                 'text': email.content
             }
+            logger.info('Sending mail request to mailgun - {}'.format(payload))
             r = requests.post(
                 'https://api.mailgun.net/v2/{0}/messages'.format(
                     config.MAILGUN_DOMAIN),
