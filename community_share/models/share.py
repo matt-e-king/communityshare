@@ -325,6 +325,10 @@ class Event(Base, Serializable):
         
         return query
 
+    def get_url(self):
+        url = '{0}/#/event/{1}'.format(config.BASEURL, self.id)
+        return url
+
 
 class EventReminder(Base):
     __tablename__ = 'eventreminder'
@@ -341,7 +345,6 @@ class EventReminder(Base):
         now = datetime.utcnow()
         one_day_in_future = now + timedelta(hours=24)
         query = store.session.query(Event)
-        query = store.session.query(Event)
         query = query.filter(Event.datetime_start < one_day_in_future)
         query = query.filter(Event.datetime_start > now)
         events = query.all()
@@ -351,3 +354,22 @@ class EventReminder(Base):
             if not oneday_before_reminders:
                 unreminded_events.append(event)
         return unreminded_events
+
+    @classmethod
+    def get_review_reminder_events(cls):
+        typ = 'review'
+        # Get all events that finished more than a day ago.
+        now = datetime.utcnow()
+        one_day_in_past = now - timedelta(hours=24)
+        two_days_in_past = now - timedelta(hours=48)
+        query = store.session.query(Event)
+        query = query.filter(Event.datetime_stop < one_day_in_past)
+        query = query.filter(Event.datetime_stop > two_days_in_past)
+        events = query.all()
+        unreminded_events = []
+        for event in events:
+            review_reminders = [r for r in event.reminders if r.typ == typ]
+            if not review_reminders:
+                unreminded_events.append(event)
+        return unreminded_events
+        

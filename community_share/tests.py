@@ -320,6 +320,17 @@ class CommunityShareTestCase(unittest.TestCase):
         serialized = json.dumps(review_data)
         rv = self.app.post('/api/user_review', data=serialized, headers=user_headers['userB'])
         assert(rv.status_code == 403)
+        # Two reminder emails should have been sent.
+        # This check is mostly here since we need to flush the emails out
+        # to test review reminder emails later.
+        mailer = mail.get_mailer()
+        while mailer.queue:
+            mailer.pop()
+        worker.work_loop(target_time_between_calls=datetime.timedelta(seconds=1),
+                         max_loops=2)
+        assert(len(mailer.queue) == 2)
+        while mailer.queue:
+            mailer.pop()
         # Let's make another conversation and share this time but put event in past.
         conversation_data = self.make_conversation(
             user_headers['userA'], search_id=searchA_id, title='Trip to moon.',
@@ -329,8 +340,19 @@ class CommunityShareTestCase(unittest.TestCase):
             user_headers['userA'], conversation_id,
             educator_user_id=user_ids['userA'],
             community_partner_user_id=user_ids['userB'],
-            starting_in_hours=-0.5, force_past_events=True)
+            starting_in_hours=-26, force_past_events=True)
         eventA_id = share_data['events'][0]['id']
+        # We should receive an email telling us to review it.
+        events = EventReminder.get_review_reminder_events()
+        assert(len(events) == 1)
+        while mailer.queue:
+            mailer.pop()
+        worker.work_loop(target_time_between_calls=datetime.timedelta(seconds=1),
+                         max_loops=2)
+        events = EventReminder.get_review_reminder_events()
+        assert(len(events) == 0)
+        # Two reminder emails should have been sent.
+        assert(len(mailer.queue) == 2)
         # Now try to make a review for the wrong user
         review_data = {
             'event_id': eventA_id,

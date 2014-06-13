@@ -80,6 +80,45 @@ Starting: {event.formatted_datetime_start}
 Stopping: {event.formatted_datetime_stop}
 '''
 
+REVIEW_REMINDER_TEMPLATE = '''You recently participated in a Community Share.
+
+Please go to {url} to leave a review and feedback.
+
+Title: {share.title}
+Description: {share.description}
+
+Educator: {share.educator.name}
+Community Partner: {share.community_partner.name}
+
+{{eventdetails}}
+'''
+
+def send_review_reminder_message(user, event):
+    subject = 'Review Community Share Event'
+    url = event.get_url()
+    event_details = EVENT_EDIT_TEMPLATE.format(event=event)
+    content = REVIEW_REMINDER_TEMPLATE.format(
+        url=url,
+        share=event.share,
+        eventdetails=event_details,
+        )
+    to_address = user.confirmed_email
+    from_address = config.DONOTREPLY_EMAIL_ADDRESS
+    if not to_address:
+        error_message = '{0} is not a confirmed email address'.format(
+            receiver.email)
+    else:
+        email = mail.Email(
+            from_address=from_address,
+            to_address=to_address,
+            subject=subject,
+            content=content,
+            new_content=content
+        )
+        error_message = mail.get_mailer().send(email)
+    return error_message
+        
+
 def send_partner_deletion_message(user, canceled_user, conversation):
     subject = 'Community Share Account Deletion'
     url = conversation.get_url()
@@ -123,8 +162,8 @@ def send_account_deletion_message(user):
 
 def send_event_reminder_message(event):
     share = event.share
-    receivers = [share.conversation.userA, share.conversation.userB]
-    other_users = [share.conversation.userB, share.conversation.userA]
+    receivers = [share.educator, share.community_partner]
+    other_users = [share.community_partner, share.educator]
     from_address = config.DONOTREPLY_EMAIL_ADDRESS
     event_details = EVENT_EDIT_TEMPLATE.format(event=event)
     url = share.conversation.get_url()
@@ -137,6 +176,7 @@ def send_event_reminder_message(event):
             other_user=other_user)
         to_address = receiver.confirmed_email
         if not to_address:
+            logger.warning('Will not send event reminder to unconfirmed email address.')
             error_message = '{0} is not a confirmed email address'.format(
                 receiver.email)
         else:
