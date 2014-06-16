@@ -37,7 +37,7 @@
           }});
         dataPromise.then(
           function(response) {
-            var user = User.setFromData(response.data.data);
+            var user = User.make(response.data.data);
             Authenticator.setApiKey(response.data.apiKey);
             Authenticator.setEmail(user.email);
             if (user.warningMessage) {
@@ -139,7 +139,7 @@
         });
         dataPromise.then(
           function(data) {
-            var user = UserBase.setFromData(data.data.data);
+            var user = UserBase.make(data.data.data);
             deferred.resolve(user);
           },
           function(response) {

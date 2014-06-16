@@ -144,6 +144,10 @@
       var userPromise = User.get(userId);
       $scope.Session = Session
       $scope.errorMessage = '';
+      if (!Session.activeUser.email_confirmed) {
+        // Refresh active User to make sure email is still unconfirmed.
+        User.get(Session.activeUser.id, true);
+      }
       $scope.conversation = new Conversation({
         title: undefined,
         search_id: searchId,

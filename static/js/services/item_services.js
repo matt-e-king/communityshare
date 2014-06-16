@@ -46,6 +46,7 @@
           }
           return item;
         }
+
         Item.get = function(id, forceRefresh) {
           var deferred = $q.defer();
           var item = Item.cache[id];
@@ -56,8 +57,7 @@
             });
             dataPromise.then(
               function(data) {
-                var item = new Item(data.data.data);
-                Item.cache[id] = item;
+                var item = Item.make(data.data.data);
                 deferred.resolve(item);
               },
               function(response) {
@@ -86,8 +86,7 @@
               function(response) {
                 var items = []
                 for (var i=0; i<response.data.data.length; i++) {
-                  var item = new Item(response.data.data[i]);
-                  Item.cache[item.id] = item;
+                  var item = Item.make(response.data.data[i]);
                   items.push(item);
                 }
                 Item.searchCache[searchHash] = items;
@@ -112,17 +111,6 @@
           for (var key in itemData) {
             this[key] = itemData[key];
           }
-        };
-        Item.setFromData = function(itemData) {
-          var id = itemData.id;
-          var item = Item.cache[id];
-          if (item === undefined) {
-            item = new Item(itemData);
-            Item.cache[id] = item;
-          } else {
-            item.updateFromData(updateData);
-          }
-          return item;
         };
         Item.prototype.save = function() {
           var _this = this;
