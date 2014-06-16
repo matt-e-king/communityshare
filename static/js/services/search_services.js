@@ -106,6 +106,17 @@
             this.displayLabelsActive[key].push(label);
           }
         }
+        this.updateNActiveLabels();
+      };
+      Search.prototype.updateNActiveLabels = function() {
+        this.nActiveLabels = 0;
+        if (this.labels) {
+          for (label in this.activeLabels) {
+            if (this.activeLabels[label]) {
+              this.nActiveLabels += 1;
+            }
+          }
+        }
       };
       Search.prototype.processLabelDisplay = function() {
         this.labels = [];

@@ -45,6 +45,7 @@
           $scope.search.displayLabelsAll.subjectAreas.Custom.push(newLabelName);
           $scope.search.activeLabels[newLabelName] = true;
         }
+        $scope.updateNActiveLabels();
         $scope.newLabel.name = '';
       }
     };
@@ -54,6 +55,7 @@
       } else {
         $scope.search.activeLabels[label] = true;
       }
+      $scope.search.updateNActiveLabels();
     }
   };
 

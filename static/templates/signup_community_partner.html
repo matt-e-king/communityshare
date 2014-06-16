@@ -10,6 +10,7 @@
     <div class="tab-content" active="interestsTabActive">
       <div cs-community-partner-labels search="newSearch"></div>
       <input type="submit" value="Continue" class="btn"
+             ng-disabled="newSearch.nActiveLabels === 0"
              ng-click="experienceTabActive=true; interestsTabCompleted=true;"/>
     </div>
   </div>
