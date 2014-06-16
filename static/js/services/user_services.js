@@ -35,6 +35,7 @@
             'user': user,
             'password': password
           }});
+        Session.clearUser();
         dataPromise.then(
           function(response) {
             var user = User.make(response.data.data);
@@ -43,11 +44,12 @@
             if (user.warningMessage) {
               Messages.error('Failed to send email to confirm address.');
             }
-            Session.activeUser = user;
+            Session.setUser(user);
             user.updateUnviewedConversations();
             deferred.resolve(user);
           },
           function(response) {
+            Session.setUser(undefined);
             deferred.reject(response.data.message);
           }
         );
