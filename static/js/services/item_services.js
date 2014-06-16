@@ -113,6 +113,17 @@
             this[key] = itemData[key];
           }
         };
+        Item.setFromData = function(itemData) {
+          var id = itemData.id;
+          var item = Item.cache[id];
+          if (item === undefined) {
+            item = new Item(itemData);
+            Item.cache[id] = item;
+          } else {
+            item.updateFromData(updateData);
+          }
+          return item;
+        };
         Item.prototype.save = function() {
           var _this = this;
           var deferred = $q.defer();
