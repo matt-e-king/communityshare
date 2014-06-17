@@ -65,10 +65,7 @@ class Question(Base, Serializable):
         return query
 
     custom_serializers = {
-        'suggested_answers': {
-            'standard': serialize_suggested_answers,
-            'admin': serialize_suggested_answers,
-        }
+        'suggested_answers': serialize_suggested_answers
     }
 
 

@@ -43,10 +43,7 @@ class InstitutionAssociation(Base, Serializable):
         }
 
     custom_serializers = {
-        'institution': {
-            'standard': serialize_institution,
-            'admin': serialize_institution,
-        }
+        'institution': serialize_institution
     }
 
 
