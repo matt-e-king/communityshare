@@ -51,7 +51,7 @@ def register_user_routes(app):
                 store.session.commit()
                 error_message = mail_actions.request_signup_email_confirmation(user)
                 secret = user.make_api_key()
-                serialized = user.admin_serialize()
+                serialized = user.serialize(user)
                 response_data = {
                     'data': serialized,
                     'apiKey': secret.key,
@@ -80,7 +80,7 @@ def register_user_routes(app):
             if user is None:
                 response = base_routes.make_not_found_response()
             else:
-                response = base_routes.make_admin_single_response(user)
+                response = base_routes.make_single_response(requester, user)
         return response
 
     @app.route('/api/requestresetpassword/<string:email>', methods=['GET'])
@@ -128,7 +128,7 @@ def register_user_routes(app):
             elif user is None:
                 response = base_routes.make_bad_request_response()
             else:
-                response = base_routes.make_admin_single_response(user)
+                response = base_routes.make_single_response(user, user)
         return response
 
     @app.route('/api/requestconfirmemail', methods=['GET'])
@@ -160,7 +160,7 @@ def register_user_routes(app):
                 response = base_routes.make_bad_request_response()
             else:
                 secret = user.make_api_key()
-                serialized = user.admin_serialize()
+                serialized = user.serialize(user)
                 response_data = {
                     'data': serialized,
                     'apiKey': secret.key,

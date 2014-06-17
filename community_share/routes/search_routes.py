@@ -27,7 +27,7 @@ def register_search_routes(app):
                     matching_searches = search_utils.find_matching_searches(search)
 
                     serialized = [
-                        search.standard_serialize(exclude=[])
+                        search.serialize(requester, exclude=[])
                         for search in matching_searches]
                     response_data = {'data': serialized}
                     response = jsonify(response_data)

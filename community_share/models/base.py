@@ -54,31 +54,27 @@ class Serializable(object):
 
     custom_serializers = {}
 
-    def _base_standard_serialize(self, exclude=[]):
+    def _base_serialize(self, requester, exclude=[]):
         d = {}
-        for fieldname in self.STANDARD_READABLE_FIELDS:
-            if fieldname not in exclude:
-                if fieldname in self.custom_serializers:
-                    d[fieldname] = self.custom_serializers[fieldname]['standard'](self)
-                else:
-                    d[fieldname] = getattr(self, fieldname)
+        if self.has_admin_rights(requester):
+            fieldnames = self.ADMIN_READABLE_FIELDS 
+        elif self.has_standard_rights(requester):
+            fieldnames = self.STANDARD_READABLE_FIELDS
+        else:
+            fieldnames = None
+        if fieldnames is None:
+            d = None
+        else:
+            for fieldname in fieldnames:
+                if not fieldname in exclude:
+                    if fieldname in self.custom_serializers:
+                        d[fieldname] = self.custom_serializers[fieldname](self, requester)
+                    else:
+                        d[fieldname] = getattr(self, fieldname)
         return d
 
-    def standard_serialize(self, exclude=[]):
-        return self._base_standard_serialize(exclude)
-
-    def _base_admin_serialize(self, exclude=[]):
-        d = {}
-        for fieldname in self.ADMIN_READABLE_FIELDS:
-            if fieldname not in exclude:
-                if fieldname in self.custom_serializers:
-                    d[fieldname] = self.custom_serializers[fieldname]['admin'](self)
-                else:
-                    d[fieldname] = getattr(self, fieldname)
-        return d
-
-    def admin_serialize(self, exclude=[]):
-        return self._base_admin_serialize(exclude)
+    def serialize(self, requester, exclude=[]):
+        return self._base_serialize(requester, exclude)
 
     def delete(self, requester):
         previously_deleted = not self.active

@@ -58,39 +58,14 @@ def make_server_error_response(message=None):
     response.status_code = StatusCodes.SERVER_ERROR
     return response
 
-def make_standard_many_response(items):
-    serialized = [item.standard_serialize() for item in items]
+def make_many_response(requester, items):
+    serialized = [item.serialize(requester) for item in items]
+    serialized = [s for s in serialized if s is not None]
     response_data = {'data': serialized}
     response = jsonify(response_data)
     return response
 
-def make_admin_many_response(items):
-    serialized = [item.admin_serialize() for item in items]
-    response_data = {'data': serialized}
-    response = jsonify(response_data)
-    return response
-
-def make_mixed_many_response(items, requester):
-    serialized = []
-    for item in items:
-        if item.has_admin_rights(requester):
-            serialized.append(item.admin_serialize())
-        elif item.has_standard_rights(requester):
-            serialized.append(item.standard_serialize())
-    response_data = {'data': serialized}
-    response = jsonify(response_data)
-    return response
-
-def make_standard_single_response(item):
-    if item is None:
-        response = make_not_found_response()
-    else:
-        serialized = item.standard_serialize()
-        response_data = {'data': serialized}
-        response = jsonify(response_data)
-    return response
-
-def make_admin_single_response(item, include_user=None):
+def make_single_response(requester, item, include_user=None):
     '''
     Sometimes we want to include the current user info in the response
     since it might be changed by a request.
@@ -98,12 +73,15 @@ def make_admin_single_response(item, include_user=None):
     if item is None:
         response = make_not_found_response()
     else:
-        serialized = item.admin_serialize()
-        response_data = {'data': serialized}
-        if include_user is not None:
-            serialized_user = include_user.admin_serialize()
-            response_data['user'] = serialized_user
-        response = jsonify(response_data)
+        serialized = item.serialize(requester)
+        if serialized is None:
+            response = make_forbidden_response()
+        else:
+            response_data = {'data': serialized}
+            if include_user is not None:
+                serialized_user = include_user.serialize(requester)
+                response_data['user'] = serialized_user
+            response = jsonify(response_data)
     return response
 
 
@@ -124,7 +102,7 @@ def make_blueprint(Item, resourceName):
                     try:
                         query = Item.args_to_query(request.args, requester)
                         items = query.all()
-                        response = make_mixed_many_response(items, requester)
+                        response = make_many_response(requester, items)
                     except ValueError as e:
                         error_message = ', '.join(e.args)
                         response = make_bad_request_response(e.args[0])
@@ -134,7 +112,7 @@ def make_blueprint(Item, resourceName):
                 try:
                     query = Item.args_to_query(request.args, requester)
                     items = query.all()
-                    response = make_admin_many_response(items)
+                    response = make_many_response(requester, items)
                 except ValueError as e:
                     error_message = ', '.join(e.args)
                     response = make_bad_request_response(e.args[0])
@@ -152,12 +130,7 @@ def make_blueprint(Item, resourceName):
             if item is None:
                 response = make_not_found_response()
             else:
-                if item.has_admin_rights(requester):
-                    response = make_admin_single_response(item)
-                elif item.has_standard_rights(requester):
-                    response = make_standard_single_response(item)
-                else:
-                    response = make_forbidden_response()
+                response = make_single_response(requester, item)
         return response
 
     @api.route(API_MANY_FORMAT.format(resourceName), methods=['POST'])
@@ -184,11 +157,8 @@ def make_blueprint(Item, resourceName):
                 store.session.commit()
                 # and refresh again to update relationships
                 refreshed_item = store.session.query(Item).filter_by(id=item.id).first()
-                if refreshed_item.has_admin_rights(requester):
-                    response = make_admin_single_response(
-                        refreshed_item, include_user=requester)
-                else:
-                    response = make_standard_single_response(refreshed_item)
+                response = make_single_response(
+                    requester, refreshed_item, include_user=requester)
             except ValidationException as e:
                 response = make_bad_request_response(str(e))
             except (IntegrityError, InvalidRequestError) as e:
@@ -227,7 +197,7 @@ def make_blueprint(Item, resourceName):
                             logger.debug('calling on_edit on {0}'.format(item))
                             item.on_edit(requester, unchanged = not store.session.dirty)
                             store.session.commit()
-                            response = make_admin_single_response(item)
+                            response = make_single_response(requester, item)
                         except ValidationException as e:
                             response = make_bad_request_response(str(e))
                     else:
@@ -250,7 +220,7 @@ def make_blueprint(Item, resourceName):
                 if item.has_delete_rights(requester):
                     item.delete(requester)
                     store.session.commit()
-                    response = make_admin_single_response(item)
+                    response = make_single_response(requester, item)
                 else:
                     response = make_forbidden_response()
         return response

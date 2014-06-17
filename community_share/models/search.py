@@ -77,27 +77,15 @@ class Search(Base, Serializable):
             has_rights = True
         return has_rights
 
-    def serialize_labels(self):
+    def serialize_labels(self, requester):
         return [l.name for l in self.labels]
+    def serialize_searcher_user(self, requester):
+        return self.searcher_user.serialize(requester)
 
     custom_serializers = {
-        'labels': {
-            'standard': serialize_labels,
-            'admin': serialize_labels,
-        },
-        'searcher_user': {
-            'standard': lambda self: self.searcher_user.standard_serialize(),
-            'admin': lambda self: self.searcher_user.standard_serialize(),
-        }
+        'labels': serialize_labels,
+        'searcher_user': serialize_searcher_user,
     }
-
-    def standard_serialize(self, exclude=[]):
-        d = self._base_standard_serialize(exclude)
-        return d
-
-    def admin_serialize(self, exclude=[]):
-        d = self._base_admin_serialize(exclude)
-        return d
 
     def deserialize_labels(self, labelnames):
         if labelnames is None:

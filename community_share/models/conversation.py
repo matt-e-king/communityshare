@@ -30,7 +30,8 @@ class Conversation(Base, Serializable):
     ]
     STANDARD_READABLE_FIELDS = []
     ADMIN_READABLE_FIELDS = [
-        'id', 'title', 'search_id', 'userA_id', 'userB_id', 'date_created', 'active'
+        'id', 'title', 'search_id', 'userA_id', 'userB_id', 'date_created', 'active',
+        'messages', 'userA', 'userB',
     ]
 
     PERMISSIONS = {
@@ -93,14 +94,18 @@ class Conversation(Base, Serializable):
                     has_rights = True
         return has_rights
 
-    def admin_serialize(self):
-        d = {}
-        for fieldname in self.ADMIN_READABLE_FIELDS:
-            d[fieldname] = getattr(self, fieldname)
-        d['messages'] = [message.admin_serialize() for message in self.messages]
-        d['userA'] = self.userA.standard_serialize()
-        d['userB'] = self.userB.standard_serialize()
-        return d
+    def serialize_userA(self, requester):
+        return self.userA.serialize(requester)
+    def serialize_userB(self, requester):
+        return self.userB.serialize(requester)
+    def serialize_messages(self, requester):
+        return [message.serialize(requester) for message in self.messages]
+
+    custom_serializers = {
+        'userA': serialize_userA,
+        'userB': serialize_userB,
+        'messages': serialize_messages,
+    }
 
     @classmethod
     def args_to_query(cls, args, requester):

@@ -29,7 +29,7 @@ class User(Base, Serializable):
         'is_community_partner', 'institution_associations',
         'zipcode', 'website', 'twitter_handle', 'linkedin_link',
         'year_of_birth', 'gender', 'ethnicity', 'bio', 'picture_url',
-        'email_confirmed']
+        'email_confirmed', 'active']
 
     ADMIN_READABLE_FIELDS = [
         'id', 'name', 'email' , 'date_created', 'last_active',
@@ -37,7 +37,7 @@ class User(Base, Serializable):
         'institution_associations',
         'zipcode', 'website', 'twitter_handle', 'linkedin_link',
         'year_of_birth', 'gender', 'ethnicity', 'bio', 'picture_url',
-        'email_confirmed',
+        'email_confirmed', 'active'
     ]
 
     PERMISSIONS = {
@@ -139,26 +139,20 @@ class User(Base, Serializable):
                 has_admin_rights = True
         return has_admin_rights
 
-    def serialize_institution_associations(self):
-        associations = [i.standard_serialize()
+    def serialize_institution_associations(self, requester):
+        associations = [i.serialize(requester)
                         for i in self.institution_associations]
         return associations
 
-    def serialize_picture_url(self):
+    def serialize_picture_url(self, requester):
         url = ''
         if (config.UPLOAD_LOCATION is not None) and self.picture_filename:
             url = config.UPLOAD_LOCATION + self.picture_filename
         return url
 
     custom_serializers = {
-        'institution_associations': {
-            'standard': serialize_institution_associations,
-            'admin': serialize_institution_associations,
-        },
-        'picture_url': {
-            'standard': serialize_picture_url,
-            'admin': serialize_picture_url,
-        }
+        'institution_associations': serialize_institution_associations,
+        'picture_url': serialize_picture_url,
     }
          
     def deserialize_institution_associations(self, data_list):

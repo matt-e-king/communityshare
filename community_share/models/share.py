@@ -81,13 +81,8 @@ class Share(Base, Serializable):
             has_rights = True
         return has_rights
 
-    def standard_serialize_events(self):
-        serialized = [e.standard_serialize(exclude=['share'])
-                      for e in self.events if e.active]
-        return serialized
-
-    def admin_serialize_events(self):
-        serialized = [e.admin_serialize(exclude=['share'])
+    def serialize_events(self, requester):
+        serialized = [e.serialize(requester, exclude=['share'])
                       for e in self.events if e.active]
         return serialized
 
@@ -106,19 +101,15 @@ class Share(Base, Serializable):
         'events': deserialize_events,
     }
 
+    def serialize_educator(self, requester):
+        return self.educator.serialize(requester)
+    def serialize_community_partner(self, requester):
+        return self.community_partner.serialize(requester)
+
     custom_serializers = {
-        'educator': {
-            'standard': lambda self: self.educator.standard_serialize(),
-            'admin': lambda self: self.educator.standard_serialize(),
-        },
-        'community_partner': {
-            'standard': lambda self: self.community_partner.standard_serialize(),
-            'admin': lambda self: self.community_partner.standard_serialize(),
-        },
-        'events': {
-            'standard': standard_serialize_events,
-            'admin': admin_serialize_events,
-        },
+        'educator': serialize_educator,
+        'community_partner': serialize_community_partner,
+        'events': serialize_events,
     }
 
     def on_delete(self, requester):
@@ -296,21 +287,17 @@ class Event(Base, Serializable):
                     has_rights = True
         return has_rights
 
+    def serialize_share(self, requester):
+        return self.share.serialize(requester, exclude=['events'])
+    def serialize_datetime_start(self, requester):
+        return time_format.to_iso8601(self.datetime_start)
+    def serialize_datetime_stop(self, requester):
+        return time_format.to_iso8601(self.datetime_stop)
+
     custom_serializers = {
-        'share': {
-            'standard': lambda self: self.share.standard_serialize(
-                exclude=['events']),
-            'admin': lambda self: self.share.admin_serialize(
-                exclude=['events']),
-        },
-        'datetime_start': {
-            'standard': lambda self: time_format.to_iso8601(self.datetime_start),
-            'admin': lambda self: time_format.to_iso8601(self.datetime_start),
-        },
-        'datetime_stop': {
-            'standard': lambda self: time_format.to_iso8601(self.datetime_stop),
-            'admin': lambda self: time_format.to_iso8601(self.datetime_stop),
-        },
+        'share': serialize_share,
+        'datetime_start': serialize_datetime_start,
+        'datetime_stop': serialize_datetime_stop,
     }
 
     @classmethod

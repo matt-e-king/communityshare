@@ -35,8 +35,8 @@ class InstitutionAssociation(Base, Serializable):
         if not self.institution:
             self.institution = Institution.admin_deserialize_add(data)
 
-    def serialize_institution(self):
-        return self.institution.standard_serialize()
+    def serialize_institution(self, requester):
+        return self.institution.serialize(requester)
 
     custom_deserializers = {
         'institution': deserialize_institution,
