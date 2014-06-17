@@ -99,6 +99,8 @@ class Statistic(Base):
         # Number of users who have started a conversation
         query = store.session.query(User)
         query = query.join(Conversation, Conversation.userA_id==User.id)
+        query = query.filter(Conversation.date_created > start_of_period,
+                             Conversation.date_created < end_of_period)
         n_users_started_conversation = query.count()
         # Number of users who did an event
         query = store.session.query(User)

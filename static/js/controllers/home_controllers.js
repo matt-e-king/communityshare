@@ -7,7 +7,8 @@
       'communityshare.directives.home',
       'communityshare.services.search',
       'communityshare.services.modal',
-      'communityshare.services.share'
+      'communityshare.services.share',
+      'communityshare.services.statistics'
     ]);
   
   module.controller(
@@ -116,7 +117,7 @@
 
   module.controller(
     'AdministratorHomeController',
-    function($scope, $location) {
+    function($scope, $location, getStatistics) {
       $scope.searchText = '';
       $scope.searchForUsers = function() {
         var searchParams = {
@@ -124,6 +125,10 @@
         };
         $location.path('/searchusers').search(searchParams);
       };
+      var statisticsPromise = getStatistics();
+      statisticsPromise.then(function(statistics) {
+        console.log(statistics);
+      });
     });
 
     module.controller(
