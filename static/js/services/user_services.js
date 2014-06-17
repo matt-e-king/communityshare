@@ -201,7 +201,7 @@
             if (message) {
               msg = ': ' + message;
             }
-            Messages.showError('Failed to get messages: ' + msg);
+            Messages.error('Failed to get messages: ' + msg);
           });
       };
 

@@ -114,7 +114,7 @@
         var share;
         if ((educator_user_id === undefined) || (community_partner_user_id === undefined)) {
           share = undefined;
-          Messages.showError('A share required both an educator and a community partner.');
+          Messages.error('A share required both an educator and a community partner.');
         } else {
           share = new Share({
             conversation_id: this.id,
