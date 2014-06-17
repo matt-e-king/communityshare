@@ -81,6 +81,7 @@ class Statistic(Base):
         'n_users_reviewed_event',
         'n_events_done',
         'n_total_events_done',
+        'n_upcoming_events',
     ]
 
     @classmethod
@@ -192,4 +193,16 @@ class Statistic(Base):
                              Event.active == True)
         n_total_events_done = query.count()
         return n_total_events_done
+        
+    @staticmethod
+    def calculate_n_upcoming_events(date):
+        start_of_period = datetime.datetime.combine(date, datetime.time())
+        end_of_period = start_of_period + datetime.timedelta(days=1)
+        query = store.session.query(Event)
+        query = query.filter(
+            Event.date_created < end_of_period,
+            Event.datetime_stop > end_of_period,
+            Event.active == True)
+        n_upcoming_events = query.count()
+        return n_upcoming_events
         

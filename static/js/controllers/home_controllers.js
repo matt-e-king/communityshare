@@ -148,6 +148,7 @@
         $scope.statisticsDate = $scope.statistics[l-1].date;
         $scope.nTotalUsers = $scope.statistics[l-1].n_total_users;
         $scope.nTotalEvents = $scope.statistics[l-1].n_total_events_done;
+        $scope.nUpcomingEvents = $scope.statistics[l-1].n_upcoming_events;
         $scope.newUsersIn7Days = 0;
         $scope.eventsIn7Days = 0;
         for (var i=0; i<7; i++) {
@@ -160,7 +161,6 @@
           $scope.newUsersIn30Days += $scope.statistics[l-1-i].n_new_users;
           $scope.eventsIn30Days += $scope.statistics[l-1-i].n_events_done;
         }
-        
       });
     });
 

@@ -211,6 +211,7 @@ class Event(Base, Serializable):
 
     id = Column(Integer, primary_key=True)
     share_id = Column(Integer, ForeignKey('share.id'), nullable=False)
+    date_created = Column(DateTime, nullable=False, default=datetime.utcnow)
     active = Column(Boolean, default=True, nullable=False)
     datetime_start = Column(DateTime, nullable=False)
     datetime_stop = Column(DateTime, nullable=False)
