@@ -53,6 +53,7 @@ class User(Base, Serializable):
     active = Column(Boolean, default=True)
     password_hash = Column(String(120), nullable=True)
     date_created = Column(DateTime, nullable=False, default=datetime.utcnow)
+    date_inactivated = Column(DateTime, nullable=True)
     is_administrator = Column(Boolean, nullable=False, default=False) 
     last_active = Column(DateTime)
 

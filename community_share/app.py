@@ -10,6 +10,7 @@ from community_share.routes.conversation_routes import register_conversation_rou
 from community_share.routes.share_routes import register_share_routes
 from community_share.routes.survey_routes import register_survey_routes
 from community_share.routes.email_routes import register_email_routes
+from community_share.routes.statistics_routes import register_statistics_routes
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +25,7 @@ def make_app():
     register_share_routes(app)
     register_survey_routes(app)
     register_email_routes(app)
+    register_statistics_routes(app)
 
     @app.teardown_appcontext
     def close_db_connection(exception):

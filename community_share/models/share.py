@@ -220,8 +220,12 @@ class Event(Base, Serializable):
     
     @validates('datetime_start', 'datetime_stop')
     def validate_datetime_start(self, key, datetime_start):
-        converted = time_format.from_iso8601(datetime_start)
-        converted = converted.replace(tzinfo=None)
+        # Hackish method to check if it's a datetime
+        if not hasattr(datetime_start, 'utcnow'):
+            converted = time_format.from_iso8601(datetime_start)
+            converted = converted.replace(tzinfo=None)
+        else:
+            converted = datetime_start
         if converted < datetime.utcnow():
             raise ValidationException('Event cannot be in the past.')
         return converted

@@ -1,12 +1,14 @@
 import logging, datetime, time
 
 from community_share import reminder
+from community_share.models.statistics import Statistic
 
 logger = logging.getLogger(__name__)
 
 def do_work():
     logger.info('Running do_work')
     reminder.send_reminders()
+    Statistic.check_statistics()
     
 default_target_time = datetime.timedelta(seconds=600)
 

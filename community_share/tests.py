@@ -8,8 +8,11 @@ import datetime
 
 from flask import jsonify
 
-from community_share import setup, app, mail, config, time_format
+from community_share import setup, app, mail, config, time_format, store
 from community_share.models.share import EventReminder, Event
+from community_share.models.user import User
+from community_share.models.conversation import Conversation
+from community_share.models.statistics import Statistic
 from community_share import reminder, worker
 from community_share.crypt import CryptHelper
 
@@ -248,6 +251,80 @@ class CommunityShareTestCase(unittest.TestCase):
         assert(rv.status_code == 200)
         data = json.loads(rv.data.decode('utf8'))['data']
         return data
+
+    def test_statistics(self):
+        user_datas = {
+            'userA': sample_userA,
+            'userB': sample_userB,
+        }
+        user_ids, user_headers = self.create_users(user_datas)
+        # userA is not an administrator so we should get forbidden.
+        rv = self.app.get(
+            '/api/statistics', headers=user_headers['userA'])
+        assert(rv.status_code == 403)
+        # Make userA an administrator
+        userA = store.session.query(User).filter(
+            User.id==user_ids['userA']).first()
+        userA.is_administrator = True
+        store.session.add(userA)
+        store.session.commit()
+        # Now we should get stats
+        rv = self.app.get(
+            '/api/statistics', headers=user_headers['userA'])
+        assert(rv.status_code == 200)
+        stats = json.loads(rv.data.decode('utf8'))['data']
+        yesterday = datetime.datetime.utcnow().date() - datetime.timedelta(days=1)
+        yesterday_string = time_format.to_iso8601(yesterday)
+        assert(stats[yesterday_string]['n_new_users'] == 0)
+        # Now create change the creation date of a user so it was yesterday.
+        userA.date_created = datetime.datetime.utcnow() - datetime.timedelta(days=1)
+        store.session.add(userA)
+        store.session.commit()
+        # Add force recalculation of statistics
+        Statistic.update_statistics(yesterday, force=True)
+        # We should get stats and see one new user yesterday.
+        rv = self.app.get(
+            '/api/statistics', headers=user_headers['userA'])
+        assert(rv.status_code == 200)
+        stats = json.loads(rv.data.decode('utf8'))['data']
+        assert(stats[yesterday_string]['n_new_users'] == 1)
+        assert(stats[yesterday_string]['n_users_started_conversation'] == 0)
+        assert(stats[yesterday_string]['n_users_did_event'] == 0)
+        # Now lets make a conversation and event
+        searchA_id, searchB_id = self.create_searches(user_ids, user_headers)
+        conversation_data = self.make_conversation(
+            user_headers['userA'], search_id=searchA_id, title='Trip to moon.',
+            userA_id=user_ids['userA'], userB_id=user_ids['userB'])
+        conversation_id = conversation_data['id']
+        share_data = self.make_share(
+            user_headers['userA'], conversation_id,
+            educator_user_id=user_ids['userA'],
+            community_partner_user_id=user_ids['userB'],
+            starting_in_hours=-20, force_past_events=True)
+        share_id = share_data['id']
+        eventA_id = share_data['events'][0]['id']
+        # Pretend conversation was created yesterday.
+        conversation = store.session.query(Conversation).filter(
+            Conversation.id==conversation_id).first()
+        conversation.date_created -= datetime.timedelta(hours=24)
+        store.session.add(conversation)
+        store.session.commit()
+        # Stats should be appropriately changed.
+        Statistic.update_statistics(yesterday, force=True)
+        rv = self.app.get(
+            '/api/statistics', headers=user_headers['userA'])
+        assert(rv.status_code == 200)
+        stats = json.loads(rv.data.decode('utf8'))['data']
+        assert(stats[yesterday_string]['n_new_users'] == 1)
+        assert(stats[yesterday_string]['n_users_started_conversation'] == 1)
+        assert(stats[yesterday_string]['n_users_did_event'] == 2)
+        # Make sure check_statistics doesn't break
+        Statistic.check_statistics()
+        rv = self.app.get(
+            '/api/statistics', headers=user_headers['userA'])
+        assert(rv.status_code == 200)
+        stats = json.loads(rv.data.decode('utf8'))['data']
+        assert(len(stats.keys()) == 30)
 
     def test_account_deletion(self):
         user_datas = {
