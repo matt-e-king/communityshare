@@ -22,3 +22,20 @@
     </form>
   </div>
 </div>
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h5 class="panel-title">Statistics</h5>
+  </div>
+  <div class="panel-body">
+    <table class="table">
+      <tr><th>Statistics Date</th><td>{{statisticsDate | date: 'mediumDate'}}</td></tr>
+      <tr><th>Total Users</th><td>{{nTotalUsers}}</td></tr>
+      <tr><th>New Users In last 7 days</th><td>{{newUsersIn7Days}}</td></tr>
+      <tr><th>New Users In last 30 days</th><td>{{newUsersIn30Days}}</td></tr>
+      <tr><th>Total Events</th><td>{{nTotalEvents}}</td></tr>
+      <tr><th>Events in last 7 days</th><td>{{eventsIn7Days}}</td></tr>
+      <tr><th>Events in last 30 days</th><td>{{eventsIn30Days}}</td></tr>
+    </table>
+  </div>
+</div>

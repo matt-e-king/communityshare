@@ -126,8 +126,41 @@
         $location.path('/searchusers').search(searchParams);
       };
       var statisticsPromise = getStatistics();
+      $scope.statistics = [];
       statisticsPromise.then(function(statistics) {
-        console.log(statistics);
+        var dates = []
+        for (var dateString in statistics) {
+          var date = new Date(dateString);
+          statistics[dateString].date = date;
+          $scope.statistics.push(statistics[dateString]);
+        }
+        var comp = function(a, b) {
+          if (a.date > b.date) {
+            return 1;
+          } else if (a.date < b.date) {
+            return -1;
+          } else {
+            return 0;
+          }
+        }
+        $scope.statistics.sort(comp);
+        var l = $scope.statistics.length;
+        $scope.statisticsDate = $scope.statistics[l-1].date;
+        $scope.nTotalUsers = $scope.statistics[l-1].n_total_users;
+        $scope.nTotalEvents = $scope.statistics[l-1].n_total_events_done;
+        $scope.newUsersIn7Days = 0;
+        $scope.eventsIn7Days = 0;
+        for (var i=0; i<7; i++) {
+          $scope.newUsersIn7Days += $scope.statistics[l-1-i].n_new_users;
+          $scope.eventsIn7Days += $scope.statistics[l-1-i].n_events_done;
+        }
+        $scope.newUsersIn30Days = $scope.newUsersIn7Days;
+        $scope.eventsIn30Days = $scope.eventsIn7Days;
+        for (var i=7; i<30; i++) {
+          $scope.newUsersIn30Days += $scope.statistics[l-1-i].n_new_users;
+          $scope.eventsIn30Days += $scope.statistics[l-1-i].n_events_done;
+        }
+        
       });
     });
 
