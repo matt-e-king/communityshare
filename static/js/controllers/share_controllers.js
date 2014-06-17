@@ -59,6 +59,34 @@
     });
 
   module.controller(
+    'UpcomingEventsController',
+    function($scope, Session, Evnt) {
+      $scope.Session = Session;
+      var now = new Date();
+      var searchParams = {
+        'datetime_start.greaterthan': now
+      };
+      var upcomingEventsPromise = Evnt.get_many(searchParams);
+      $scope.infoMessage = 'Loading for upcoming events...';
+      $scope.errorMessage = '';
+      upcomingEventsPromise.then(
+        function(events) {
+          $scope.events = events;
+          $scope.infoMessage = '';
+          $scope.errorMessage = '';
+        },
+        function(message) {
+          $scope.events = [];
+          $scope.infoMessage = '';
+          var msg = 'Failed to load upcoming events';
+          if (message) {
+            msg += ': ' + message;
+          }
+          $scope.errorMessage = msg;
+        });
+    });
+
+  module.controller(
     'EventController',
     function($scope, Session, evnt, Question, Answer) {
       $scope.Session = Session;

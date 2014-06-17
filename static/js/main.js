@@ -143,6 +143,16 @@
       }
     });
 
+    $routeProvider.when('/upcomingevents', {
+      templateUrl: './static/templates/upcoming_events.html',
+      controller: 'UpcomingEventsController',
+      resolve: {
+        activeUser: function(activeUserLoader) {
+          return activeUserLoader();
+        }
+      }
+    });
+
     $routeProvider.when('/event/:eventId', {
       templateUrl: './static/templates/event_view.html',
       controller: 'EventController',

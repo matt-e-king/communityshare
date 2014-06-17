@@ -1,0 +1,40 @@
+<div cs-forbidden ng-if="!Session.activeUser.is_administrator">
+</div>
+
+<div ng-if="Session.activeUser.is_administrator">
+
+  <h4>Upcoming Events</h4>
+  
+  <div ng-show="infoMessage" class="alert alert-info">
+    {{infoMessage}}
+  </div>
+
+  <div ng-show="errorMessage" class="alert alert-danger">
+    {{errorMessage}}
+  </div>
+  
+  <div ng-show="(events !== undefined) && (events.length === 0)"
+       class="alert alert-warning"
+       >
+    No upcoming events.
+  </div>
+
+  <table class="table" ng-show="events">
+    <thead>
+      <tr><th>Date and Time</th><th>Educator</th>
+        <th>Community Partner</th><th>Title</th></tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat = "evnt in events">
+        <td><a href="#/share/{{evnt.share.id}}">
+            {{evnt.datetime_start | date: 'medium'}}</a></td>
+        <td><a href="#/user/{{evnt.share.educator.id}}">
+            {{evnt.share.educator.name}}</a></td>
+        <td><a href="#/user/{{evnt.share.community_partner.id}}">
+            {{evnt.share.community_partner.name}}</a></td>
+        <td>{{evnt.title || evnt.share.title}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
