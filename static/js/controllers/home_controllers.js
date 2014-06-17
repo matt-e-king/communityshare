@@ -190,8 +190,29 @@
 
         combinedPromise.then(
           function(results) {
+            var addedIds = {};
+            var uniqueUsers = [];
             var users = results.byName.concat(results.byEmail);
-            $scope.users = users;
+            for (var i=0; i<users.length; i++) {
+              var user = users[i];
+              if (!(user.id in addedIds)) {
+                uniqueUsers.push(user);
+                addedIds[user.id] = true;
+              }
+            }
+            var compare = function(a, b) {
+              var aUC = a.name.toUpperCase();
+              var bUC = b.name.toUpperCase();
+              if (aUC > bUC) {
+                return 1;
+              } else if (aUC < bUC) {
+                return -1;
+              } else {
+                return 0;
+              }
+            }
+            uniqueUsers.sort(compare);
+            $scope.users = uniqueUsers;
             $scope.infoMessage = '';
             $scope.errorMessage = '';
           },
