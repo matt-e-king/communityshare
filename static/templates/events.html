@@ -3,8 +3,18 @@
 
 <div ng-if="Session.activeUser.is_administrator">
 
-  <h4>Upcoming Events</h4>
-  
+  <h4>Events</h4>
+
+  <div ng-if="start && stop">
+    Showing all events in the interval {{start | date: 'medium'}} to {{stop | date: 'medium'}}.
+  </div>  
+  <div ng-if="start && !stop">
+    Showing all events after {{start | date: 'medium'}}.
+  </div>  
+  <div ng-if="!start && stop">
+    Showing all events before {{stop | date: 'medium'}}.
+  </div>  
+
   <div ng-show="infoMessage" class="alert alert-info">
     {{infoMessage}}
   </div>
@@ -16,7 +26,7 @@
   <div ng-show="(events !== undefined) && (events.length === 0)"
        class="alert alert-warning"
        >
-    No upcoming events.
+    No events in that time range.
   </div>
 
   <table class="table" ng-show="events">

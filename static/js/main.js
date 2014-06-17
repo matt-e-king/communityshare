@@ -143,9 +143,9 @@
       }
     });
 
-    $routeProvider.when('/upcomingevents', {
-      templateUrl: './static/templates/upcoming_events.html',
-      controller: 'UpcomingEventsController',
+    $routeProvider.when('/events', {
+      templateUrl: './static/templates/events.html',
+      controller: 'EventsController',
       resolve: {
         activeUser: function(activeUserLoader) {
           return activeUserLoader();

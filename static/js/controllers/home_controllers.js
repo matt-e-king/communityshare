@@ -119,6 +119,13 @@
     'AdministratorHomeController',
     function($scope, $location, getStatistics) {
       $scope.searchText = '';
+      $scope.now = new Date();
+      $scope.tomorrow = new Date();
+      $scope.tomorrow.setDate($scope.tomorrow.getDate()+1);
+      $scope.daysAgo7 = new Date();
+      $scope.daysAgo7.setDate($scope.daysAgo7.getDate()-6);
+      $scope.daysAgo30 = new Date();
+      $scope.daysAgo30.setDate($scope.daysAgo7.getDate()-29);
       $scope.searchForUsers = function() {
         var searchParams = {
           'searchText': $scope.searchText

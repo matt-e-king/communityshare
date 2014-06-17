@@ -58,18 +58,32 @@
       };
     });
 
+  var parseyyyyMMdd = function(yyyyMMdd) {
+    return new Date(yyyyMMdd.substring(0, 4), yyyyMMdd.substring(4, 6),
+                    yyyyMMdd.substring(6, 8));
+  };
+
   module.controller(
-    'UpcomingEventsController',
-    function($scope, Session, Evnt) {
+    'EventsController',
+    function($scope, $routeParams, Session, Evnt) {
       $scope.Session = Session;
-      var now = new Date();
-      var searchParams = {
-        'datetime_start.greaterthan': now
-      };
-      var upcomingEventsPromise = Evnt.get_many(searchParams);
-      $scope.infoMessage = 'Loading for upcoming events...';
+      var searchParams = {};
+      var start = $routeParams.start;
+      if (start) {
+        start = parseyyyyMMdd(start);
+        searchParams['datetime_start.greaterthan'] = start;
+      }
+      var stop = $routeParams.stop;
+      if (stop) {
+        stop = parseyyyyMMdd(stop);
+        searchParams['datetime_start.lessthan'] = stop;
+      }
+      $scope.start = start;
+      $scope.stop = stop;
+      var eventsPromise = Evnt.get_many(searchParams);
+      $scope.infoMessage = 'Loading events...';
       $scope.errorMessage = '';
-      upcomingEventsPromise.then(
+      eventsPromise.then(
         function(events) {
           $scope.events = events;
           $scope.infoMessage = '';
@@ -78,7 +92,7 @@
         function(message) {
           $scope.events = [];
           $scope.infoMessage = '';
-          var msg = 'Failed to load upcoming events';
+          var msg = 'Failed to load events';
           if (message) {
             msg += ': ' + message;
           }
@@ -94,7 +108,8 @@
       $scope.questions = [];
       var questionsPromise = Question.get_many_with_answers(
         Session.activeUser.id,
-        {question_type: 'post_event'}
+        {question_type: 'post_event'},
+        {about_event_id: evnt.id}
       );
       questionsPromise.then(
         function(questions) {
@@ -103,6 +118,7 @@
           for (var i=0; i<questions.length; i++) {
             var question = questions[i];
             if (!question.answer.text) {
+              question.answer.about_event_id = evnt.id;
               $scope.questions.push(question);
             }
           }
