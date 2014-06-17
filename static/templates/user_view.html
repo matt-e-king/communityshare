@@ -11,12 +11,54 @@
 
     <p class="show-linebreaks">{{user.bio}}</p>
     
-    <image ng-if="user.picture_url" ng-src="{{user.picture_url}}"
+    <image ng-if="user.picture_url" ng-src="{{user.picture_url}}" class="profile-image"
            height="200"/>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h5 class="panel-title">Info</h5>
+      </div>
+      <div class="panel-body">
+        <table class="table">
+          <tr><th>Zipcode</th><td>{{user.zipcode}}</td></tr>
+          <tr><th>Website</th><td>{{user.website}}</td></tr>
+          <tr><th>Twitter</th><td>{{user.twitter_handle}}</td></tr>
+          <tr><th>LinkedIn</th><td>{{user.linkedin_link}}</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel panel-default" ng-show="user.institution_associations">
+      <div class="panel-heading">
+        <h5 class="panel-title">Institutions</h5>
+      </div>
+      <div class="panel-body">
+        <table class="table">
+          <thead>
+            <tr><th>Institution Name</th><th>Role</th></tr>
+          </thead>
+          <tbody
+             <tr ng-repeat="assoc in user.institution_associations">
+               <td>{{assoc.institution.name}}</td>
+               <td>{{assoc.role}}</td>
+             </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
     
-    <div class="row" ng-show="Session.activeUser.is_administrator">
-      <div class="col-lg-3 text-right">Email</div>
-      <div class="col-lg-3">{{user.email}}</div>
+    <div class="panel panel-default" ng-show="Session.activeUser.is_administrator">
+      <div class="panel-heading">
+        <h5 class="panel-title">Private Info</h5>
+      </div>
+      <div class="panel-body">
+        <table class="table">
+          <tr><th>Email</th><td>{{user.email}}</td></tr>
+          <tr><th>Year of Birth</th><td>{{user.year_of_birth}}</td></tr>
+          <tr><th>Gender</th><td>{{user.gender}}</td></tr>
+          <tr><th>Ethnicity</th><td>{{user.ethnicity}}</td></tr>
+        </table>
+      </div>
     </div>
 
     <div ng-show="user.is_community_partner" cs-community-partner-view
@@ -29,6 +71,18 @@
          methods="educatorViewMethods">
     </div>
 
+
+    <div class="panel panel-default" ng-show="questions">
+      <div class="panel-heading">
+        <h5 class="panel-title">Experience</h5>
+      </div>
+      <div class="panel-body">
+        <div ng-repeat="question in questions">
+          <strong>{{question.text}}</strong><br/>
+          {{question.answer.text}}<br/>
+        </div>
+      </div>
+    </div>
   </div>
 
 </div>

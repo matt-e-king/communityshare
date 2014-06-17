@@ -14,7 +14,7 @@
   
   module.controller(
     'UserController',
-    function($scope, $routeParams, User, Session) {
+    function($scope, $routeParams, User, Session, Question) {
       $scope.Session = Session;
       var userId = $routeParams.userId;
       var userPromise = User.get(userId);
@@ -35,6 +35,20 @@
         });
       $scope.communityPartnerViewMethods = {};
       $scope.educatorViewMethods = {};
+      var questionsPromise = Question.get_many_with_answers(
+        userId,
+        {question_type: 'signup_community_partner'}
+      );
+      questionsPromise.then(
+        function(questions) {
+          $scope.questions = [];
+          for (var i=0; i<questions.length; i++) {
+            var question = questions[i];
+            if (question.answer.text) {
+              $scope.questions.push(question);
+            }
+          }
+        });
     });
 
   // User Signups

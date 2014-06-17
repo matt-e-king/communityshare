@@ -49,7 +49,7 @@ class Question(Base, Serializable):
     def has_standard_rights(self, requester):
         return True
     
-    def serialize_suggested_answers(self):
+    def serialize_suggested_answers(self, requester):
         serialized = [sa.text for sa in self.suggested_answers if sa.active]
         return serialized
 
@@ -64,8 +64,12 @@ class Question(Base, Serializable):
         query = query.order_by(cls.order)
         return query
 
+    def serialize_creator(self, requester):
+        return self.creator.serialize(requester)
+
     custom_serializers = {
-        'suggested_answers': serialize_suggested_answers
+        'suggested_answers': serialize_suggested_answers,
+        'creator': serialize_creator,
     }
 
 
