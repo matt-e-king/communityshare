@@ -185,6 +185,7 @@ class Event(Base, Serializable):
 
     MANDATORY_FIELDS = [
         'share_id', 'datetime_start', 'datetime_stop', 'location',]
+    WRITEABLE_ONCE_FIELDS = ['about_event_id']
     WRITEABLE_FIELDS = [
         'datetime_start', 'datetime_stop', 'title', 'description', 'location',]
     STANDARD_READABLE_FIELDS = [
@@ -192,7 +193,7 @@ class Event(Base, Serializable):
         'description', 'location', 'active', 'share']
     ADMIN_READABLE_FIELDS = [
         'id', 'share_id', 'datetime_start', 'datetime_stop', 'title',
-        'description', 'location', 'active', 'share']
+        'description', 'location', 'active', 'share', 'answers']
 
     PERMISSIONS = {
         'all_can_read_many': False,
@@ -209,6 +210,8 @@ class Event(Base, Serializable):
     title = Column(String(100), nullable=True)
     description = Column(String, nullable=True)
     location = Column(String(100), nullable=False)
+
+    answers = relationship('Answer')
     
     @validates('datetime_start', 'datetime_stop')
     def validate_datetime_start(self, key, datetime_start):
@@ -293,11 +296,14 @@ class Event(Base, Serializable):
         return time_format.to_iso8601(self.datetime_start)
     def serialize_datetime_stop(self, requester):
         return time_format.to_iso8601(self.datetime_stop)
+    def serialize_answers(self, requester):
+        return [a.serialize(requester) for a in self.answers]
 
     custom_serializers = {
         'share': serialize_share,
         'datetime_start': serialize_datetime_start,
         'datetime_stop': serialize_datetime_stop,
+        'answers': serialize_answers,
     }
 
     @classmethod

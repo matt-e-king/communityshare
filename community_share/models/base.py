@@ -19,6 +19,7 @@ class Serializable(object):
     """
     
     MANDATORY_FIELDS = []
+    WRITEABLE_ONCE_FIELDS = []
     WRITEABLE_FIELDS = []
     STANDARD_READABLE_FIELDS = ['id']
     ADMIN_READABLE_FIELDS = ['id']
@@ -106,7 +107,9 @@ class Serializable(object):
     def admin_deserialize_update(self, data, add=False):
         logger.debug('admin_deserialize_update')
         if add:
-            fieldnames = set(self.MANDATORY_FIELDS) | set(self.WRITEABLE_FIELDS)
+            fieldnames = (set(self.MANDATORY_FIELDS) |
+                          set(self.WRITEABLE_FIELDS) |
+                          set(self.WRITEABLE_ONCE_FIELDS))
         else:
             fieldnames = self.WRITEABLE_FIELDS
         for fieldname in data.keys():

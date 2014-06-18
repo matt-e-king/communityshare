@@ -33,13 +33,13 @@
       <tr><th>Total Users</th><td>{{nTotalUsers}}</td></tr>
       <tr><th>New Users In last 7 days</th><td>{{newUsersIn7Days}}</td></tr>
       <tr><th>New Users In last 30 days</th><td>{{newUsersIn30Days}}</td></tr>
-      <tr><th><a href="/#/events?start={{now | date: 'yyyymmdd'}}">
+      <tr><th><a href="/#/events?start={{now | date: 'yyyyMMdd'}}">
             Total Upcoming Events</a></th><td>{{nUpcomingEvents}}</td></tr>
       <tr><th>Total Events Done</th><td>{{nTotalEvents}}</td></tr>
-      <tr><th><a href="/#/events?start={{daysAgo7 | date: 'yyyymmdd'}}&stop={{tomorrow | date: 'yyyymmdd'}}">
+      <tr><th><a href="/#/events?start={{daysAgo7 | date: 'yyyyMMdd'}}&stop={{tomorrow | date: 'yyyyMMdd'}}">
             Events in last 7 days</a></th>
         <td>{{eventsIn7Days}}</td></tr>
-      <tr><th><a href="/#/events?start={{daysAgo30 | date: 'yyyymmdd'}}&stop={{tomorrow | date: 'yyyymmdd'}}">
+      <tr><th><a href="/#/events?start={{daysAgo30 | date: 'yyyyMMdd'}}&stop={{tomorrow | date: 'yyyyMMdd'}}">
             Events in last 30 days</th></a><td>{{eventsIn30Days}}</td></tr>
     </table>
   </div>
