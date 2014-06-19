@@ -1,6 +1,6 @@
 <div class="panel panel-default">
   <div class="panel-heading">
-    <h4 class="panel-title">Grade Levels</h4>
+    <h4 class="panel-title">For which grade levels are you looking for someone?</h4>
   </div>
   <div class="row panel-body">
     <div ng-repeat="label in search.displayLabelsAll.gradeLevels" ng-click="toggleLabel(label)"
@@ -13,7 +13,7 @@
 
 <div class="panel panel-default">
   <div class="panel-heading">
-    <h4 class="panel-title">Subject Areas</h4>
+    <h4 class="panel-title">In which subject areas should they have expertise?  Please type in subjects which are not shown.</h4>
   </div>
   <div class="panel-body row">
     <div ng-click="toggleLabel('STEM')"
@@ -50,7 +50,7 @@
     </div>
   </div>
   <div class="panel-body row">
-    <h5 class="col-lg-3">Add Specific Subject Area</h5>
+    <h5 class="col-lg-3">Type in subject areas not shown above here</h5>
     <div class="col-lg-3">
       <input class="form-control" type="text"
              cs-new-label methods="newLabelMethods" ng-model="newLabel.name"/>
@@ -60,7 +60,7 @@
 
 <div class="panel panel-default">
   <div class="panel-heading">
-    <h4 class="panel-title">Engagement Levels</h4>
+    <h4 class="panel-title">What roles are you looking for someone to fill?</h4>
   </div>
   <div class="row panel-body">
     <div ng-repeat="label in search.displayLabelsAll.engagementLevels" ng-click="toggleLabel(label)"
