@@ -45,7 +45,7 @@
           $scope.search.displayLabelsAll.subjectAreas.Custom.push(newLabelName);
           $scope.search.activeLabels[newLabelName] = true;
         }
-        $scope.updateNActiveLabels();
+        $scope.search.updateNActiveLabels();
         $scope.newLabel.name = '';
       }
     };
