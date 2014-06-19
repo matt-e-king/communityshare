@@ -6,6 +6,14 @@
   ]);
 
   module.directive(
+    'csUserAgreement',
+    function() {
+      return {
+        templateUrl: '/static/templates/user_agreement.html'
+      };
+    });
+
+  module.directive(
     'csForbidden',
     function() {
       return {

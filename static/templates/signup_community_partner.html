@@ -64,8 +64,29 @@
         Personal Settings are incomplete.
       </div>
 
-      <input type="submit" value="Sign Up!" class="btn btn-default"
+      <input type="submit" value="Continue" class="btn btn-default"
              ng-disabled="personalSettingsForm.$invalid || accountSettingsForm.$invalid"
+             ng-click="agreementTabActive=true; accountTabCompleted=true"/>
+    </div>
+  </div>
+
+  <div tab active="agreementTabActive" disabled="!accountTabCompleted">
+    <div tab-heading>
+      <span ng-class="{'tab-heading-error': (accountTabCompleted && !agreed)}">
+        User Agreement
+      </span>
+    </div>
+    <div class="tab-content">
+      
+      <div cs-user-agreement></div>
+        
+      <p>
+        I agree 
+        <input type=checkbox ng-model="agreed"/><br/>
+      </p>
+      
+      <input type="submit" value="Sign Up!" class="btn btn-default"
+             ng-disabled="personalSettingsForm.$invalid || accountSettingsForm.$invalid || (!agreed)"
              ng-click="submit();"/>
     </div>
   </div>
