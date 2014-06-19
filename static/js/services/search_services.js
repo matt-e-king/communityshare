@@ -29,13 +29,24 @@
       var compareLabels = function(targetLabels, retrievedLabels) {
         var matchingLabels = {};
         var missingLabels = [];
+        var lcTargetLabels = [];
         for (var i=0; i<targetLabels.length; i++) {
-          var targetLabel = targetLabels[i];
-          var index = retrievedLabels.indexOf(targetLabel);
+          lcTargetLabels.push(targetLabels[i].toLowerCase());
+        }
+        var lcRetrievedLabels = [];
+        for (var i=0; i<retrievedLabels.length; i++) {
+          lcRetrievedLabels.push(retrievedLabels[i].toLowerCase());
+        }
+        for (var i=0; i<lcTargetLabels.length; i++) {
+          var lcTargetLabel = lcTargetLabels[i];
+          var index = lcRetrievedLabels.indexOf(lcTargetLabel);
           if (index === -1) {
-            missingLabels.push(targetLabel);
+            missingLabels.push(targetLabels[i]);
           }
-          matchingLabels[targetLabel] = (index >= 0);
+          matchingLabels[targetLabels[i]] = (index >= 0);
+          if (index !== -1) {
+            matchingLabels[retrievedLabels[index]] = true;
+          }
         }
         var comparison = {
           'matching': matchingLabels,

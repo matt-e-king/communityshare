@@ -6,10 +6,10 @@ from community_share import store
 
 def get_searches_ordered_by_label_matches(
         labels, searcher_role, searching_for_role, max_number=10):
-    labelnames = [label.name for label in labels]
+    labelnames = [label.name.lower() for label in labels]
     query = store.session.query(Search, func.count(Label.id).label('matches'))
     query = query.join(Search.labels)
-    query = query.filter(Label.name.in_(labelnames))
+    query = query.filter(func.lower(Label.name).in_(labelnames))
     query = query.filter(Search.active==True)
     query = query.filter(Search.searcher_role==searcher_role)
     query = query.filter(Search.searching_for_role==searching_for_role)
