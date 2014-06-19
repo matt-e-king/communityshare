@@ -22,7 +22,7 @@
     <div ng-repeat="question in questions" cs-question question="question"
          answers="answers"></div>
 
-    <input ng-show="questions.length > 0" type="submit" value="Submit Feedback" class="btn"
+    <input ng-show="questions.length > 0" type="submit" value="Submit Feedback" class="btn btn-default"
            ng-disabled="eventReviewForm.$invalid"
            ng-click="save()"/>
   </form>

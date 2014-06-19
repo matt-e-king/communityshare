@@ -1,7 +1,7 @@
 <div ng-if="Session.activeUser.is_educator" cs-educator-labels search="search"></div>
 <div ng-if="!Session.activeUser.is_educator" cs-community-partner-labels search="search"></div>
 
-<button class="btn"
+<button class="btn btn-default"
         ng-disabled="properties.educatorSearchSettingsForm.$invalid"
         ng-click="saveSettings()">
   Save Changes

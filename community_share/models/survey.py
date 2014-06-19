@@ -91,6 +91,7 @@ class Answer(Base, Serializable):
     __tablename__ = 'answer'
 
     MANDATORY_FIELDS = ['question_id', 'responder_id', 'text']
+    WRITEABLE_ONCE_FIELDS = ['about_event_id', 'about_user_id', 'about_share_id']
     WRITEABLE_FIELDS = ['text']
     STANDARD_READABLE_FIELDS = [
         'id', 'question_id', 'responder_id', 'text', 'date_created',

@@ -45,23 +45,23 @@
           </tr>
         </tbody>
       </table>
-      <button class="btn" type="submit" ng-click="editShare()" ng-show="share.id !== undefined">
+      <button class="btn btn-default" type="submit" ng-click="editShare()" ng-show="share.id !== undefined">
         Edit Share Details
       </button>
-      <button class="btn" type="submit" ng-click="editShare()" ng-show="share.id === undefined">
+      <button class="btn btn-default" type="submit" ng-click="editShare()" ng-show="share.id === undefined">
         Create Share Details
       </button>      
-      <button class="btn" type="submit" ng-click="confirmShare()" ng-show="share.canApprove">
+      <button class="btn btn-default" type="submit" ng-click="confirmShare()" ng-show="share.canApprove">
         Confirm Share Details
       </button>
-      <button class="btn" disabled type="submit"
+      <button class="btn btn-default" disabled type="submit"
               ng-show="(!share.approved) && (!share.canApprove) && (share.id >= 0)">
         Waiting for Confirmation from {{otherUser.name}}
       </button>
-      <button class="btn" disabled type="submit" ng-show="share.approved">
+      <button class="btn btn-default" disabled type="submit" ng-show="share.approved">
         Confirmed
       </button>
-      <button class="btn" type="submit" ng-click="cancelShare()"
+      <button class="btn btn-default" type="submit" ng-click="cancelShare()"
               ng-disabled="!share.hasActiveEvent()">
         Cancel Share
       </button>
@@ -101,7 +101,7 @@
       {{errorMessage}}
     </div>
     
-    <button class="btn" type="submit" ng-click="sendMessage()"
+    <button class="btn btn-default" type="submit" ng-click="sendMessage()"
             ng-disabled="newConversationForm.$invalid">
       Send Message
     </button>

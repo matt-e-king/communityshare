@@ -17,11 +17,15 @@
     function(ItemFactory, $q, Answer) {
       var Question = ItemFactory('question');
       Question.get_many_with_answers = function(
-        user_id, searchParams, forceRefresh) {
+        user_id, searchParams, answerParams, forceRefresh) {
         var deferred = $q.defer();
         var questionsPromise = Question.get_many(searchParams, forceRefresh);
         // FIXME: Not scalable. Grabbing all answers for a given user.
-        var answersPromise = Answer.get_many({responder_id: user_id});
+        if (!answerParams) {
+          answerParams = {};
+        }
+        answerParams.responder_id = user_id;
+        var answersPromise = Answer.get_many(answerParams);
         $q.all([questionsPromise, answersPromise]).then(
           function(data) {
             var questions = data[0];

@@ -9,7 +9,7 @@
     </div>
     <div class="tab-content" active="interestsTabActive">
       <div cs-community-partner-labels search="newSearch"></div>
-      <input type="submit" value="Continue" class="btn"
+      <input type="submit" value="Continue" class="btn btn-default"
              ng-disabled="newSearch.nActiveLabels === 0"
              ng-click="experienceTabActive=true; interestsTabCompleted=true;"/>
     </div>
@@ -26,7 +26,7 @@
         <div ng-repeat="question in questions" cs-question question="question"
              answers="answers"></div>
       </form>
-      <input type="submit" value="Continue" class="btn"
+      <input type="submit" value="Continue" class="btn btn-default"
              ng-click="personalTabActive=true; experienceTabCompleted=true;"/>
     </div>
   </div>
@@ -43,7 +43,7 @@
             class="form-horizontal">
         <div cs-personal-settings></div>
       </form>
-      <input type="submit" value="Continue" class="btn"
+      <input type="submit" value="Continue" class="btn btn-default"
              ng-disabled="personalSettingsForm.$invalid"
              ng-click="accountTabActive=true; personalTabCompleted=true;"/>
     </div>
@@ -64,7 +64,7 @@
         Personal Settings are incomplete.
       </div>
 
-      <input type="submit" value="Sign Up!" class="btn"
+      <input type="submit" value="Sign Up!" class="btn btn-default"
              ng-disabled="personalSettingsForm.$invalid || accountSettingsForm.$invalid"
              ng-click="submit();"/>
     </div>
