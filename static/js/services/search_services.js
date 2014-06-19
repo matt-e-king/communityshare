@@ -9,6 +9,30 @@
     ])
 
   module.factory(
+    'getAllLabels',
+    function($q, $http) {
+      var getAllLabels = function() {
+        var url = '/api/labels';
+        var labelsPromise = $http({
+          method: 'GET',
+          url: url
+        });
+        var deferred = $q.defer();
+        labelsPromise.then(
+          function(response) {
+            var labels = response.data.data;
+            deferred.resolve(labels);
+          },
+          function(response) {
+            var message = response.data.message;
+            deferred.reject(message);
+          });
+        return deferred.promise;
+      };
+      return getAllLabels;
+    });
+
+  module.factory(
     'Search',
     function(ItemFactory, $q, $http, makeBaseLabels, sortLabels, UserBase) {
       var baseLabels = makeBaseLabels();

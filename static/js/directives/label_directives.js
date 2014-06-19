@@ -27,16 +27,21 @@
                scope.$apply(scope.update);
              }
            });
-           elm.bind('blur', function(event) {
-             scope.$apply(scope.update);
-           });
          }
        };
      });
 
-  var LabelsController = function($scope) {
+  var LabelsController = function($scope, getAllLabels) {
     $scope.newLabel = {
       name: ''
+    };
+    var labelsPromise = getAllLabels();
+    labelsPromise.then(
+      function(labels) {
+        $scope.allLabels = labels;
+      })
+    $scope.typeaheadSelect = function() {
+      $scope.newLabelMethods.onUpdate();
     };
     $scope.newLabelMethods = {
       onUpdate: function() {

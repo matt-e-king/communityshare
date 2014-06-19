@@ -1,6 +1,6 @@
 from flask import jsonify
 
-from community_share.models.search import Search
+from community_share.models.search import Search, Label
 from community_share import search_utils, store
 from community_share.routes import base_routes
 from community_share.authorization import get_requesting_user
@@ -10,6 +10,14 @@ def register_search_routes(app):
 
     search_blueprint = base_routes.make_blueprint(Search, 'search')
     app.register_blueprint(search_blueprint)
+
+    @app.route('/api/labels/')
+    def get_labels():
+        labels = store.session.query(Label).filter(Label.active==True).all()
+        labelnames = [label.name for label in labels]
+        response_data = {'data': labelnames}
+        response = jsonify(response_data)
+        return response
 
     @app.route(base_routes.API_SINGLE_FORMAT.format('search') + '/results', methods=['GET'])
     def get_search_results(id):
