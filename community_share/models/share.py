@@ -114,7 +114,7 @@ class Share(Base, Serializable):
 
     def on_delete(self, requester):
         for e in self.events:
-            e.delete()
+            e.delete(requester)
         mail_actions.send_share_message(self, requester, is_delete=True)
         
     def on_add(self, requester):

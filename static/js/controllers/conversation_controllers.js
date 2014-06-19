@@ -121,7 +121,7 @@
           function(result) {
             if (result === 'yes') {
               // FIXME: Send email to otherUser saying they want to cancel it.
-              deletePromise = $scope.share.destroy();
+              var deletePromise = $scope.share.destroy();
               deletePromise.then(
                 function() {
                   $scope.share = conversation.makeShare();
