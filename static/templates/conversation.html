@@ -11,13 +11,14 @@
 
   <div class="panel panel-default">
     <div class="panel-heading">
-      <h5 class="panel-title">Share Details</h5>
+      <h5 class="panel-title">Share Scheduling</h5>
+      This is where you set the date, time and location of the share.
     </div>
     <div class="panel-body">
       <div ng-show="share.id === undefined">
         No Share arranged yet.
       </div>
-      <table ng-show="share.id >= 0">
+      <table class="table" ng-show="share.id >= 0">
         <tbody>
           <tr><th>Title of Share</th><td>{{share.title}}</td></tr>
           <tr><th>Description of Share</th><td>{{share.description}}</td></tr>
@@ -68,44 +69,62 @@
     </div>
   </div>
 
-  <div ng-repeat="message in conversation.messages" class="conversation-block">
-    <div class="conversation-sender">{{message.sender_user.name}}</div>
-    <div class="conversation-message show-linebreaks"
-         ng-class="messageHighlightClasses[message.sender_user_id]"
-         >{{message.content}}</div>
-  </div>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h5 class="panel-title">Share Conversation</h5>
+      <ul class="list-unstyled">
+        <li>Messages added to the conversation will be emailed to your partner.</li>
+        <li>The contents of all conversations are only visible to you, your partner and the CommunityShare administrators.</li>
+        <li>CommunityShare administrators will analyze the contents of the conversations to assess the effectiveness of the program and improve it.</li>
+      </ul>
+    </div>
+    <div class="panel-body">
 
-  <form novalidate login-with-auto-fill
-        action="" role="form" name="newConversationForm" class="form-horizontal">
-
-    <div class="form-group">
-      <label for="content"
-             class="control-label">Message</label>
-      <div class="">
-        <textarea ng-model="newMessage.content"
-                  required
-                  name="content"
-                  id="content"
-                  class="form-control"
-                  ng-class="messageHighlightClasses[Session.activeUser.id]"
-                  type="text">
-        </textarea>
-        <p ng-show="newConversationForm.content.$invalid && !newConversationForm.content.$pristine"
-           class="help-block">
-          A message is required.
-        </p>
+      <div ng-show="conversation.messages.length >=2" class="alert alert-warning">
+        Don't forget to use the Share Scheduler above to set the date, time and location of
+        your events.
       </div>
-    </div>
-    
-    <div class="alert alert-danger" ng-show="errorMessage">
-      {{errorMessage}}
-    </div>
-    
-    <button class="btn btn-default" type="submit" ng-click="sendMessage()"
-            ng-disabled="newConversationForm.$invalid">
-      Send Message
-    </button>
 
-  </form>
+      <div ng-repeat="message in conversation.messages" class="conversation-block">
+        <div class="conversation-sender">{{message.sender_user.name}}</div>
+        <div class="conversation-message show-linebreaks"
+             ng-class="messageHighlightClasses[message.sender_user_id]"
+             >{{message.content}}</div>
+      </div>
+
+      <form novalidate login-with-auto-fill
+            action="" role="form" name="newConversationForm" class="form-horizontal">
+        
+        <div class="form-group">
+          <label for="content"
+                 class="control-label">Send a new message</label>
+          <div class="">
+            <textarea ng-model="newMessage.content"
+                      required
+                      name="content"
+                      id="content"
+                      class="form-control"
+                      ng-class="messageHighlightClasses[Session.activeUser.id]"
+                      type="text">
+            </textarea>
+            <p ng-show="newConversationForm.content.$invalid && !newConversationForm.content.$pristine"
+               class="help-block">
+              A message is required.
+            </p>
+          </div>
+        </div>
+    
+        <div class="alert alert-danger" ng-show="errorMessage">
+          {{errorMessage}}
+        </div>
+        
+        <button class="btn btn-default" type="submit" ng-click="sendMessage()"
+                ng-disabled="newConversationForm.$invalid">
+          Send Message
+        </button>
+        
+      </form>
+    </div>
+  </div>
 
 </div>
