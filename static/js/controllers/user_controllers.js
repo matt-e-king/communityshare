@@ -14,7 +14,8 @@
   
   module.controller(
     'UserController',
-    function($scope, $routeParams, User, Session, Question, Conversation) {
+    function($scope, $routeParams, User, Session, Question, Conversation,
+             Evnt) {
       $scope.Session = Session;
       var userId = $routeParams.userId;
       var userPromise = User.get(userId);
@@ -45,6 +46,11 @@
         conversationsPromise.then(
           function(conversations) {
             $scope.conversations = conversations;
+          });
+        var eventsPromise = Evnt.get_many({user_id: userId});
+        eventsPromise.then(
+          function(events) {
+            $scope.events = events;
           });
       }
       questionsPromise.then(
