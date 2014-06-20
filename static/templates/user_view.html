@@ -83,6 +83,31 @@
         </div>
       </div>
     </div>
+
+    <div class="panel panel-default" ng-show="conversations">
+      <div class="panel-heading">
+        <h5 class="panel-title">Conversations</h5>
+      </div>
+      <div class="panel-body">
+        <table class="table">
+          <thead>
+            <th>Title</th><th>Initiator</th><th>Receiver</th><th>Date of last message</th>
+          </thead>
+          <tbody>
+            <tr ng-repeat="conversation in conversations">
+              <td><a href="/#/conversation/{{conversation.id}}">
+                  {{conversation.title}}</a></td>
+              <td><a href="/#/user/{{conversation.userA.id}}">
+                  {{conversation.userA.name}}</a></td>
+              <td><a href="/#/user/{{conversation.userB.id}}">
+                  {{conversation.userB.name}}</td>
+              <td>{{conversation.datetime_last_message | date: 'mediumDate'}}
+            </tr>
+          </tbody>
+        </div>
+      </div>
+    </div>
+
   </div>
 
 </div>

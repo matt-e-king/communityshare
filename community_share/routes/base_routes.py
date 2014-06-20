@@ -101,8 +101,11 @@ def make_blueprint(Item, resourceName):
                     Item.PERMISSIONS.get('all_can_read_many', False)):
                     try:
                         query = Item.args_to_query(request.args, requester)
-                        items = query.all()
-                        response = make_many_response(requester, items)
+                        if query is None:
+                            response = make_forbidden_response()
+                        else:
+                            items = query.all()
+                            response = make_many_response(requester, items)
                     except ValueError as e:
                         error_message = ', '.join(e.args)
                         response = make_bad_request_response(e.args[0])

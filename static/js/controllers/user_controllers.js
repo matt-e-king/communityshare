@@ -14,7 +14,7 @@
   
   module.controller(
     'UserController',
-    function($scope, $routeParams, User, Session, Question) {
+    function($scope, $routeParams, User, Session, Question, Conversation) {
       $scope.Session = Session;
       var userId = $routeParams.userId;
       var userPromise = User.get(userId);
@@ -40,6 +40,13 @@
         userId,
         {'question_type.in': ['signup_community_partner', 'signup', 'signup_educator']}
       );
+      if ($scope.Session.activeUser.is_administrator) {
+        var conversationsPromise = Conversation.get_many({user_id: userId});
+        conversationsPromise.then(
+          function(conversations) {
+            $scope.conversations = conversations;
+          });
+      }
       questionsPromise.then(
         function(questions) {
           $scope.questions = [];

@@ -117,14 +117,14 @@ class Conversation(Base, Serializable):
         if user_id is not None:
             try:
                 user_id = int(user_id)
-                if requester.id == user_id:
+                if (requester.id == user_id) or requester.is_administrator:
                     query = store.session.query(Conversation)
                     query = query.filter(
-                        or_(Conversation.userA==requester, Conversation.userB==requester))
+                        or_(Conversation.userA_id==user_id, Conversation.userB_id==user_id))
                     if with_unviewed_messages:
                         query = query.join(Message)
                         query = query.filter(
-                            and_(Message.viewed==False, Message.sender_user!=requester))
+                            and_(Message.viewed==False, Message.sender_user_id!=user_id))
                     if messages_date_created_greaterthan:
                         query = query.join(Message)
                         query = query.filter(
