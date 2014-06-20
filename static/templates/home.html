@@ -6,6 +6,12 @@
 
   <div class="alert alert-danger" ng-show="errorMessage">{{errorMessage}}</div>
 
+  <div ng-show="Session.activeUser.is_educator" cs-educator-home>
+  </div>
+  
+  <div ng-show="Session.activeUser.is_community_partner" cs-community-partner-home>
+  </div>
+
   <div class="panel panel-default">
     <div class="panel-heading">
       <h5 class="panel-title">Upcoming Shares</h5>
@@ -60,13 +66,7 @@
     </div>
   </div>
 
-  <div ng-show="Session.activeUser.is_administrator" cs-administrator-home>
+  <div ng-if="Session.activeUser.is_administrator" cs-administrator-home>
   </div>
   
-  <div ng-show="Session.activeUser.is_educator" cs-educator-home>
-  </div>
-  
-  <div ng-show="Session.activeUser.is_community_partner" cs-community-partner-home>
-  </div>
-
 </div>

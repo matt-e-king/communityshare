@@ -158,6 +158,7 @@ class User(Base, Serializable):
     def deserialize_institution_associations(self, data_list):
         if data_list is None:
             data_list = []
+        data_list = [d for d in data_list if d != {}]
         self.institution_associations = [
             InstitutionAssociation.admin_deserialize(data) for data in data_list]
         for ia in self.institution_associations:

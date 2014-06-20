@@ -193,6 +193,7 @@
       };
       // Grab a community partner's passive search.
       if ($scope.user && $scope.user.is_community_partner) {
+        $scope.interestsTabActive = true;
         var searchesPromise = $scope.user.getSearches();
         var searchPromise = CommunityPartnerUtils.searchesPromiseToSearchPromise(
           searchesPromise);

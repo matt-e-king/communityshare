@@ -1,28 +1,29 @@
 <div class="panel panel-default">
   <div class="panel-heading">
-    <h5 class="panel-title">I'm an Educator</h5>
+    <h5 class="panel-title">Search for a Community Partner</h5>
   </div>
   <div class="panel-body">
-    <p><button ng-click="newSearch()" class="clickable btn btn-default">Start a New Search</button></p>
     
-    <h5>Previous active searches</h5>
-
+    <button class="btn btn-primary clickable" ng-click="newSearch()">
+      Start a New Search
+    </button>
+    <h5>Previous Searches</h5>
     <p>
-      Community partner may contact you if they match an earlier search you made.
+      Community Partners can find you based on these searches.
     </p>
-    <p>
-      Delete any searches below, for which you do not want this to happen.
-    </p>
-    
     <div class="search-summary" ng-repeat="search in activeSearches">
       <div>
         <a ng-href="#/search/{{search.id}}/edit">Edit Search</a> - 
-        <a ng-click="deleteSearch(search)" class="clickable">Delete Search</a> - 
-        <a ng-href="#/search/{{search.id}}/results">Show Search Results</a>
+        <a ng-click="deleteSearch(search)" class="clickable">Delete Search</a>
       </div>
       <div ng-repeat="label in search.labels" class="labelbox">
         {{label}}
       </div>
+      <a href="#/search/{{search.id}}/results">
+        <button class="btn btn-primary">
+          Show Matching Community Partners
+        </button>
+      </a>
       <div class="clearfix"></div>
     </div>
   </div>

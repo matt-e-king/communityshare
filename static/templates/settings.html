@@ -7,6 +7,18 @@
 
   <div tabset name="settingsTabSet">
 
+    <div tab active="interestsTabActive" 
+         ng-if="Session.activeUser.is_community_partner">
+      <div tab-heading>
+        <span ng-class="">
+          Interests
+        </span>
+      </div>
+      <div class="tab-content" active="interestsTabActive">
+        <div cs-community-partner-labels search="search"></div>
+      </div>
+    </div>
+
     <div tab active="personalTabActive">
       <div tab-heading>
         <span ng-class="{'tab-heading-error': personalSettingsForm.$invalid}">
@@ -22,18 +34,6 @@
         </form>
       </div>
 
-    </div>
-
-    <div tab active="interestsActive" 
-         ng-if="Session.activeUser.is_community_partner">
-      <div tab-heading>
-        <span ng-class="">
-          Interests
-        </span>
-      </div>
-      <div class="tab-content" active="interestsTabActive">
-        <div cs-community-partner-labels search="search"></div>
-      </div>
     </div>
 
     <div tab active="experienceTabActive">
@@ -60,7 +60,7 @@
     Account Settings are invalid
   </div>
   
-  <input type="submit" value="Save" class="btn btn-default"
+  <input type="submit" value="Save" class="btn btn-primary"
          ng-disabled="personalSettingsForm.$invalid || accountSettingsForm.$invalid"
          ng-click="save()"/>
 
