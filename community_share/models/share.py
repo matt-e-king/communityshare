@@ -19,7 +19,7 @@ class Share(Base, Serializable):
     
     MANDATORY_FIELDS = [
         'educator_user_id', 'community_partner_user_id', 'conversation_id',
-        'title', 'description']
+        'description']
     WRITEABLE_FIELDS = [
         'educator_approved', 'community_partner_approved', 'title', 'description', 'events']
     STANDARD_READABLE_FIELDS = [

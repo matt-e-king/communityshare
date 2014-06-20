@@ -57,7 +57,7 @@ Description: {share.description}
 Educator: {share.educator.name}
 Community Partner: {share.community_partner.name}
 
-{eventdetals}
+{eventdetails}
 
 To confirm this suggestion please go to {url} and click the confirm share button.
 '''
