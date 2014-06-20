@@ -57,7 +57,7 @@ Description: {share.description}
 Educator: {share.educator.name}
 Community Partner: {share.community_partner.name}
 
-{{eventdetails}}
+{eventdetals}
 
 To confirm this suggestion please go to {url} and click the confirm share button.
 '''
@@ -70,7 +70,7 @@ Description: {share.description}
 Educator: {share.educator.name}
 Community Partner: {share.community_partner.name}
 
-{{eventdetails}}
+{eventdetails}
 
 To confirm these changes please go to {url} and click the confirm share button.
 '''
@@ -90,7 +90,7 @@ Description: {share.description}
 Educator: {share.educator.name}
 Community Partner: {share.community_partner.name}
 
-{{eventdetails}}
+{eventdetails}
 '''
 
 def send_review_reminder_message(user, event):
