@@ -1,6 +1,5 @@
 import logging
 import datetime
-
 import dateutil
 from dateutil import parser
 
@@ -158,6 +157,9 @@ class Serializable(object):
                 elif len(bits) == 2:
                     if bits[1] in ('like', 'ilike'):
                         new_arg = getattr(getattr(cls, bits[0]), bits[1])(args[key])
+                        filter_args.append(new_arg)
+                    elif bits[1] in ('in',):
+                        new_arg = getattr(cls, bits[0]).in_(args.getlist(key))
                         filter_args.append(new_arg)
                     elif bits[1] in cls.CONDITION_MAPPING.keys():
                         field = getattr(cls, bits[0])
