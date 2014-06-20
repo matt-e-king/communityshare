@@ -99,33 +99,35 @@
         }
       };
       Conversation.prototype.makeShare = function() {
-        var educator_user_id = undefined;
-        var community_partner_user_id = undefined;
-        if (SessionBase.activeUser.is_educator) {
-          educator_user_id = SessionBase.activeUser.id;
-        } else if (SessionBase.activeUser.is_community_partner) {
-          community_partner_user_id = SessionBase.activeUser.id;
-        }
-        if (this.otherUser.is_educator) {
-          educator_user_id = this.otherUser.id;
-        } else if (this.otherUser.is_community_partner) {
-          community_partner_user_id = this.otherUser.id;
-        }
-        var share;
-        if ((educator_user_id === undefined) || (community_partner_user_id === undefined)) {
-          share = undefined;
-          Messages.error('A share required both an educator and a community partner.');
-        } else {
-          share = new Share({
-            conversation_id: this.id,
-            educator_user_id: educator_user_id,
-            community_partner_user_id: community_partner_user_id,
-            title: undefined,
-            description: undefined,
-            educator_approved: false,
-            community_partner_approved: false
-          });
-          share.addNewEvent();
+        if (this.otherUser) {
+          var educator_user_id = undefined;
+          var community_partner_user_id = undefined;
+          if (SessionBase.activeUser.is_educator) {
+            educator_user_id = SessionBase.activeUser.id;
+          } else if (SessionBase.activeUser.is_community_partner) {
+            community_partner_user_id = SessionBase.activeUser.id;
+          }
+          if (this.otherUser.is_educator) {
+            educator_user_id = this.otherUser.id;
+          } else if (this.otherUser.is_community_partner) {
+            community_partner_user_id = this.otherUser.id;
+          }
+          var share;
+          if ((educator_user_id === undefined) || (community_partner_user_id === undefined)) {
+            share = undefined;
+            Messages.error('A share required both an educator and a community partner.');
+          } else {
+            share = new Share({
+              conversation_id: this.id,
+              educator_user_id: educator_user_id,
+              community_partner_user_id: community_partner_user_id,
+              title: undefined,
+              description: undefined,
+              educator_approved: false,
+              community_partner_approved: false
+            });
+            share.addNewEvent();
+          }
         }
         return share;
       };

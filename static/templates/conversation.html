@@ -3,7 +3,8 @@
 
 <div ng-if="(conversation !== undefined) && (Session.activeUser !== undefined)">
 
-  <h4>Organizing a Share with {{otherUser.name}}</h4>
+  <h4 ng-if="conversation.otherUser">Organizing a Share with {{conversation.otherUser.name}}</h4>
+  <h4 ng-if="!conversation.otherUser">Share between {{conversation.userA.name}} and {{conversation.userB.name}}</h4>
 
   <div ng-show="!otherUser.active">
     {{otherUser.name}} has deleted their account.
@@ -93,7 +94,8 @@
       </div>
 
       <form novalidate login-with-auto-fill
-            action="" role="form" name="newConversationForm" class="form-horizontal">
+            action="" role="form" name="newConversationForm" class="form-horizontal"
+            ng-if="conversation.otherUser">
         
         <div class="form-group">
           <label for="content"

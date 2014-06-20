@@ -68,15 +68,17 @@
       sharesPromise.then(
         function(shares) {
           shares.sort(function(a, b) { return a.id - b.id; });
-          if (shares.length === 0) {
-            $scope.share = conversation.makeShare();
-            $scope.events = $scope.share.events;
-          } else {
-            $scope.share = shares[0];
-            if ($scope.share.events.length === 0) {
-              $scope.share.addNewEvent();
+          if (conversation.otherUser) {
+            if ((shares.length === 0)) {
+              $scope.share = conversation.makeShare();
+              $scope.events = $scope.share.events;
+            } else {
+              $scope.share = shares[0];
+              if ($scope.share.events.length === 0) {
+                $scope.share.addNewEvent();
+              }
+              $scope.events = $scope.share.events;
             }
-            $scope.events = $scope.share.events;
           }
         },
         showErrorMessage
