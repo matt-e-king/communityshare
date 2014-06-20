@@ -8,22 +8,6 @@
   <div class="modal-body">
     <form novalidate login-with-auto-fill
           action="" role="form" name="shareForm" class="form-horizontal">
-      <div class="form-group">
-        <label for="title"
-               class="control-label ">Title</label>
-        <div class="">
-          <input ng-model="share.title"
-                 required
-                 name="title"
-                 id="title"
-                 class="form-control"
-                 type="text"/>
-          <p ng-show="shareForm.title.$invalid && !shareForm.title.$pristine" class="help-block">
-            Enter a title.
-          </p>
-        </div>
-      </div>
-
 
       <div class="form-group">
         <label for="description"

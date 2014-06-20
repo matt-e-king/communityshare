@@ -45,7 +45,7 @@ class Share(Base, Serializable):
     community_partner_user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
     educator_approved = Column(Boolean, default=False, nullable=False)
     community_partner_approved = Column(Boolean, default=False, nullable=False)
-    title = Column(String(100), nullable=False)
+    title = Column(String(100), nullable=True)
     active = Column(Boolean, default=True, nullable=False)
     description = Column(String, nullable=False)
     date_created = Column(DateTime, nullable=False, default=datetime.utcnow)
