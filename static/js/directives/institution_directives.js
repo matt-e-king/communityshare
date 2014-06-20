@@ -10,13 +10,25 @@
      function(Session, Institution) {
        return {
          scope: {
-           user: '='
+           user: '=',
+           isEducator: '=',
+           isCommunityPartner: '='
          },
          templateUrl: './static/templates/institution_adder.html',
          controller: function($scope) {
            // FIXME: Not scaleable.  Change to get the most popular.
            var institutionsPromise = Institution.get_many();
-           $scope.options = {'institutions': []};
+           var institutionTypes = [];
+           $scope.options = {institutions: [],
+                             institutionTypes: [],
+                            };
+           if ($scope.isCommunityPartner) {
+             $scope.options.institutionTypes = [
+               'Company', 'University', 'School'];
+           } else if ($scope.isEducator) {
+             $scope.options.institutionTypes = [
+               'University', 'Public School', 'Charter School', 'Private School'];
+           }
            institutionsPromise.then(
              function(institutions) {
                $scope.options.institutions = institutions;
@@ -31,7 +43,8 @@
       return {
         scope: {
           institutionAssociation: '=',
-          institutionOptions: '=',
+          institutions: '=',
+          institutionTypes: '=',
           methods: '=',
           index: '@'
         },

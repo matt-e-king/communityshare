@@ -3,7 +3,8 @@
   <div ng-repeat="ia in user.institution_associations" cs-institution-association-edit
        class="institution-group"
        institution-association="ia", index="{{$index+1}}"
-       institution-options="options.institutions">
+       institutions="options.institutions"
+       institution-types="options.institutionTypes">
   </div>
 
   <a ng-click="user.addNewInstitutionAssociation()" class="cs-form-button">

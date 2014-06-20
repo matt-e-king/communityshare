@@ -113,6 +113,7 @@
     'SignupCommunityPartnerController',
     function($scope, Session, Messages, User, signUp, $location, $q, Search,
             Question, Answer) {
+      $scope.isCommunityPartner = true;
       $scope.newSearch = new Search({
           searcher_user_id: undefined,
           searcher_role: 'partner',
@@ -132,6 +133,7 @@
     'SignupEducatorController',
     function($scope, Session, Messages, User, signUp, $location, $q, Search,
             Question, Answer) {
+      $scope.isEducator = true;
       $scope.newSearch = new Search({
         searcher_user_id: undefined,
         searcher_role: 'educator',
