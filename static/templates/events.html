@@ -31,7 +31,7 @@
 
   <table class="table" ng-show="events">
     <thead>
-      <tr><th>Date and Time</th><th>Educator</th>
+      <tr><th>Date and Time</th><th>Educator</th><th>Educational Institution</th>
         <th>Community Partner</th><th>Title</th></tr>
     </thead>
     <tbody>
@@ -40,6 +40,7 @@
             {{evnt.datetime_start | date: 'medium'}}</a></td>
         <td><a href="#/user/{{evnt.share.educator.id}}">
             {{evnt.share.educator.name}}</a></td>
+        <td>{{evnt.share.educator.institution_associations[0].institution.name}}</td>
         <td><a href="#/user/{{evnt.share.community_partner.id}}">
             {{evnt.share.community_partner.name}}</a></td>
         <td>{{evnt.title || evnt.share.title}}</td>

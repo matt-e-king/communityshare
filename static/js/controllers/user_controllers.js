@@ -161,6 +161,8 @@
         return;
       }
       $scope.user = Session.activeUser;
+      $scope.isCommunityPartner = $scope.user.is_community_partner;
+      $scope.isEducator = $scope.user.is_educator;
       $scope.properties = {};
       $scope.settingsTabSet = {};
       // passwordMethods hooks up the password matching directives.
