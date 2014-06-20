@@ -46,10 +46,19 @@ class Question(Base, Serializable):
         'standard_can_read_many': True
     }
 
+    def __init__(self, *args, **kwargs):
+        self.long_answer = False
+        self.active = True
+        self.only_suggested_answers = False
+        self.requires_share_id = False
+        self.requires_event_id = False
+        self.requires_user_id = False
+        Base.__init__(self, *args, **kwargs)
+
     def has_standard_rights(self, requester):
         return True
     
-    def serialize_suggested_answers(self, requester):
+    def serialize_suggested_answers(self, requester=None):
         serialized = [sa.text for sa in self.suggested_answers if sa.active]
         return serialized
 
@@ -75,6 +84,10 @@ class Question(Base, Serializable):
 
 class SuggestedAnswer(Base, Serializable):
     __tablename__ = 'suggested_answer'
+
+    def __init__(self, *args, **kwargs):
+        self.active = True
+        Base.__init__(self, *args, **kwargs)
 
     id = Column(Integer, primary_key=True)
     question_id = Column(Integer, ForeignKey('question.id'), nullable=False)

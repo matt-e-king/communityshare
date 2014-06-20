@@ -35,9 +35,10 @@
         });
       $scope.communityPartnerViewMethods = {};
       $scope.educatorViewMethods = {};
+      var question_types = [];
       var questionsPromise = Question.get_many_with_answers(
         userId,
-        {question_type: 'signup_community_partner'}
+        {'question_type.in': ['signup_community_partner', 'signup', 'signup_educator']}
       );
       questionsPromise.then(
         function(questions) {
@@ -54,10 +55,24 @@
   // User Signups
 
   var commonSignupLogic = function($scope, Session, Messages, User, signUp,
-                                   $location, $q) {
+                                   $location, $q, Question, Answer) {
     $scope.Session = Session;
     $scope.editedUser = new User();
     $scope.newSearch.makeLabelDisplay()
+
+    // Get questions to display during signup.
+    $scope.questions = [];
+    var questionsPromise = Question.get_many({
+      'question_type.in': ['signup_community_partner', 'signup', 'signup_educator']
+    });
+    questionsPromise.then(
+      function(questions) {
+        $scope.questions = questions;
+        for (var i=0; i<$scope.questions.length; i++) {
+          var question = $scope.questions[i];
+          question.answer = new Answer({question_id: question.id});
+        }
+      });
 
     // passwordMethods hooks up the password matching directives.
     $scope.passwordMethods = {};
@@ -97,7 +112,7 @@
   module.controller(
     'SignupCommunityPartnerController',
     function($scope, Session, Messages, User, signUp, $location, $q, Search,
-             Question, Answer) {
+            Question, Answer) {
       $scope.newSearch = new Search({
           searcher_user_id: undefined,
           searcher_role: 'partner',
@@ -108,26 +123,15 @@
           longitude: undefined,
           distance: undefined
         });
-      // Get questions to display during signup.
-      $scope.questions = [];
-      var questionsPromise = Question.get_many({
-        question_type: 'signup_community_partner'
-      });
-      questionsPromise.then(
-        function(questions) {
-          $scope.questions = questions;
-          for (var i=0; i<$scope.questions.length; i++) {
-            var question = $scope.questions[i];
-            question.answer = new Answer({question_id: question.id});
-          }
-        });
       // Signup logic common to Community Partners and Educators
-      commonSignupLogic($scope, Session, Messages, User, signUp, $location, $q);
+      commonSignupLogic($scope, Session, Messages, User, signUp, $location, $q,
+                       Question, Answer);
     });
   
   module.controller(
     'SignupEducatorController',
-    function($scope, Session, Messages, User, signUp, $location, $q, Search) {
+    function($scope, Session, Messages, User, signUp, $location, $q, Search,
+            Question, Answer) {
       $scope.newSearch = new Search({
         searcher_user_id: undefined,
         searcher_role: 'educator',
@@ -140,7 +144,8 @@
       });
       $scope.questions = [];
       // Signup logic common to Community Partners and Educators
-      commonSignupLogic($scope, Session, Messages, User, signUp, $location, $q);
+      commonSignupLogic($scope, Session, Messages, User, signUp, $location, $q,
+                       Question, Answer);
     });
 
   // Settings Controller
@@ -159,10 +164,10 @@
       // passwordMethods hooks up the password matching directives.
       $scope.passwordMethods = {};
       // Get the questions
-      if ($scope.user && $scope.user.is_community_partner) {
+      if ($scope.user) {
         var questionsPromise = Question.get_many_with_answers(
           $scope.user.id,
-          {question_type: 'signup_community_partner'}
+          {'question_type.in': ['signup_community_partner', 'signup_educator']}
         );
         questionsPromise.then(
           function(questions) {

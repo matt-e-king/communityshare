@@ -29,10 +29,28 @@ def get_questions(creator):
             order=1,
         ),
         Question(
+            text='To what extent have you worked with community experts before?',
+            creator=creator,
+            question_type='signup_educator',
+            public=True,
+            only_suggested_answers=False,
+            order=0,
+            suggested_answers=[
+                SuggestedAnswer(creator=creator,
+                                text='Never'),
+                SuggestedAnswer(creator=creator,
+                                text='A few times'),
+                SuggestedAnswer(creator=creator,
+                                text='6+ times'),
+                SuggestedAnswer(creator=creator,
+                                text='Dozens'),
+            ]
+        ),
+        Question(
             text='How did you hear about Community Share?',
             creator=creator,
             question_type='signup',
-            public=True,
+            public=False,
             only_suggested_answers=False,
             order=2,
             suggested_answers=[
@@ -53,6 +71,8 @@ def get_questions(creator):
             question_type='post_event',
             public=False,
             only_suggested_answers=False,
+            requires_event_id=True,
+            requires_user_id=True,
             order=1
         ),
         Question(
@@ -62,6 +82,7 @@ def get_questions(creator):
             question_type='post_event',
             public=False,
             only_suggested_answers=False,
+            requires_event_id=True,
             order=2
         ),
     ]

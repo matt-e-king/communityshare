@@ -10,9 +10,29 @@
     <div class="tab-content" active="needsTabActive">
       <div cs-educator-labels search="newSearch"></div>
       <input type="submit" value="Continue" class="btn btn-default"
-             ng-click="personalTabActive=true; needsTabCompleted=true;"/>
+             ng-click="experienceTabActive=true; needsTabCompleted=true;"/>
     </div>
   </div>
+
+  <div tab active="experienceTabActive"
+       disabled="!needsTabCompleted">
+    <div tab-heading>
+      <span ng-class="{'tab-heading-error': experienceSettingsForm.$invalid}">
+        Experience
+      </span>
+    </div>
+    <div class="tab-content">
+      <form novalidate action="" role="form" name="experienceSettingsForm">
+        <div ng-repeat="question in questions"
+             ng-if="(question.question_type=='signup' || question.question_type=='signup_educator')"
+             cs-question question="question"
+             answers="answers"></div>
+      </form>
+      <input type="submit" value="Continue" class="btn btn-default"
+             ng-click="personalTabActive=true; experienceTabCompleted=true;"/>
+    </div>
+  </div>
+
   <div tab active="personalTabActive" disabled="!needsTabCompleted">
     <div tab-heading>
       <span ng-class="{'tab-heading-error': personalSettingsForm.$invalid && !personalSettingsForm.$pristine}">

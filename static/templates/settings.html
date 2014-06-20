@@ -36,8 +36,7 @@
       </div>
     </div>
 
-    <div tab active="experienceTabActive"
-         ng-if="Session.activeUser.is_community_partner">
+    <div tab active="experienceTabActive">
       <div tab-heading>
         <span ng-class="{'tab-heading-error': experienceSettingsForm.$invalid}">
           Experience
@@ -46,6 +45,7 @@
       <div class="tab-content">
         <form novalidate action="" role="form" name="experienceSettingsForm">
           <div ng-repeat="question in questions" cs-question question="question"
+               ng-if="((question.question_type == 'signup_community_partner') && Session.activeUser.is_community_partner) || ((question.question_type == 'signup_educator') && Session.activeUser.is_educator)"
                answers="answers"></div>
         </form>
       </div>

@@ -188,7 +188,7 @@ def make_admin_user(name, email, password):
 
 def update_questions(questions):
     new_hashs = set([question.make_hash() for question in questions])
-    existing_questions = store.session.query(Question)
+    existing_questions = store.session.query(Question).filter(Question.active == True).all()
     old_hashs = set([question.make_hash() for question in existing_questions])
     hashs_to_add = new_hashs - old_hashs
     hashs_to_delete = old_hashs - new_hashs

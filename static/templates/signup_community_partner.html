@@ -24,6 +24,7 @@
     <div class="tab-content">
       <form novalidate action="" role="form" name="experienceSettingsForm">
         <div ng-repeat="question in questions" cs-question question="question"
+             ng-if="(question.question_type=='signup' || question.question_type=='signup_community_partner')"
              answers="answers"></div>
       </form>
       <input type="submit" value="Continue" class="btn btn-default"
