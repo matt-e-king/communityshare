@@ -47,6 +47,7 @@
           </tr>
         </tbody>
       </table>
+      <div ng-if="conversation.otherUser">
       <button class="btn btn-default" type="submit" ng-click="editShare()" ng-show="share.id !== undefined">
         Edit Share Details
       </button>
@@ -67,6 +68,7 @@
               ng-disabled="!share.hasActiveEvent()">
         Cancel Share
       </button>
+      </div>
     </div>
   </div>
 
