@@ -49,6 +49,18 @@ SHARE_CONFIRMATION_TEMPLATE = '''{editer.name} has confirmed the details of a sh
 To view the share details go to {url}.
 '''
 
+NOTIFY_SHARE_CREATION_TEMPLATE = '''A share has been created.
+Title: {share.title}
+Description: {share.description}
+
+Educator: {share.educator.name}
+Community Partner: {share.community_partner.name}
+
+{eventdetails}
+
+View the details at {url}.
+'''
+
 SHARE_CREATION_TEMPLATE = '''{editer.name} has proposed a share with you.  The details are:
 
 Title: {share.title}
@@ -193,8 +205,27 @@ def send_event_reminder_message(event):
         [e for e in error_messages if e is not None])
     return combined_error_message
 
-        
-    
+def send_notify_share_creation(share, requester):
+    to_address = config.NOTIFY_EMAIL_ADDRESS
+    from_address = config.DONOTREPLY_EMAIL_ADDRESS
+    event_details = ''.join([EVENT_EDIT_TEMPLATE.format(event=event)
+                             for event in share.events])
+    url = share.conversation.get_url()
+    subject = 'Share Created: {0}'.format(share.title)
+    content = NOTIFY_SHARE_CREATION_TEMPLATE.format(
+        share=share, eventdetails=event_details, url=url)
+    if not to_address:
+        error_message = 'Recipient has not confirmed their email address'
+    else:
+        email = mail.Email(
+            from_address=from_address,
+            to_address=to_address,
+            subject=subject,
+            content=content,
+            new_content=content
+        )
+        error_message = mail.get_mailer().send(email)
+    return error_message    
 
 def send_share_message(share, editer, new_share=False, is_confirmation=False,
                        is_delete=False):

@@ -119,6 +119,7 @@ class Share(Base, Serializable):
         
     def on_add(self, requester):
         logger.debug('in share on_add')
+        mail_actions.send_notify_share_creation(self, requester)        
         self.on_edit(requester, unchanged=False, is_add=True)
     
     def on_edit(self, requester, unchanged=False, is_add=False):
