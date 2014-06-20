@@ -120,19 +120,23 @@
   module.factory(
     'Evnt',
     function(ItemFactory, EvntBase, Share) {
+      var default_datetime = new Date();
+      default_datetime.setHours(0, 0, 0, 0);
       EvntBase.prototype.updateFromData = function(eventData) {
         this._baseUpdateFromData(eventData);
-        if (this.datetime_start) {
-          this.datetime_start = new Date(this.datetime_start);
-          var split = splitDateTime(this.datetime_start);
-          this.date = split.date;
-          this.time_start = split.time;
+        if (this.datetime_start === undefined) {
+          this.datetime_start = default_datetime;
         }
-        if (this.datetime_stop) {
-          this.datetime_stop = new Date(this.datetime_stop);
-          var split = splitDateTime(this.datetime_stop);
-          this.time_stop = split.time;
+        if (this.datetime_stop === undefined) {
+          this.datetime_stop = default_datetime;
         }
+        this.datetime_start = new Date(this.datetime_start);
+        var split = splitDateTime(this.datetime_start);
+        this.date = split.date;
+        this.time_start = split.time;
+        this.datetime_stop = new Date(this.datetime_stop);
+        var split = splitDateTime(this.datetime_stop);
+        this.time_stop = split.time;
         if (this.share) {
           this.share = new Share(this.share);
         }
