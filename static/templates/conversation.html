@@ -34,7 +34,7 @@
             <th>Starting</th>
             <td ng-show="evnt.datetime_start">{{evnt.datetime_start | date : 'EEEE d MMMM yyyy, h:mm a'}}</td>           
             <td ng-show="!evnt.datetime_start">No starting time chosen</td>
-            <td ng-show="now > evnt.datetime_start"> 
+            <td ng-show="conversation.otherUser" ng-show="now > evnt.datetime_start"> 
               <a ng-click="reviewEvent(evnt)" class="clickable">
                 Review Event
               </a>
