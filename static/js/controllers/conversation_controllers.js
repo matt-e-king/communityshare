@@ -79,7 +79,11 @@
               }
               $scope.events = $scope.share.events;
             }
-          }
+          } else {
+            if (shares) {
+              $scope.share = shares[0];
+            }
+          }            
         },
         showErrorMessage
       );
