@@ -156,16 +156,19 @@ class Serializable(object):
                     raise Exception('Unknown filter parameter')
                 elif len(bits) == 2:
                     if bits[1] in ('like', 'ilike'):
-                        new_arg = getattr(getattr(cls, bits[0]), bits[1])(args[key])
-                        filter_args.append(new_arg)
+                        if args[key]:
+                            new_arg = getattr(getattr(cls, bits[0]), bits[1])(args[key])
+                            filter_args.append(new_arg)
                     elif bits[1] in ('in',):
-                        new_arg = getattr(cls, bits[0]).in_(args.getlist(key))
-                        filter_args.append(new_arg)
+                        if args.getlist(key):
+                            new_arg = getattr(cls, bits[0]).in_(args.getlist(key))
+                            filter_args.append(new_arg)
                     elif bits[1] in cls.CONDITION_MAPPING.keys():
-                        field = getattr(cls, bits[0])
-                        value = args[key]
-                        condition = cls.CONDITION_MAPPING[bits[1]](field, value)
-                        filter_args.append(condition)
+                        if args[key]:
+                            field = getattr(cls, bits[0])
+                            value = args[key]
+                            condition = cls.CONDITION_MAPPING[bits[1]](field, value)
+                            filter_args.append(condition)
                     else:
                         raise Exception('Unknown filter parameter')
                 elif len(bits) == 1:
