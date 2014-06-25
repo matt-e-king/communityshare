@@ -58,16 +58,9 @@
       };
     });
 
-  var parseyyyyMMdd = function(yyyyMMdd) {
-    var date = new Date(yyyyMMdd.substring(0, 4), yyyyMMdd.substring(4, 6),
-                        yyyyMMdd.substring(6, 8));
-    date.setMonth(date.getMonth()-1);
-    return date;
-  };
-
   module.controller(
     'EventsController',
-    function($scope, $routeParams, Session, Evnt) {
+    function($scope, $routeParams, Session, Evnt, parseyyyyMMdd) {
       $scope.Session = Session;
       var searchParams = {};
       var start = $routeParams.start;

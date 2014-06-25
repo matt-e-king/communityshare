@@ -178,28 +178,56 @@
 
   module.controller(
     'SearchUsersController',
-    function($scope, $location, $q, User, Session) {
+    function($scope, $location, $q, User, Session, $routeParams, parseyyyyMMdd) {
       $scope.Session = Session;
       $scope.infoMessage = 'Searching for matching users...';
       $scope.users = undefined;
-      $scope.searchText = $location.search().searchText;
+      $scope.searchText = $routeParams.searchText;
+      var start = $routeParams.created_start;
+      if (start) {
+        start = parseyyyyMMdd(start);
+      }
+      var stop = $routeParams.created_stop;
+      if (stop) {
+        stop = parseyyyyMMdd(stop);
+      }
+      $scope.start = start;
+      $scope.stop = stop;
       var searchForUsers = function() {
-        var searchNameParams = {
-          'name.ilike': '%' + $scope.searchText + '%'
-        };
-        var searchEmailParams = {
-          'email.ilike': '%' + $scope.searchText + '%'
-        };
-        var byNamePromise = User.get_many(searchNameParams);
-        var byEmailPromise = User.get_many(searchEmailParams);
-        var combinedPromise = $q.all({byName: byNamePromise,
-                                      byEmail: byEmailPromise});
+        var combinedPromise;
+        if ($scope.searchText) {
+          var searchNameParams = {
+            'name.ilike': '%' + $scope.searchText + '%',
+            'date_created.greaterthan': start,
+            'date_created.lessthan': stop
+          };
+          var searchEmailParams = {
+            'email.ilike': '%' + $scope.searchText + '%',
+            'date_created.greaterthan': start,
+            'date_created.lessthan': stop
+          };
+          var byNamePromise = User.get_many(searchNameParams);
+          var byEmailPromise = User.get_many(searchEmailParams);
+          combinedPromise = $q.all({byName: byNamePromise,
+                                        byEmail: byEmailPromise});
+        } else {
+          var searchParams = {
+            'date_created.greaterthan': start,
+            'date_created.lessthan': stop
+          }            
+          combinedPromise = User.get_many(searchParams);
+        }
 
         combinedPromise.then(
           function(results) {
             var addedIds = {};
             var uniqueUsers = [];
-            var users = results.byName.concat(results.byEmail);
+            var users;
+            if (results.byName === undefined) {
+              users = results;
+            } else {
+              users = results.byName.concat(results.byEmail);
+            }
             for (var i=0; i<users.length; i++) {
               var user = users[i];
               if (!(user.id in addedIds)) {
