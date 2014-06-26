@@ -7,15 +7,15 @@
 
   module.factory(
     'Answer',
-    function(ItemFactory) {
-      var Answer = ItemFactory('answer');
+    function(itemFactory) {
+      var Answer = itemFactory('answer');
       return Answer;
     });
 
   module.factory(
     'Question',
-    function(ItemFactory, $q, Answer) {
-      var Question = ItemFactory('question');
+    function(itemFactory, $q, Answer) {
+      var Question = itemFactory('question');
       Question.get_many_with_answers = function(
         user_id, searchParams, answerParams, forceRefresh) {
         var deferred = $q.defer();

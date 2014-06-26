@@ -97,7 +97,7 @@
           },
           showErrorMessage
         );
-      }
+      };
       $scope.editShare = function() {
         var opts = {
           templateUrl: './static/templates/share_edit.html',
@@ -108,7 +108,7 @@
         };
         var m = $modal.open(opts);
       };
-      $scope.now = new Date()
+      $scope.now = new Date();
       $scope.reviewEvent = function(event) {
         $location.path('/event/' + event.id);
       };
@@ -148,7 +148,7 @@
     function (Session, $scope, $modalInstance, userId, searchId, User,
               Conversation, Message, Authenticator, Messages) {
       var userPromise = User.get(userId);
-      $scope.Session = Session
+      $scope.Session = Session;
       $scope.errorMessage = '';
       if (!Session.activeUser.email_confirmed) {
         // Refresh active User to make sure email is still unconfirmed.

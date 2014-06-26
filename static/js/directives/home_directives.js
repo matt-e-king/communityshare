@@ -43,7 +43,7 @@
         },
         templateUrl: './static/templates/searches_display.html',
         controller: 'SearchesDisplayController'
-      }
+      };
     });
   
 })();

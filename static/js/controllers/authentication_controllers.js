@@ -49,7 +49,7 @@
             var msg = 'Failed to reset password';
             if (message) {
               if (message == 'Not found') {
-                msg += ': ' + 'Unknown email address'
+                msg += ': ' + 'Unknown email address';
               } else {
                 msg += ': ' + message;
               }
@@ -93,7 +93,7 @@
   module.controller(
     'LoginController',
     function($scope, $location, Authenticator) {
-      var nextLocation = $location.search()['goto'];
+      var nextLocation = $location.search().goto;
       $scope.email = undefined;
       $scope.password = undefined;
       $scope.errorMessage = '';
@@ -105,18 +105,18 @@
             if (nextLocation) {
               $location.path(nextLocation);
             } else {
-              $location.path("/home")
+              $location.path("/home");
             }
           },
           function(message) {
-            var msg = ''
+            var msg = '';
             if (message) {
               msg = ': ' + message;
             }
             $scope.errorMessage = 'Authentication failed' + msg;
           }
         );
-      }
+      };
     });
 
   module.controller(

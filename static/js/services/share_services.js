@@ -5,12 +5,12 @@
     'communityshare.services.share',
     [
       'communityshare.services.item'
-    ])
+    ]);
 
   module.factory(
     'Share',
-    function(ItemFactory, EvntBase, SessionBase) {
-      var Share = ItemFactory('share');
+    function(itemFactory, EvntBase, SessionBase) {
+      var Share = itemFactory('share');
       Share.prototype.updateFromData = function(shareData) {
         this._baseUpdateFromData(shareData);
         if (this.events) {
@@ -69,8 +69,8 @@
 
   module.factory(
     'EvntBase',
-    function(ItemFactory) {
-      var Evnt = ItemFactory('event');
+    function(itemFactory) {
+      var Evnt = itemFactory('event');
       return Evnt;
     });
 
@@ -103,7 +103,7 @@
     'eventLoader',
     function(Evnt, $q) {
       return function(eventId) {
-        var deferred = $q.defer()
+        var deferred = $q.defer();
         var eventPromise = Evnt.get(eventId);
         eventPromise.then(
           function(event) {
@@ -119,7 +119,7 @@
 
   module.factory(
     'Evnt',
-    function(ItemFactory, EvntBase, Share) {
+    function(EvntBase, Share) {
       var default_datetime = new Date();
       default_datetime.setHours(0, 0, 0, 0);
       EvntBase.prototype.updateFromData = function(eventData) {

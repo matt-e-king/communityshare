@@ -24,7 +24,7 @@
             $scope.upcomingShares = events;
           },
           function(message) {
-            var msg = 'Failed to load upcoming shares'
+            var msg = 'Failed to load upcoming shares';
             if (message) {
               msg += ': ' + message;
             }
@@ -38,7 +38,7 @@
             $scope.recentConversations = conversations;
           },
           function(message) {
-            var msg = 'Failed to load recent conversations'
+            var msg = 'Failed to load recent conversations';
             if (message) {
               msg += ': ' + message;
             }
@@ -81,7 +81,7 @@
                     Messages.error(message);
                   });
               }
-            })
+            });
         };
         var searchesPromise = Search.get_many(searchParams);
         searchesPromise.then(
@@ -135,7 +135,7 @@
       var statisticsPromise = getStatistics();
       $scope.statistics = [];
       statisticsPromise.then(function(statistics) {
-        var dates = []
+        var dates = [];
         for (var dateString in statistics) {
           var date = new Date(dateString);
           statistics[dateString].date = date;
@@ -149,7 +149,7 @@
           } else {
             return 0;
           }
-        }
+        };
         $scope.statistics.sort(comp);
         var l = $scope.statistics.length;
         $scope.statisticsDate = $scope.statistics[l-1].date;
@@ -164,9 +164,9 @@
         }
         $scope.newUsersIn30Days = $scope.newUsersIn7Days;
         $scope.eventsIn30Days = $scope.eventsIn7Days;
-        for (var i=7; i<30; i++) {
-          $scope.newUsersIn30Days += $scope.statistics[l-1-i].n_new_users;
-          $scope.eventsIn30Days += $scope.statistics[l-1-i].n_events_done;
+        for (var j=7; j<30; j++) {
+          $scope.newUsersIn30Days += $scope.statistics[l-1-j].n_new_users;
+          $scope.eventsIn30Days += $scope.statistics[l-1-j].n_events_done;
         }
       });
     });
@@ -214,7 +214,7 @@
           var searchParams = {
             'date_created.greaterthan': start,
             'date_created.lessthan': stop
-          }            
+          };
           combinedPromise = User.get_many(searchParams);
         }
 
@@ -245,7 +245,7 @@
               } else {
                 return 0;
               }
-            }
+            };
             uniqueUsers.sort(compare);
             $scope.users = uniqueUsers;
             $scope.infoMessage = '';
@@ -259,7 +259,7 @@
             $scope.errorMessage = 'Failed to load users' + msg;
             $scope.infoMessage = '';
           });
-      }
+      };
       searchForUsers();
       $scope.newSearch = function() {
         var searchParams = {

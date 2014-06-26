@@ -43,7 +43,7 @@
           msg += ': ' + message;
         }
         $scope.errorMessage = msg;
-      }
+      };
       var close = function() {
         $modalInstance.close($scope.share);
       };
@@ -119,6 +119,14 @@
           }
         });
       $scope.questions = [];
+      var makeQuestionRemover = function(question) {
+        return function() {
+          var index = $scope.questions.indexOf(question);
+          if (index >= 0) {
+            $scope.questions.splice(index, 1);
+          }
+        };
+      };
       $scope.save = function() {
         var allPromises = [];
         var saveAnswerPromises = [];
@@ -128,10 +136,8 @@
           if (answer.text) {
             var saveAnswerPromise = answer.save();
             saveAnswerPromise.then(
-              function() {
-                var index = $scope.questions.indexOf(question);
-                $scope.questions.splice(index, 1);
-              }
+              // Wrapping function since it is in a loop.
+              makeQuestionRemover(question)
             );
             saveAnswerPromises.push(saveAnswerPromise);
             allPromises.push(saveAnswerPromise);

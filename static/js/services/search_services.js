@@ -34,7 +34,7 @@
 
   module.factory(
     'Search',
-    function(ItemFactory, $q, $http, makeBaseLabels, sortLabels, UserBase) {
+    function(itemFactory, $q, $http, makeBaseLabels, sortLabels, UserBase) {
       var baseLabels = makeBaseLabels();
       var labellists = {
         gradeLevels: baseLabels.all.gradeLevels,
@@ -79,7 +79,7 @@
         return comparison;
       }
 
-      var Search = ItemFactory('search');
+      var Search = itemFactory('search');
       Search.prototype.initialize = function() {
         if (this.labels) {
           sortLabels(this.labels);

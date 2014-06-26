@@ -7,13 +7,13 @@
       'communityshare.services.item',
       'communityshare.services.user',
       'communityshare.services.share'
-    ])
+    ]);
 
   module.factory(
     'conversationLoader',
     function(Conversation, $q) {
       return function(conversationId) {
-        var deferred = $q.defer()
+        var deferred = $q.defer();
         var conversationPromise = Conversation.get(conversationId);
         conversationPromise.then(
           function(conversation) {
@@ -23,15 +23,15 @@
             deferred.resolve(undefined);
           });
         return deferred.promise;
-      }
+      };
     });
 
   module.factory(
     'Conversation',
-    function(SessionBase, ItemFactory, UserBase, Message, Messages, Share, Evnt) {
-      var Conversation = ItemFactory('conversation');
+    function(SessionBase, itemFactory, UserBase, Message, Messages, Share, Evnt) {
+      var Conversation = itemFactory('conversation');
       Conversation.prototype.toData = function() {
-        var fields = ['id', 'title', 'search_id', 'userA_id', 'userB_id']
+        var fields = ['id', 'title', 'search_id', 'userA_id', 'userB_id'];
         var d = {};
         for (var i=0; i<fields.length; i++) {
           var field = fields[i];
@@ -59,7 +59,7 @@
                 _this.otherUser = _this.userA;
               }
             }
-          })
+          });
         this.datetime_last_message = undefined;
         if (this.messages) {
           for (var i=0; i<this.messages.length; i++) {
@@ -99,9 +99,10 @@
         }
       };
       Conversation.prototype.makeShare = function() {
+        var share;
         if (this.otherUser) {
-          var educator_user_id = undefined;
-          var community_partner_user_id = undefined;
+          var educator_user_id;
+          var community_partner_user_id;
           if (SessionBase.activeUser.is_educator) {
             educator_user_id = SessionBase.activeUser.id;
           } else if (SessionBase.activeUser.is_community_partner) {
@@ -112,9 +113,7 @@
           } else if (this.otherUser.is_community_partner) {
             community_partner_user_id = this.otherUser.id;
           }
-          var share;
           if ((educator_user_id === undefined) || (community_partner_user_id === undefined)) {
-            share = undefined;
             Messages.error('A share required both an educator and a community partner.');
           } else {
             share = new Share({
@@ -136,7 +135,7 @@
         var data = {
           user_id: user_id,
           with_unviewed_messages: true
-        }
+        };
         var conversationsPromise = Conversation.get_many(data=data);
         return conversationsPromise;
       };
@@ -146,8 +145,8 @@
 
   module.factory(
     'Message',
-    function(ItemFactory) {
-      var Message = ItemFactory('message');
+    function(itemFactory) {
+      var Message = itemFactory('message');
       Message.prototype.updateFromData = function(data) {
         for (var key in data) {
           this[key] = data[key];

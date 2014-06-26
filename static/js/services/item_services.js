@@ -9,9 +9,9 @@
     ])
 
   module.factory(
-    'ItemFactory',
+    'itemFactory',
     function($q, $http, SessionBase) {
-      var ItemFactory = function(resourceName) {
+      var itemFactory = function(resourceName) {
         var Item = function(itemData) {
           this.updateFromData(itemData);
           if (this.initialize) {
@@ -180,7 +180,7 @@
 
         return Item;
       };
-      return ItemFactory;
+      return itemFactory;
     });  
 
 })();

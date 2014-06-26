@@ -39,7 +39,7 @@
     labelsPromise.then(
       function(labels) {
         $scope.allLabels = labels;
-      })
+      });
     $scope.typeaheadSelect = function() {
       $scope.newLabelMethods.onUpdate();
     };
@@ -61,7 +61,7 @@
         $scope.search.activeLabels[label] = true;
       }
       $scope.search.updateNActiveLabels();
-    }
+    };
   };
 
   module.directive(

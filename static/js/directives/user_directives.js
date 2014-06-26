@@ -22,7 +22,7 @@
                 searchesPromise);
               searchPromise.then(
                 function(search) {
-                  search.makeLabelDisplay()
+                  search.makeLabelDisplay();
                   $scope.search = search;
                 },
                 function(message) {
@@ -119,7 +119,7 @@
       link: function(scope, elem, attrs, ctrl) {
         var methodName = attrs.csParserHook;
         ctrl.$parsers.push(function(value) {
-          var output = undefined;
+          var output;
           if (scope.methods[methodName]) {
             output = scope.methods[methodName](value);
           }
@@ -151,7 +151,7 @@
         };
 
         ctrl.$parsers.push(function(value) {
-          var output = undefined;
+          var output;
           var matches = isMatch(value, otherValue);
           ctrl.$setValidity('match', matches);
           if (matches) {
@@ -174,7 +174,7 @@
   module.directive('emitScope', function() {
     return {
       link: function(scope, element, attrs) {
-        scope.$emit(attrs['emitScope'], scope);
+        scope.$emit(attrs.emitScope, scope);
       }
     };
   });

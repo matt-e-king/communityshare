@@ -19,7 +19,7 @@
       $scope.Session = Session;
       var userId = $routeParams.userId;
       var userPromise = User.get(userId);
-      $scope.message = 'Loading user...'
+      $scope.message = 'Loading user...';
       userPromise.then(
         function(user) {
           $scope.message = '';
@@ -71,7 +71,7 @@
                                    $location, $q, Question, Answer) {
     $scope.Session = Session;
     $scope.editedUser = new User();
-    $scope.newSearch.makeLabelDisplay()
+    $scope.newSearch.makeLabelDisplay();
 
     // Get questions to display during signup.
     $scope.questions = [];
@@ -170,7 +170,7 @@
     function($scope, $location, Session, Messages, $q, CommunityPartnerUtils,
              Question, Answer, $fileUploader, $http, makeDialog, Authenticator, $rootScope) {
 
-      var turnOffLocationChangeHandler = undefined;
+      var turnOffLocationChangeHandler;
 
       var onLocationChange = function(event, newUrl, oldUrl) {
         var title = 'Changes not Saved';
@@ -212,7 +212,7 @@
           function(questions) {
             $scope.questions = questions;
           });
-      };
+      }
       // Grab a community partner's passive search.
       if ($scope.user && $scope.user.is_community_partner) {
         $scope.interestsTabActive = true;
@@ -255,11 +255,10 @@
       });
 
       var onError = function(message) {
-        var msg = '';
+        var msg = 'Failed to update settings';
         if (message) {
-          msg = ': ' + message;
+          msg += ': ' + message;
         }
-        var msg = 'Failed to update settings' + msg;
         $scope.errorMessage = msg;
         $scope.successMessage = '';
       };
@@ -322,7 +321,7 @@
       $scope.save = function() {
         var saveUserPromise = $scope.editedUser.save();
         var savedImages = uploader.uploadAll();
-        var saveSearchPromise = undefined;
+        var saveSearchPromise;
         var allPromises = [saveSearchPromise];
         if ($scope.search) {
           $scope.search.processLabelDisplay();

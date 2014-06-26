@@ -29,7 +29,7 @@
              $scope.options.institutionTypes = [
                'University', 'Public School', 'Charter School', 'Private School'];
            }
-           if ($scope.user.institution_associations.length == 0) {
+           if ($scope.user.institution_associations.length === 0) {
              $scope.user.institution_associations.push({});
            }
            institutionsPromise.then(

@@ -48,7 +48,7 @@ app.directive('ngFileDrop', ['$fileUploader', function ($fileUploader) {
                 });
         }
     };
-}])
+}]);
 
 // It is attached to an element which will be assigned to a class "ng-file-over" or ng-file-over="className"
 app.directive('ngFileOver', function () {
@@ -700,7 +700,7 @@ app.factory('$fileUploader', ['$compile', '$rootScope', '$http', '$window', func
         },
         isHTML5: Uploader.prototype.isHTML5
     };
-}])
+}]);
 
     // Angular File Upload module does not include this directive
     // Only for example

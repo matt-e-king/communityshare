@@ -34,7 +34,7 @@
               $location.path('/conversation/' + conversation.id);
             }
           });
-      }
+      };
       if (searchId !== undefined) {
         var searchesPromise = Search.getResults(searchId);
         searchesPromise.then(
@@ -71,7 +71,7 @@
         searchPromise.then(
           function(search) {
             $scope.search = search;
-            $scope.search.makeLabelDisplay()
+            $scope.search.makeLabelDisplay();
           },
           function(message) {
             Messages.error(message);
@@ -92,11 +92,11 @@
           searching_for_role: searching_for_role,
           zipcode: Session.activeUser.zipcode
         });
-        $scope.search.makeLabelDisplay()
+        $scope.search.makeLabelDisplay();
       }
 
       $scope.saveSettings = function() {
-        $scope.search.processLabelDisplay()
+        $scope.search.processLabelDisplay();
         var promise = $scope.search.save();
         promise.then(
           function(search) {

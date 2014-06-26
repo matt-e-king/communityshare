@@ -60,8 +60,8 @@
 
   module.factory(
     'UserBase',
-    function(ItemFactory) {
-      var UserBase = ItemFactory('user');
+    function(itemFactory) {
+      var UserBase = itemFactory('user');
       return UserBase;
     });
 
@@ -238,8 +238,8 @@
 
   module.factory(
     'Institution',
-    function(ItemFactory) {
-      var Institution = ItemFactory('institution');
+    function(itemFactory) {
+      var Institution = itemFactory('institution');
       return Institution;
     });
 

@@ -9,7 +9,7 @@
     'getStatistics',
     function($q, $http) {
       var getStatistics = function() {
-        var url = '/api/statistics'
+        var url = '/api/statistics';
         var statisticsPromise = $http({
           method: 'GET',
           url: url
