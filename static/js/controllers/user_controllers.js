@@ -168,7 +168,29 @@
   module.controller(
     'SettingsController',
     function($scope, $location, Session, Messages, $q, CommunityPartnerUtils,
-             Question, Answer, $fileUploader, $http, makeDialog, Authenticator) {
+             Question, Answer, $fileUploader, $http, makeDialog, Authenticator, $rootScope) {
+
+      var turnOffLocationChangeHandler = undefined;
+
+      var onLocationChange = function(event, newUrl, oldUrl) {
+        var title = 'Changes not Saved';
+        var msg = 'Do you really want to leave this page without saving your changes?';
+        var btns = [{result:'yes', label: 'Yes'},
+                    {result:'no', label: 'No', cssClass: 'btn-primary'}];
+        var d = makeDialog(title, msg, btns);
+        d.result.then(
+          function(result) {
+            if (result === 'yes') {
+              turnOffLocationChangeHandler();
+              var relUrl = newUrl.replace(/^.*\#/, "");
+              $location.path(relUrl);
+            }
+          });
+        event.preventDefault();
+      };
+
+      turnOffLocationChangeHandler = $rootScope.$on('$locationChangeStart', onLocationChange);
+
       $scope.Session = Session;
       if (!Session.activeUser) {
         return;
