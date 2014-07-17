@@ -1,11 +1,11 @@
 <div class="panel panel-default">
   <div class="panel-heading">
-    <h4 class="panel-title">For which grade levels are you looking for someone?</h4>
+    <h4 class="page-title">For which grade levels are you looking for someone?</h4>
   </div>
   <div class="row panel-body">
     <div ng-repeat="label in search.displayLabelsAll.gradeLevels" ng-click="toggleLabel(label)"
          ng-class="{true: 'labelbox-selected', false: ''}[search.activeLabels[label]]"
-         class="clickable labelbox">
+         class="clickable light-yellow-button">
       {{label}}
     </div>
   </div>

@@ -3,7 +3,7 @@
     <h5 class="panel-title">Search for a Community Partner</h5>
   </div>
   <div class="panel-body">
-    
+
     <button class="btn btn-primary clickable" ng-click="newSearch()">
       Start a New Search
     </button>
@@ -13,16 +13,19 @@
     </p>
     <div class="search-summary" ng-repeat="search in activeSearches">
       <div>
-        <a ng-href="#/search/{{search.id}}/edit">Edit Search</a> - 
+        <a ng-href="#/search/{{search.id}}/edit">Edit Search</a> -
         <a ng-click="deleteSearch(search)" class="clickable">Delete Search</a>
       </div>
       <div ng-repeat="label in search.labels" class="labelbox">
         {{label}}
       </div>
       <a href="#/search/{{search.id}}/results">
-        <button class="btn btn-primary">
+
+        <div class="">
+        <button class="btn btn-primary center-block">
           Show Matching Community Partners
         </button>
+      </div>
       </a>
       <div class="clearfix"></div>
     </div>
