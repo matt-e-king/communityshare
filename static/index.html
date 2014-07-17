@@ -44,6 +44,7 @@
                 Community Share
               </a>
               <a class="navbar-brand" href="#/home" ng-switch-when="true">
+                <!-- FIXME: Should point to a locally served file. -->
               <img src="http://i.imgur.com/iIE2wPf.png"  id="logo-id" />
               </a>
             </div>
@@ -56,11 +57,11 @@
                 </a>
               </li>
               <li ng-show="Session.activeUser">
-                  <li><a href="#/settings">Settings</a></li>
-                  <li><a href="#/logout">Logout</a></li>
-              </li>
-              <li><a href="#login" ng-show="!Session.activeUser">Login</a></li>
-
+                <a href="#/settings">Settings</a></li>
+              <li ng-show="Session.activeUser">
+                <a href="#/logout">Logout</a></li>
+              <li ng-show="Session.activeUser == undefined">
+                <a href="#login" ng-show="!Session.activeUser">Login</a></li>
             </ul>
 
           </div><!--/.nav-collapse -->
