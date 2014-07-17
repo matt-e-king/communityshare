@@ -1,0 +1,72 @@
+<div cs-main-view has-permission="{{(!(Session.activeUser === undefined))}}">
+ <div class="row">
+
+   <div class="col-sm-2 col-md-3">
+
+
+     <div id="side-bar">
+       <img src="http://lorempixel.com/200/200/people/" class="img-responsive img-circle centered">
+       <ul class="side-nav" id="side-nav-items">
+         <li class="side-nav-links"><a ng-href="/#/search/{{search.id}}/results">Matches</a>
+         </li>
+         <li class="side-nav-links"><a href="#">Search</a>
+         </li>
+         <li class="side-nav-links"><a href="#">Messages</a>
+         </li>
+         <li class="side-nav-links"><a href="#">Shares</a>
+         </li>
+
+       </ul>
+
+
+     </div>
+
+   </div>
+
+
+<div class="col-sm-10 col-md-9">
+  <div class="panel panel-default">
+    <div class="gradient-header">
+      <h1>Messages</h1>
+    </div>
+    <div class="row">
+
+      <div class="panel-body">
+
+        <div class="archive-message">
+
+          <div class="col-md-2 ">
+            <image src="http://lorempixel.com/200/200/people/" class="img-responsive img-circle" />
+          </div>
+          <div class="col-md-10">
+            <a href="#"><h4>Sammy Davis</h4></a>
+            <h5>Pitcher * Diamondbacks</h5>
+            <p class="show-linebreaks">Hey this is our most recent message. Can you come Friday?</p>
+
+
+          </div>
+          <div class="clearfix"></div>
+        </div>
+
+      </div>
+
+
+
+
+    <div class="archive-message">
+      <div class="col-md-2 ">
+        <image src="http://lorempixel.com/200/200/people/" class="img-responsive img-circle" />
+      </div>
+      <div class="col-md-10">
+        <a href="#"><h4>Tony Hortan</h4></a>
+        <h5> Coach * Diamondbacks</h5>
+        <p class="show-linebreaks">Hey this is our most recent message. Can you come Friday?</p>
+      </div>
+      <div class="clearfix"></div>
+
+    </div>
+    </div>
+
+
+  </div>
+</div>
