@@ -6,7 +6,7 @@ html {
 }
 body {
   margin: 0;
-  padding: 10% 0 0 0;
+  padding: 5% 0 0 0;
 }
 article,
 aside,
@@ -6181,24 +6181,14 @@ color:#BCBEC0;
 .light-yellow-button {
     background-color: #FDDF88;
     color: #fff;
-    float: left;
-    width: 10%;
-    margin-left: 3%;
-    margin-right: 3%;
 }
 .light-green-button {
     background-color: #BDE787;
     color: #fff;
-    width: 10%;
-    margin-left: 3%;
-    margin-right: 3%;
 }
 .light-blue-button {
     background-color: #A7CAE5;
     color: #fff;
-    width: 10%;
-    margin-left: 3%;
-    margin-right: 3%;
 }
 
 .share-result{
@@ -6226,3 +6216,61 @@ padding: 5px;
 /*.archive-message:last-of-type{
   border-bottom: none;
 }*/
+
+.search-btn-group{
+  margin-left:20%;
+  margin-right:20%;
+}
+
+.search-input{
+  margin:20px;
+}
+
+.search-section{
+  margin-left:10px;
+  margin-right:10px;
+  padding-left:30px;
+  padding-right:30px;
+  border-bottom: solid;
+  border-width:1px;
+  border-color: #A7A9AC;
+}
+
+
+
+#search-section-last{
+  margin-left:10px;
+  margin-right:10px;
+  padding-left:30px;
+  padding-right:30px;
+}
+
+.profile-btns{
+  margin:10px;
+  display:block;
+  width:100%;
+}
+
+
+.org-choice{
+  padding:10px;
+}
+
+.org-input{
+  margin:5px;
+
+}
+
+.signup-btn{
+  margin-top:10px;
+
+}
+
+.signup-bottom{
+  width:80%;
+  float:none;
+  margin: 0 auto;
+  padding:20px;
+  margin-bottom:40px;
+
+}
