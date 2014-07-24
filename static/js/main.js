@@ -53,7 +53,7 @@
     });
 
     $routeProvider.when('/signup/educator', {
-      templateUrl: './static/templates/signup_educator.html',
+      templateUrl: './static/templates/sign-up-educator-1.html',
       controller: 'SignupEducatorController'
     });
 

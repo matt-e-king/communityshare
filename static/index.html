@@ -74,17 +74,31 @@
       </div>
 
       <!-- Side menu stuff -->
-      <div>
-        <ul>
-          <li><a href="/#/search">Search</li>
-          <li><a href="/#/messages">Messages</li>
-          <li><a href="/#/shares">Shares</li>
-          <li><a href="/#/matches">Matches</li>
-        </ul>
-      </div>
-      
-      <!-- Main component for a primary marketing message or call to action -->
-      <div class="ng-view container-fluid">
+
+      <div class="container-fluid">
+        <div class="row">
+        
+          <div ng-controller="NavigationController">
+            <div ng-show="Session.activeUser" class="col-sm-2 col-md-3">
+              <div id="side-bar">
+                <img src="http://lorempixel.com/200/200/people/" class="img-responsive img-circle centered">
+                <ul class="side-nav" id="side-nav-items">
+                  <li class="side-nav-links"><a href="/#/search">Search</a>
+                  </li>
+                  <li class="side-nav-links"><a href="/#/messages">Messages</a>
+                  </li>
+                  <li class="side-nav-links"><a href="/#/shares">Shares</a>
+                  </li>
+                  <li class="side-nav-links"><a href="/#/matches">Matches</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <!-- Main component for a primary marketing message or call to action -->
+          <div class="ng-view col-sm-10 col-md-9">
+          </div>
+        </div>
       </div>
       
     </div> <!-- /container -->
