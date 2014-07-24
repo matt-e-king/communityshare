@@ -13,7 +13,7 @@
     function(Session, $scope, Share) {
       $scope.Session = Session;
       if ($scope.Session.activeUser) {
-        var sharesPromise = Share.get_many({'user_id': Session.activeUser.id});
+        var sharesPromise = Share.get_many({'user_id': Session.activeUser.id}, true);
         $scope.errorMessage = '';
         $scope.infoMessage = 'Loading shares...';
         sharesPromise.then(

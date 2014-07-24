@@ -23,7 +23,7 @@
     function($scope, Session, Conversation, $location) {
       $scope.Session = Session;
       var user = Session.activeUser;
-      var conversationsPromise = Conversation.get_many({'user_id': user.id});
+      var conversationsPromise = Conversation.get_many({'user_id': user.id}, true);
       conversationsPromise.then(
         function(conversations) {
           $scope.conversations = conversations;
