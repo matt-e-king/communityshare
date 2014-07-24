@@ -87,28 +87,4 @@
       };
     });
 
-  module.directive(
-    'csEducatorLabels',
-     function(Session) {
-       return {
-         scope: {
-           search: '=',
-         },
-         templateUrl: './static/templates/educator_labels.html',
-         controller: LabelsController
-       };
-     });
-
-  module.directive(
-    'csCommunityPartnerLabels',
-     function(Session) {
-       return {
-         scope: {
-           search: '=',
-         },
-         templateUrl: './static/templates/community_partner_labels.html',
-         controller: LabelsController
-       };
-     });
-  
 })();

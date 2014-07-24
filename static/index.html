@@ -15,7 +15,6 @@
     <link rel="stylesheet"
           href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"
           type="text/css" />
-
   </head>
 
   <body>
@@ -56,7 +55,7 @@
             <li ng-show="Session.activeUser">
               <a href="#/settings">Settings</a></li>
             <li ng-show="Session.activeUser">
-              <a href="#/logout">Logout</a></li>
+              <a ng-click="logout()" class="clickable">Logout</a></li>
             <li ng-show="Session.activeUser == undefined">
               <a href="#login" ng-show="!Session.activeUser">Login</a></li>
           </ul>

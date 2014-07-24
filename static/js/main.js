@@ -37,23 +37,18 @@
       controller: 'LoginController'
     });
 
-    $routeProvider.when('/logout', {
-      templateUrl: './static/templates/logout.html',
-      controller: 'LogoutController'
-    });
-
     $routeProvider.when('/signup/communitypartner', {
-      templateUrl: './static/templates/partner_signup_1.html',
+      templateUrl: './static/templates/signup_community_partner.html',
       controller: 'SignupCommunityPartnerController'
     });
 
     $routeProvider.when('/signup/personal', {
-      templateUrl: './static/templates/partner_signup_2.html',
+      templateUrl: './static/templates/signup_personal.html',
       controller: 'SignupPersonalController'
     });
 
     $routeProvider.when('/signup/educator', {
-      templateUrl: './static/templates/sign-up-educator-1.html',
+      templateUrl: './static/templates/signup_educator.html',
       controller: 'SignupEducatorController'
     });
 
@@ -143,7 +138,7 @@
     });
 
     $routeProvider.when('/matches', {
-      templateUrl: './static/templates/search_results.html',
+      templateUrl: './static/templates/matches.html',
       controller: 'MatchesController',
       resolve: {
         activeUser: function(activeUserLoader) {
@@ -163,7 +158,7 @@
     });
 
     $routeProvider.when('/search', {
-      templateUrl: './static/templates/search_edit.html',
+      templateUrl: './static/templates/search.html',
       controller: 'SearchEditController',
       resolve: {
         activeUser: function(activeUserLoader) {

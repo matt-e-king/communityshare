@@ -78,9 +78,6 @@
   module.controller(
     'LogoutController',
     function(Authenticator, Session, $location) {
-      Authenticator.clean();
-      Session.activeUser = undefined;
-      $location.path('');
     });
 
   module.controller(
@@ -166,8 +163,12 @@
 
   module.controller(
     'NavigationController',
-    function($scope, Session) {
+    function($scope, Session, Authenticator, $location) {
       $scope.Session = Session;
+      $scope.logout = function() {
+        Authenticator.clean();
+        $location.path('');
+      };
     });
   
   module.controller(
