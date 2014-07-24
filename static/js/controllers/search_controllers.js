@@ -25,6 +25,19 @@
           $scope.infoMessage = '';
           $scope.errorMessage = '';
           $scope.searches = searches;
+          var compareSearchDate = function(search1, search2) {
+            var output = -1;
+            if (search1.created === search2.created) {
+              output = 0;
+            } else if (search1.created < search2.created) {
+              output = 1;
+            }
+            return output;
+          };
+          $scope.searches.sort(compareSearchDate);
+          if ($scope.searches.length > 0) {
+            $scope.getMatches($scope.searches[0]);
+          }
         },
         function() {
           console.log('failed to get searches');

@@ -88,6 +88,12 @@
           this.searcher_user = UserBase.make(this.searcher_user);
         }
       };
+      Search.prototype.updateFromData = function(data) {
+        for (var key in data) {
+          this[key] = data[key];
+        }
+        this.created = new Date(this.created);
+      };
       Search.getResults = function(searchId) {
         var deferred = $q.defer();
         var url = '/api/search/' + searchId + '/results';
