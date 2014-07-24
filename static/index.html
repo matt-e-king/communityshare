@@ -16,12 +16,9 @@
           href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"
           type="text/css" />
 
-
   </head>
 
   <body>
-
-
 
     <!-- Static navbar -->
     <div class="navbar navbar-default navbar-fixed-top" role="navigation"
@@ -69,12 +66,21 @@
     
     <div class="container">
       <div class="message-container" ng-controller="MessageController">
-        <div alert>Hello world</div>
         <div alert ng-repeat="alert in messages.messages"
              class="animated-alert"
              type="{{ "{{" }} alert.type {{ "}}" }}"
              close="messages.removeMessage(alert)">
           {{ "{{" }}alert.text{{ "}}" }}</div>
+      </div>
+
+      <!-- Side menu stuff -->
+      <div>
+        <ul>
+          <li><a href="/#/search">Search</li>
+          <li><a href="/#/messages">Messages</li>
+          <li><a href="/#/shares">Shares</li>
+          <li><a href="/#/matches">Matches</li>
+        </ul>
       </div>
       
       <!-- Main component for a primary marketing message or call to action -->
