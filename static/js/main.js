@@ -112,6 +112,16 @@
       }
     });
 
+    $routeProvider.when('/shares', {
+      templateUrl: './static/templates/shares.html',
+      controller: 'SharesController',
+      resolve: {
+        activeUser: function(activeUserLoader) {
+          return activeUserLoader();
+        }
+      }
+    });
+
     $routeProvider.when('/user/:userId', {
       templateUrl: './static/templates/user_view.html',
       controller: 'UserController',
