@@ -77,9 +77,10 @@
 
   module.controller(
     'LogoutController',
-    function(Authenticator, Session) {
+    function(Authenticator, Session, $location) {
       Authenticator.clean();
       Session.activeUser = undefined;
+      $location.path('');
     });
 
   module.controller(
