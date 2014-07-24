@@ -9,7 +9,7 @@
 
   module.controller(
     'MatchesController',
-    function($scope, Session, Search, $location) {
+    function($scope, Session, Search, $location, $modal) {
       $scope.Session = Session;
       var user = Session.activeUser;
       $scope.infoMessage = 'Loading searches...';
@@ -56,6 +56,23 @@
           function(errorMessage) {
             search.infoMessage = '';
             search.errorMessage = errorMessage;
+          });
+      };
+      $scope.startConversation = function(userId, searchId) {
+        var opts = {
+          templateUrl: './static/templates/new_conversation.html',
+          controller: 'NewConversationController',
+          resolve: {
+            userId: function() {return userId;},
+            searchId: function() {return searchId;}
+          }
+        };
+        var m = $modal.open(opts);
+        m.result.then(
+          function(conversation) {
+            if (conversation) {
+              $location.path('/conversation/' + conversation.id);
+            }
           });
       };
     });
@@ -154,7 +171,7 @@
         var promise = $scope.search.save();
         promise.then(
           function(search) {
-            $location.path('/search/' + search.id + '/results');
+            $location.path('/matches');
           },
           function(message) {
             Messages.error(message);

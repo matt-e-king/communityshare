@@ -35,7 +35,7 @@
               <div class="col-md-3 ">
                 <image ng-src="{{match.searcher_user.picture_url}}" class="img-responsive img-circle" />
                 <button class="btn btn-primary search-btn btn-default btn-block"
-                        ng-click="startConversation(search.searcher_user_id)">
+                        ng-click="startConversation(match.searcher_user_id, match.id)">
                   Message
                 </button>
                 <button class="btn fav-btn btn-xs">

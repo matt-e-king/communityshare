@@ -17,7 +17,7 @@
     ]);
   
   app.config(function($routeProvider) {
-
+    
     $routeProvider.when('/', {
       templateUrl: './static/templates/default.html',
       controller: 'DefaultController',
@@ -95,6 +95,16 @@
     $routeProvider.when('/settings', {
       templateUrl: './static/templates/settings.html',
       controller: 'SettingsController',
+      resolve: {
+        activeUser: function(activeUserLoader) {
+          return activeUserLoader();
+        }
+      }
+    });
+
+    $routeProvider.when('/messages', {
+      templateUrl: './static/templates/messages.html',
+      controller: 'MessagesController',
       resolve: {
         activeUser: function(activeUserLoader) {
           return activeUserLoader();
