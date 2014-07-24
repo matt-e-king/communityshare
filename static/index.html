@@ -37,7 +37,8 @@
           </button>
           <div ng-switch on="Session.activeUser !== undefined">
             <a class="navbar-brand" href="#/" ng-switch-when="false">
-              Community Share
+              <!-- FIXME: Should point to a locally served file. -->
+              <img src="http://i.imgur.com/iIE2wPf.png"  id="logo-id" />
             </a>
             <a class="navbar-brand" href="#/home" ng-switch-when="true">
               <!-- FIXME: Should point to a locally served file. -->

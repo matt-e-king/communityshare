@@ -101,7 +101,8 @@
         </label>
       </div>
       
-      <p> By clicking Sign Up, you agree to our <a href="#">Terms of Service</a>.</p>
+      <p> By clicking Sign Up, you agree to our <a ng-click="showTerms()" class="clickable">
+          Terms of Service</a>.</p>
 
       <div alert alert-error ng-show="errorMessage">{{errorMessage}}</div>
       

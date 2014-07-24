@@ -84,8 +84,16 @@
     });
 
   module.controller(
+    'TermsController',
+    function($scope, $modalInstance) {
+      $scope.closeTerms = function() {
+        $modalInstance.close();        
+      };
+    });
+
+  module.controller(
     'DefaultController',
-    function($scope, user, $location, User, signUp, Messages) {
+    function($scope, user, $location, User, signUp, Messages, $modal) {
       if (user) {
         if (!(user.isCommunityPartner || user.isEducator)) {
           $location.path('signup/choice');
@@ -118,6 +126,12 @@
           $scope.pg = 'educator1';
           $scope.isEducator = true;
         }*/
+      };
+      $scope.showTerms = function() {
+        var m = $modal.open({
+          templateUrl: './static/templates/terms.html',
+          controller: 'TermsController'
+        });
       };
     });
 
