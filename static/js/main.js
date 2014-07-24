@@ -122,6 +122,16 @@
       }
     });
 
+    $routeProvider.when('/matches', {
+      templateUrl: './static/templates/search_results.html',
+      controller: 'MatchesController',
+      resolve: {
+        activeUser: function(activeUserLoader) {
+          return activeUserLoader();
+        }
+      }
+    });
+
     $routeProvider.when('/search/:searchId/results', {
       templateUrl: './static/templates/search_results.html',
       controller: 'SearchResultsController',

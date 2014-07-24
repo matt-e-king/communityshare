@@ -8,6 +8,46 @@
     ]);
 
   module.controller(
+    'MatchesController',
+    function($scope, Session, Search, $location) {
+      $scope.Session = Session;
+      var user = Session.activeUser;
+      $scope.infoMessage = 'Loading searches...';
+      $scope.errorMessage = '';
+      $scope.title = '';
+      $scope.goToConversation = function(conversation) {
+        $location.path('/conversation/' + conversation.id);
+      };
+
+      var searchesPromise = Search.get_many({'searcher_user_id': user.id});
+      searchesPromise.then(
+        function(searches) {
+          $scope.infoMessage = '';
+          $scope.errorMessage = '';
+          $scope.searches = searches;
+        },
+        function() {
+          console.log('failed to get searches');
+        });
+      $scope.getMatches = function(search) {
+        var matchesPromise = Search.getResults(search.id);
+        search.show = true;
+        search.infoMessage = 'Loading matches...';
+        search.errorMessage = '';
+        matchesPromise.then(
+          function(matches) {
+            search.matches = matches;
+            search.infoMessage = '';
+            search.errorMessage = '';
+          },
+          function(errorMessage) {
+            search.infoMessage = '';
+            search.errorMessage = errorMessage;
+          });
+      };
+    });
+
+  module.controller(
     'SearchResultsController',
     function(Session, $scope, $location, $routeParams, $modal, Search, Messages) {
       $scope.Session = Session;
@@ -18,6 +58,7 @@
       $scope.goToConversation = function(conversation) {
         $location.path('/conversation/' + conversation.id);
       };
+
       $scope.startConversation = function(userId) {
         var opts = {
           templateUrl: './static/templates/new_conversation.html',
