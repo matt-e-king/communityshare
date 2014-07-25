@@ -5,6 +5,123 @@
     'communityshare.services.search'
   ]);
 
+  module.factory(
+    'makeBaseLabels',
+    function() {
+      var makeBaseLabels = function() {
+        var labels = {
+          // Grade levels
+          gradeLevels: {
+            suggested: ['K-5', '6-8', '9-12', 'College', 'Adult'] ,
+            other: ['K-3', '4-5', '6-8', '9-12', 'Preschool']
+          },
+          subjectAreas: {
+            communityPartnerSuggested: [
+              'Science', 'Technology', 'Engineering', 'Match',
+              'Visual Arts', 'Digital Media', 'Film & Photography', 'Literature',
+              'Performing Arts'
+            ],
+            educatorSuggested: [
+              'Social Studies', 'English/Language Arts', 'Foreign Languages', 'PE/Health/Sports',
+              'Mathematics', 'Goverment', 'Science',
+            ],
+            other: []
+          },
+          // Level of Engagement
+          engagementLevels: {
+            suggested: [
+              'Guest Speaker', 'Field Trip Host', 'Student Competition Judget',
+              'Individual Mentor', 'Small Group Mentor', 'Curriculuum Development',
+              'Career Day Participant', 'Classroom Materials Provider',
+              'Short-term', 'Long-term'],
+            other: []
+          }
+        };
+
+        var allLabels = {
+          gradeLevels: labels.gradeLevels.suggested.concat(
+            labels.gradeLevels.other),
+          engagementLevels: labels.engagementLevels.suggested.concat(
+            labels.engagementLevels.other),
+          subjectAreas: labels.subjectAreas.communityPartnerSuggested.concat(
+            labels.subjectAreas.educatorSuggested).concat(
+              labels.subjectAreas.other)
+        };
+        var educatorSuggestedLabels = {
+          gradeLevels: labels.gradeLevels.suggested,
+          engagementLevels: labels.engagementLevels.suggested,
+          subjectAreas: labels.subjectAreas.educatorSuggested
+        };
+        var communityPartnerSuggestedLabels = {
+          gradeLevels: labels.gradeLevels.suggested,
+          engagementLevels: labels.engagementLevels.suggested,
+          subjectAreas: labels.subjectAreas.communityPartnerSuggested
+        };
+        var communityPartnerAndEducatorSuggestedLabels = {
+          gradeLevels: labels.gradeLevels.suggested,
+          engagementLevels: labels.engagementLevels.suggested,
+          subjectAreas: labels.subjectAreas.communityPartnerSuggested.concat(
+            labels.subjectAreas.educatorSuggested)
+        };
+
+        
+        return {'educatorSuggested': educatorSuggestedLabels,
+                'communityPartnerSuggested': communityPartnerSuggestedLabels,
+                'communityPartnerAndEducatorSuggested': communityPartnerAndEducatorSuggestedLabels,
+                'all': allLabels}
+      };
+
+      return makeBaseLabels;
+    });
+
+  module.factory(
+    'LabelDisplay',
+    function(makeBaseLabels) {
+      var labellists = makeBaseLabels().all;
+      var labelMapping = {};
+      for (var key in labellists) {
+        for (var i=0; i<labellists[key].length; i++) {
+          var label = labellists[key][i];
+          labelMapping[label] = key;
+        }
+      }
+      var LabelDisplay = function(search, type) {
+        this.search = search;
+        var baseLabels = makeBaseLabels();
+        this.all = {};
+        this.active = {};
+        if (type == 'educator') {
+          this.all = baseLabels.educatorSuggested;
+        } else {
+          this.all = baseLabels.communityPartnerSuggested;
+        }
+        for (var i=0; i<search.labels.length; i++) {
+          var label = search.labels[i];
+          this.active[label] = true;
+          var key = labelMapping[label];
+          if (key === undefined) {
+            key = 'subjectAreas'
+            this.all[key].push(label);
+          }
+        }
+      };
+      LabelDisplay.prototype.toggle = function(label) {
+        if (this.active[label]) {
+          this.active[label] = false;
+          var index = this.search.labels.indexOf(label);
+          if (index >= 0) {
+            this.search.labels.splice(index, 1);
+          }
+        } else {
+          this.active[label] = true;
+          this.search.labels.push(label);
+        }
+        console.log('labels is');
+        console.log(this.search.labels);
+      };
+      return LabelDisplay;
+    });
+
   module.directive(
     'csNewLabel',
      function(Session) {
@@ -31,24 +148,14 @@
        };
      });
 
-  var LabelsController = function($scope, getAllLabels) {
-    $scope.labelClasses = {
-      'gradeLevels': 'light-yellow-button',
-      'educatorSubjectAreas': 'light-green-button',
-      'engagementLevels': 'light-blue-button'
-    }
-    $scope.labelInfos = [];
-    for (var i=0; i<$scope.labelTitles.length; i++) {
-      $scope.labelInfos.push([$scope.labelTitles[i], $scope.labelTypes[i]]);
-    }
+  var LabelsController = function($scope, LabelDisplay) {
+    console.log('scope is');
+    console.log($scope);
+    // Problem with search getting overridden.
+    $scope.display = new LabelDisplay($scope.search, $scope.type);
     $scope.newLabel = {
       name: ''
     };
-    var labelsPromise = getAllLabels();
-    labelsPromise.then(
-      function(labels) {
-        $scope.allLabels = labels;
-      });
     $scope.typeaheadSelect = function() {
       $scope.newLabelMethods.onUpdate();
     };
@@ -56,22 +163,32 @@
       onUpdate: function() {
         var newLabelName = $scope.newLabel.name;
         if (newLabelName) {
-          $scope.search.displayLabelsAll.subjectAreas.Custom.push(newLabelName);
-          $scope.search.activeLabels[newLabelName] = true;
+          $scope.display.all.subjectAreas.push(newLabelName);
+          $scope.display.active[newLabelName] = true;
         }
-        $scope.search.updateNActiveLabels();
         $scope.newLabel.name = '';
       }
     };
     $scope.toggleLabel = function(label) {
-      if ($scope.search.activeLabels[label]) {
-        $scope.search.activeLabels[label] = false;
-      } else {
-        $scope.search.activeLabels[label] = true;
+      if (!$scope.onlyShowActive) {
+        $scope.display.toggle(label);
       }
-      $scope.search.updateNActiveLabels();
     };
   };
+
+/*
+ - list of labels.
+
+ - create directive whre you choose them (need titles, and suggested labels)
+
+ - create directive where you display them (need classification and ordering)
+
+  cs-choose-labels search titles suggestion-type
+
+  cs-display-labels search
+
+*/
+
 
   module.directive(
     'csLabels',
@@ -79,8 +196,11 @@
       return {
         scope: {
           search: '=',
-          labelTitles: '=',
-          labelTypes: '='
+          gradeLevelsTitle: '@',
+          engagementLevelsTitle: '@',
+          subjectAreasTitle: '@',
+          type: '@',
+          onlyShowActive: '@',
         },
         templateUrl: './static/templates/labels.html',
         controller: LabelsController,

@@ -21,15 +21,19 @@ class User(Base, Serializable):
     __tablename__ = 'user'
 
     MANDATORY_FIELDS = ['name', 'email']
-    WRITEABLE_FIELDS = ['name', 'is_administrator', 'institution_associations',
-                        'zipcode', 'website', 'twitter_handle', 'linkedin_link',
-                        'year_of_birth', 'gender', 'ethnicity', 'bio', 'phonenumber']
+    WRITEABLE_FIELDS = [
+        'name', 'is_administrator', 'institution_associations',
+        'zipcode', 'website', 'twitter_handle', 'linkedin_link',
+        'year_of_birth', 'gender', 'ethnicity', 'bio', 'phonenumber',
+        'educator_profile_search', 'community_partner_profile_search'
+    ]
     STANDARD_READABLE_FIELDS = [
         'id', 'name', 'is_administrator', 'last_active', 'is_educator',
         'is_community_partner', 'institution_associations',
         'zipcode', 'website', 'twitter_handle', 'linkedin_link',
         'year_of_birth', 'gender', 'ethnicity', 'bio', 'picture_url',
-        'email_confirmed', 'active']
+        'email_confirmed', 'active', 'educator_profile_search',
+        'community_partner_profile_search']
 
     ADMIN_READABLE_FIELDS = [
         'id', 'name', 'email' , 'date_created', 'last_active',
@@ -37,7 +41,8 @@ class User(Base, Serializable):
         'institution_associations',
         'zipcode', 'phonenumber', 'website', 'twitter_handle', 'linkedin_link',
         'year_of_birth', 'gender', 'ethnicity', 'bio', 'picture_url',
-        'email_confirmed', 'active'
+        'email_confirmed', 'active', 'educator_profile_search',
+        'community_partner_profile_search'
     ]
 
     PERMISSIONS = {
@@ -56,6 +61,8 @@ class User(Base, Serializable):
     date_inactivated = Column(DateTime, nullable=True)
     is_administrator = Column(Boolean, nullable=False, default=False) 
     last_active = Column(DateTime)
+    educator_profile_search_id = Column(Integer)
+    community_partner_profile_search_id = Column(Integer)
 
     picture_filename = Column(String(100))
     bio = Column(String(1000))
@@ -68,8 +75,19 @@ class User(Base, Serializable):
     gender = Column(String(100))
     ethnicity = Column(String(100))
     
-    searches = relationship("Search", backref="searcher_user")
+    searches = relationship(
+        "Search",
+        primaryjoin="Search.searcher_user_id == User.id",
+        backref="searcher_user")
     institution_associations = relationship("InstitutionAssociation")
+    educator_profile_search = relationship(
+        "Search",
+        primaryjoin="Search.id == User.educator_profile_search_id",
+        foreign_keys="User.educator_profile_search_id")
+    community_partner_profile_search = relationship(
+        "Search",
+        primaryjoin="Search.id == User.community_partner_profile_search_id",
+        foreign_keys="User.community_partner_profile_search_id")
 
     pwd_context = passlib.context.CryptContext(
         schemes=['sha512_crypt'],
@@ -145,6 +163,20 @@ class User(Base, Serializable):
                         for i in self.institution_associations]
         return associations
 
+    def serialize_educator_profile_search(self, requester):
+        if self.educator_profile_search:
+            serialized = self.educator_profile_search.serialize(requester, exclude='searcher_user')
+        else:
+            serialized = None
+        return serialized
+
+    def serialize_community_partner_profile_search(self, requester):
+        if self.community_partner_profile_search:
+            serialized = self.community_partner_profile_search.serialize(requester, exclude='searcher_user')
+        else:
+            serialized = None
+        return serialized
+
     def serialize_picture_url(self, requester):
         url = ''
         if (config.UPLOAD_LOCATION is not None) and self.picture_filename:
@@ -154,6 +186,8 @@ class User(Base, Serializable):
     custom_serializers = {
         'institution_associations': serialize_institution_associations,
         'picture_url': serialize_picture_url,
+        'educator_profile_search': serialize_educator_profile_search,
+        'community_partner_profile_search': serialize_community_partner_profile_search,
     }
          
     def deserialize_institution_associations(self, data_list):
@@ -165,8 +199,26 @@ class User(Base, Serializable):
         for ia in self.institution_associations:
             ia.user = self
 
+    def deserialize_educator_profile_search(self, data):
+        if self.educator_profile_search:
+            profile_search_id = self.educator_profile_search.id
+        else:
+            profile_search_id = None
+        data['id'] = profile_search_id
+        self.educator_profile_search = Search.admin_deserialize(data)
+
+    def deserialize_community_partner_profile_search(self, data):
+        if self.community_partner_profile_search:
+            profile_search_id = self.community_partner_profile_search.id
+        else:
+            profile_search_id = None
+        data['id'] = profile_search_id
+        self.community_partner_profile_search = Search.admin_deserialize(data)
+            
     custom_deserializers = {
         'institution_associations': deserialize_institution_associations,
+        'educator_profile_search': deserialize_educator_profile_search,
+        'community_partner_profile_search': deserialize_community_partner_profile_search,
         }
 
     def make_api_key(self):

@@ -1,16 +1,37 @@
-<div ng-repeat="labelInfo in labelInfos">
-  <h3>{{labelInfo[0]}}</h3>
-  <div class="btn-group">
-    <button ng-repeat="label in search.displayLabelsAll[labelInfo[1]]" ng-click="toggleLabel(label)"
-            ng-class="labelClasses[labelInfo[1]] + ' ' + {true: 'labelbox-selected', false: ''}[search.activeLabels[label]]"
-            class="btn btn-sm search-btn"
-            >
-      {{label}}
-    </button>
-  </div>
+<h3>{{gradeLevelsTitle}}</h3>
+<div class="btn-group">
+  <button ng-repeat="label in display.all.gradeLevels" ng-click="toggleLabel(label)"
+          ng-show="display.active[label] || !onlyShowActive"
+          ng-class="{true: 'labelbox-selected', false: ''}[display.active[label]]"
+          class="btn btn-sm search-btn light-yellow-button"
+          >
+    {{label}}
+  </button>
 </div>
 
-<div class="search-input">
+<h3>{{engagementLevelsTitle}}</h3>
+<div class="btn-group">
+  <button ng-repeat="label in display.all.engagementLevels" ng-click="toggleLabel(label)"
+          ng-show="display.active[label] || !onlyShowActive"
+          ng-class="{true: 'labelbox-selected', false: ''}[display.active[label]]"
+          class="btn btn-sm search-btn light-blue-button"
+          >
+    {{label}}
+  </button>
+</div>
+
+<h3>{{subjectAreasTitle}}</h3>
+<div class="btn-group">
+  <button ng-repeat="label in display.all.subjectAreas" ng-click="toggleLabel(label)"
+          ng-show="display.active[label] || !onlyShowActive"
+          ng-class="{true: 'labelbox-selected', false: ''}[display.active[label]]"
+          class="btn btn-sm search-btn light-green-button"
+          >
+    {{label}}
+  </button>
+</div>
+
+<div class="search-input" ng-show="!onlyShowActive">
   <form class="form-inline">
     <div class="form-group">
       <input

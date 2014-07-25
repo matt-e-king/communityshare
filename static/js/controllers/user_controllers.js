@@ -41,7 +41,7 @@
         userId,
         {'question_type.in': ['signup_community_partner', 'signup', 'signup_educator']}
       );
-      if ($scope.Session.activeUser.is_administrator) {
+      if ($scope.Session.activeUser && $scope.Session.activeUser.is_administrator) {
         var conversationsPromise = Conversation.get_many({user_id: userId});
         conversationsPromise.then(
           function(conversations) {
@@ -67,12 +67,10 @@
 
   // User Signups
 
-  var commonSignupLogic = function($scope, Session, Messages, $location,
+  var commonSignupLogic = function($scope, user, search, Messages, $location,
                                    $q, Question, Answer) {
-    $scope.Session = Session;
-    var user = Session.activeUser;
     $scope.user = user;
-    $scope.newSearch.makeLabelDisplay();
+    $scope.search = search;
 
     // Get questions to display during signup.
     $scope.questions = [];
@@ -92,12 +90,6 @@
       // Save changes made to user.
       var userPromise = user.save();
       var allPromises = [userPromise];
-      // Save the passive search.
-      $scope.newSearch.processLabelDisplay();
-      $scope.newSearch.searcher_user_id = user.id;
-      $scope.newSearch.zipcode = user.zipcode;
-      var searchPromise = $scope.newSearch.save();
-      allPromises.push(searchPromise);
       // And save the answers to questions.
       for (var i=0; i<$scope.questions.length; i++) {
         var question = $scope.questions[i];
@@ -119,20 +111,16 @@
   module.controller(
     'SignupCommunityPartnerController',
     function($scope, Session, Messages, $location, $q, Search,
-            Question, Answer) {
+             Question, Answer) {
+      $scope.Session = Session;
+      var user = Session.activeUser;
+      var search;
+      if (user) {
+        search = user.community_partner_profile_search;
+      }
       $scope.isCommunityPartner = true;
-      $scope.newSearch = new Search({
-          searcher_user_id: undefined,
-          searcher_role: 'partner',
-          searching_for_role: 'educator',
-          active: true,
-          labels: [],
-          latitude: undefined,
-          longitude: undefined,
-          distance: undefined
-        });
       // Signup logic common to Community Partners and Educators
-      commonSignupLogic($scope, Session, Messages, $location, $q,
+      commonSignupLogic($scope, user, search, Messages, $location, $q,
                        Question, Answer);
     });
   
@@ -171,20 +159,16 @@
     'SignupEducatorController',
     function($scope, Session, Messages, $location, $q, Search,
             Question, Answer) {
+      $scope.Session = Session;
+      var user = Session.activeUser;
+      var search;
+      if (user) {
+        search = user.educator_profile_search;
+      }
       $scope.isEducator = true;
-      $scope.newSearch = new Search({
-        searcher_user_id: undefined,
-        searcher_role: 'educator',
-        searching_for_role: 'partner',
-        active: true,
-        labels: [],
-        latitude: undefined,
-        longitude: undefined,
-        distance: undefined
-      });
       $scope.questions = [];
       // Signup logic common to Community Partners and Educators
-      commonSignupLogic($scope, Session, Messages, $location, $q,
+      commonSignupLogic($scope, user, search, Messages, $location, $q,
                        Question, Answer);
     });
 
@@ -248,7 +232,6 @@
           function(search) {
             if (search) {
               $scope.search = search;
-              search.makeLabelDisplay();
             } else {
               // Apparently the user didn't have a search.
               $scope.search = new Search({
@@ -262,7 +245,6 @@
                 distance: undefined
               });
             }
-            $scope.search.makeLabelDisplay();
           },
           function(message) {
             Messages.error(message);
@@ -349,7 +331,6 @@
         var saveSearchPromise;
         var allPromises = [saveSearchPromise];
         if ($scope.search) {
-          $scope.search.processLabelDisplay();
           saveSearchPromise = $scope.search.save();
           allPromises.push(saveSearchPromise);
         }

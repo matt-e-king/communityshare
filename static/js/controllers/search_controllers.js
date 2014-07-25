@@ -142,7 +142,6 @@
         searchPromise.then(
           function(search) {
             $scope.search = search;
-            $scope.search.makeLabelDisplay();
           },
           function(message) {
             Messages.error(message);
@@ -161,13 +160,12 @@
           searcher_user_id: Session.activeUser.id,
           searcher_role: searcher_role,
           searching_for_role: searching_for_role,
-          zipcode: Session.activeUser.zipcode
+          zipcode: Session.activeUser.zipcode,
+          labels: []
         });
-        $scope.search.makeLabelDisplay();
       }
 
       $scope.saveSettings = function() {
-        $scope.search.processLabelDisplay();
         var promise = $scope.search.save();
         promise.then(
           function(search) {

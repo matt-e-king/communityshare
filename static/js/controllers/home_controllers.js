@@ -105,9 +105,6 @@
         searchPromise.then(
           function(search) {
             $scope.search = search;
-            if (search) {
-              search.makeLabelDisplay();
-            }
           }, 
           function(message) {
             Messages.error(message);

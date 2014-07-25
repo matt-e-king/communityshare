@@ -118,7 +118,7 @@
           });
         return deferred.promise;
       };
-      Search.prototype.makeLabelDisplay = function() {
+      Search.prototype.makeLabelDisplay = function(customType) {
         this.displayLabelsAll = makeBaseLabels()['suggested'];
         this.displayLabelsActive = {};
         for (key in this.displayLabelsAll) {
@@ -131,13 +131,16 @@
             this.activeLabels[label] = true;
             var key = labelMapping[label];
             if (key === undefined) {
-              key = 'customSubjectAreas';
-              this.displayLabelsAll[key].push(label);
+              this.displayLabelsAll[customType].push(label);
+              this.displayLabelsActive[customType].push(label);
+            } else {
+              this.displayLabelsActive[key].push(label);
             }
-            this.displayLabelsActive[key].push(label);
           }
         }
         this.updateNActiveLabels();
+        return {'all': this.displayLabelsAll,
+                'active': this.displayLabelsActive};
       };
       Search.prototype.updateNActiveLabels = function() {
         this.nActiveLabels = 0;
@@ -149,10 +152,10 @@
           }
         }
       };
-      Search.prototype.processLabelDisplay = function() {
+      Search.prototype.processLabelDisplay = function(activeLabels) {
         this.labels = [];
-        for (var key in this.activeLabels) {
-          if (this.activeLabels[key]) {
+        for (var key in activeLabels) {
+          if (activeLabels[key]) {
             this.labels.push(key);
           }
         }
@@ -160,61 +163,5 @@
       return Search;
     });
 
-  module.factory(
-    'makeBaseLabels',
-    function() {
-      var makeBaseLabels = function() {
-        var labels = {
-          // Grade levels
-          gradeLevels: {
-            suggested: ['K-5', '6-8', '9-12', 'College', 'Adult'] ,
-            other: ['K-3', '4-5', '6-8', '9-12', 'Preschool']
-          },
-          communityPartnerSubjectAreas: {
-            suggested: [
-              'Science', 'Technology', 'Engineering', 'Match',
-              'Visual Arts', 'Digital Media', 'Film & Photography', 'Literature',
-              'Performing Arts'
-            ],
-            other: []
-          },
-          educatorSubjectAreas: {
-            suggested: [
-              'Social Studies', 'English/Language Arts', 'Foreign Languages', 'PE/Health/Sports',
-              'Mathematics', 'Goverment', 'Science',
-            ],
-            other: []
-          },
-          customSubjectAreas: {
-            suggested: [],
-            other: []
-          },
-          // Level of Engagement
-          engagementLevels: {
-            suggested: [
-              'Guest Speaker', 'Field Trip Host', 'Student Competition Judget',
-              'Individual Mentor', 'Small Group Mentor', 'Curriculuum Development',
-              'Career Day Participant', 'Classroom Materials Provider',
-              'Short-term', 'Long-term'],
-            other: []
-          }
-        };
-
-        var suggestedLabels = {};
-        var allLabels = {};
-        for (var labelType in labels) {
-          suggestedLabels[labelType] = labels[labelType].suggested;
-          allLabels[labelType] = labels[labelType].suggested.concat(
-            labels[labelType].other);
-        }
-        
-        return {'suggested': suggestedLabels,
-                'all': allLabels}
-      };
-
-
-      
-      return makeBaseLabels;
-    });
 
 })();

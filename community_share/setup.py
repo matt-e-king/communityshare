@@ -161,6 +161,12 @@ def make_random_user():
     search.labels = Label.name_list_to_object_list(get_labels())
     store.session.add(search)
     store.session.commit()
+    if search.searcher_role == 'educator':
+        new_user.educator_profile_search = search
+    else:
+        new_user.community_partner_profile_search = search
+    store.session.add(new_user)
+    store.session.commit()
         
 def make_labels():
     all_labels = labels['GradeLevels'] + labels['SubjectAreas'] + labels['LevelOfEngagement']

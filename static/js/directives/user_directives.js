@@ -22,7 +22,6 @@
                 searchesPromise);
               searchPromise.then(
                 function(search) {
-                  search.makeLabelDisplay();
                   $scope.search = search;
                 },
                 function(message) {

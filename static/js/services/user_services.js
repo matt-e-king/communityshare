@@ -56,6 +56,8 @@
       UserBase.prototype.toData = function() {
         this.cleanInstitutionAssociations();
         var data = JSON.parse(JSON.stringify(this));
+        data['educator_profile_search'] = this.educator_profile_search.toData();
+        data['community_partner_profile_search'] = this.community_partner_profile_search.toData();
         return data;
       };
       return UserBase;
@@ -107,6 +109,31 @@
 
       UserBase.prototype.initialize = function() {
         var _this = this;
+        if (this.educator_profile_search) {
+          this.educator_profile_search = new Search(
+            this.educator_profile_search);
+        } else {
+          this.educator_profile_search = new Search({
+            searcher_user_id: this.id,
+            searcher_role: 'educator',
+            searching_for_role: 'partner',
+            zipcode: this.zipcode,
+            labels: []
+          });
+        }
+        if (this.community_partner_profile_search) {
+          this.community_partner_profile_search = new Search(
+            this.community_partner_profile_search);
+        } else {
+          this.community_partner_profile_search = new Search({
+            searcher_user_id: this.id,
+            searcher_role: 'partner',
+            searching_for_role: 'educator',
+            zipcode: this.zipcode,
+            labels: []
+          });
+        }
+
         if (this.institution_associations === undefined)  {
           this.institution_associations = [];
           this.addNewInstitutionAssociation();
