@@ -131,7 +131,8 @@ class Serializable(object):
             
     @classmethod
     def admin_deserialize(cls, data):
-        if 'id' in data:
+        item_id = data.get('id', None)
+        if item_id is not None:
             item = store.session.query(cls).filter(cls.id==data['id']).first()
             if item is not None:
                 item.admin_deserialize_update(data)
