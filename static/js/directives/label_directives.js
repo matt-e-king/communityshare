@@ -148,7 +148,7 @@
        };
      });
 
-  var LabelsController = function($scope, LabelDisplay) {
+  var LabelsController = function($scope, LabelDisplay, getAllLabels) {
     console.log('scope is');
     console.log($scope);
     // Problem with search getting overridden.
@@ -156,6 +156,13 @@
     $scope.newLabel = {
       name: ''
     };
+    var labelsPromise = getAllLabels();
+    $scope.allLabels = [];
+    labelsPromise.then(
+      function(labels) {
+        $scope.allLabels = labels;
+      },
+      function(){});
     $scope.typeaheadSelect = function() {
       $scope.newLabelMethods.onUpdate();
     };
