@@ -56,8 +56,13 @@
       UserBase.prototype.toData = function() {
         this.cleanInstitutionAssociations();
         var data = JSON.parse(JSON.stringify(this));
-        data['educator_profile_search'] = this.educator_profile_search.toData();
-        data['community_partner_profile_search'] = this.community_partner_profile_search.toData();
+        if (this.id) {
+          data['educator_profile_search'] = this.educator_profile_search.toData();
+          data['community_partner_profile_search'] = this.community_partner_profile_search.toData();
+        } else {
+          data['educator_profile_search'] = null;
+          data['community_partner_profile_search'] = null;          
+        }
         return data;
       };
       return UserBase;
@@ -107,8 +112,8 @@
         };
       };
 
-      UserBase.prototype.initialize = function() {
-        var _this = this;
+      UserBase.prototype.updateFromData = function(data) {
+        this._baseUpdateFromData(data)
         if (this.educator_profile_search) {
           this.educator_profile_search = new Search(
             this.educator_profile_search);
@@ -133,6 +138,14 @@
             labels: []
           });
         }
+        if ((this.educator_profile_search.labels.length === 0) &&
+            (this.community_partner_profile_search.labels.length == 0)) {
+          this.accountCreationStatus = 'choice';
+        } else if (!this.bio) {
+          this.accountCreationStatus = 'personal';
+        } else {
+          this.accountCreationStatus = 'done';
+        }
 
         if (this.institution_associations === undefined)  {
           this.institution_associations = [];
@@ -143,6 +156,10 @@
             this.addInstitutionAssociationRemoveMethod(ia);
           }
         }
+      };
+
+      UserBase.prototype.initialize = function() {
+        var _this = this;
         if (SessionBase.activeUser) {
           var conversationsPromise = Conversation.get_many(
             {user_id: SessionBase.activeUser.id});

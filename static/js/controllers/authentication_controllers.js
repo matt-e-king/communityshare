@@ -92,10 +92,12 @@
     'DefaultController',
     function($scope, user, $location, User, signUp, Messages, $modal) {
       if (user) {
-        if (!(user.isCommunityPartner || user.isEducator)) {
+        if (user.accountCreationStatus === 'choice') {
           $location.path('signup/choice');
+        } else if (user.accountCreationStatus === 'personal') {
+          $location.path('signup/personal')
         } else {
-          $location.path('home');
+          $location.path('matches');
         }
       }
       $scope.newUser = new User();

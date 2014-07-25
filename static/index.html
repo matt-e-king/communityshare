@@ -73,13 +73,15 @@
           {{ "{{" }}alert.text{{ "}}" }}</div>
       </div>
 
-      <!-- Side menu stuff -->
+      <!-- Stuff on side -->
 
       <div class="container-fluid">
         <div class="row">
-        
+
+          <!-- Only show the side nav bar when logged in and finished account creation -->
           <div ng-controller="NavigationController">
-            <div ng-show="Session.activeUser" class="col-sm-2 col-md-3">
+            <div ng-show="Session.activeUser.accountCreationStatus === 'done'"
+                 class="col-sm-2 col-md-3">
               <div id="side-bar">
                 <img src="http://lorempixel.com/200/200/people/" class="img-responsive img-circle centered">
                 <ul class="side-nav" id="side-nav-items">
