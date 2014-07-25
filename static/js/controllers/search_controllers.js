@@ -136,6 +136,7 @@
   module.controller(
     'SearchEditController',
     function(Session, $location, $scope, $routeParams, Search, Messages) {
+      $scope.Session = Session;
       var searchId = $routeParams.searchId;
       if (searchId !== undefined) {
         var searchPromise = Search.get(searchId);
