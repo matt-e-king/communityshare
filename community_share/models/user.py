@@ -200,20 +200,22 @@ class User(Base, Serializable):
             ia.user = self
 
     def deserialize_educator_profile_search(self, data):
-        if self.educator_profile_search:
-            profile_search_id = self.educator_profile_search.id
-        else:
-            profile_search_id = None
-        data['id'] = profile_search_id
-        self.educator_profile_search = Search.admin_deserialize(data)
+        if data is not None:
+            if self.educator_profile_search:
+                profile_search_id = self.educator_profile_search.id
+            else:
+                profile_search_id = None
+            data['id'] = profile_search_id
+            self.educator_profile_search = Search.admin_deserialize(data)
 
     def deserialize_community_partner_profile_search(self, data):
-        if self.community_partner_profile_search:
-            profile_search_id = self.community_partner_profile_search.id
-        else:
-            profile_search_id = None
-        data['id'] = profile_search_id
-        self.community_partner_profile_search = Search.admin_deserialize(data)
+        if data is not None:
+            if self.community_partner_profile_search:
+                profile_search_id = self.community_partner_profile_search.id
+            else:
+                profile_search_id = None
+            data['id'] = profile_search_id
+            self.community_partner_profile_search = Search.admin_deserialize(data)
             
     custom_deserializers = {
         'institution_associations': deserialize_institution_associations,
