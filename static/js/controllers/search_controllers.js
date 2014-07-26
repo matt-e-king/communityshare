@@ -9,8 +9,15 @@
 
   module.controller(
     'MatchesController',
-    function($scope, Session, Search, $location, $modal) {
+    function($scope, Session, Search, $location, $modal, labelMapping) {
       $scope.Session = Session;
+      $scope.labelMapping = labelMapping;
+      $scope.labelClasses = {
+        gradeLevels: 'light-yellow-button',
+        engagementLevels: 'light-blue-button',
+        subjectAreas: 'light-green-button',
+        undefined: 'light-green-button'
+      };
       var user = Session.activeUser;
       $scope.infoMessage = 'Loading searches...';
       $scope.errorMessage = '';
@@ -79,7 +86,7 @@
 
   module.controller(
     'SearchResultsController',
-    function(Session, $scope, $location, $routeParams, $modal, Search, Messages) {
+    function(Session, $scope, $location, $routeParams, $modal, Search, Messages, labelMapping) {
       $scope.Session = Session;
       var searchId = $routeParams.searchId;
       $scope.infoMessage = 'Searching for matches...';
@@ -88,6 +95,14 @@
       $scope.goToConversation = function(conversation) {
         $location.path('/conversation/' + conversation.id);
       };
+
+      $scope.labelClasses = {
+        gradeLevels: 'light-yellow-button',
+        engagementLevels: 'light-blue-button',
+        subjectAreas: 'light-green-button',
+        undefined: 'light-green-button'
+      };
+      $scope.labelMapping = labelMapping;
 
       $scope.startConversation = function(userId) {
         var opts = {

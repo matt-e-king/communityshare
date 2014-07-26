@@ -33,9 +33,9 @@
     });
 
   module.factory(
-    'Search',
-    function(itemFactory, $q, $http, makeBaseLabels, UserBase) {
-      var labellists = makeBaseLabels();
+    'LabelMapping',
+    function(makeBaseLabels) {
+      var labellists = makeBaseLabels().all;
       var labelMapping = {};
       for (var key in labellists) {
         for (var i=0; i<labellists[key].length; i++) {
@@ -43,6 +43,12 @@
           labelMapping[label] = key;
         }
       }
+      return labelMapping;
+    });
+
+  module.factory(
+    'Search',
+    function(itemFactory, $q, $http, labelMapping, UserBase) {
 
       var compareLabels = function(targetLabels, retrievedLabels) {
         var matchingLabels = {};
@@ -118,48 +124,6 @@
           });
         return deferred.promise;
       };
-      Search.prototype.makeLabelDisplay = function(customType) {
-        this.displayLabelsAll = makeBaseLabels()['suggested'];
-        this.displayLabelsActive = {};
-        for (key in this.displayLabelsAll) {
-          this.displayLabelsActive[key] = [];
-        }
-        this.activeLabels = {};
-        if (this.labels) {
-          for (var i=0; i<this.labels.length; i++) {
-            var label = this.labels[i];
-            this.activeLabels[label] = true;
-            var key = labelMapping[label];
-            if (key === undefined) {
-              this.displayLabelsAll[customType].push(label);
-              this.displayLabelsActive[customType].push(label);
-            } else {
-              this.displayLabelsActive[key].push(label);
-            }
-          }
-        }
-        this.updateNActiveLabels();
-        return {'all': this.displayLabelsAll,
-                'active': this.displayLabelsActive};
-      };
-      Search.prototype.updateNActiveLabels = function() {
-        this.nActiveLabels = 0;
-        if (this.labels) {
-          for (label in this.activeLabels) {
-            if (this.activeLabels[label]) {
-              this.nActiveLabels += 1;
-            }
-          }
-        }
-      };
-      Search.prototype.processLabelDisplay = function(activeLabels) {
-        this.labels = [];
-        for (var key in activeLabels) {
-          if (activeLabels[key]) {
-            this.labels.push(key);
-          }
-        }
-      }
       return Search;
     });
 

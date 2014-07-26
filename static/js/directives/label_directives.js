@@ -75,7 +75,7 @@
     });
 
   module.factory(
-    'LabelDisplay',
+    'labelMapping',
     function(makeBaseLabels) {
       var labellists = makeBaseLabels().all;
       var labelMapping = {};
@@ -85,6 +85,12 @@
           labelMapping[label] = key;
         }
       }
+      return labelMapping;
+    });
+
+  module.factory(
+    'LabelDisplay',
+    function(makeBaseLabels, labelMapping) {
       var LabelDisplay = function(search, type) {
         this.search = search;
         var baseLabels = makeBaseLabels();
