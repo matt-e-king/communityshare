@@ -261,34 +261,6 @@
     });
 
   module.factory(
-    'CommunityPartnerUtils',
-    function(Messages, $q) {
-      var CommunityPartnerUtils = {};
-      CommunityPartnerUtils.searchesPromiseToSearchPromise = function(searchesPromise) {
-        var deferred = $q.defer();
-        searchesPromise.then(
-          function(searches) {
-            var search;
-            if (searches.length > 1) {
-              Messages.error('More than one search for a community partner.');
-              search = searches[0];
-            } else if (searches.length === 0) {
-              Messages.error('No searches for a community partner');
-              search = undefined;
-            } else {
-              search = searches[0];
-            }
-            deferred.resolve(search);
-          },
-          function(message) {
-            deferred.reject(message)
-          });
-        return deferred.promise;
-      };
-      return CommunityPartnerUtils;
-    });
-
-  module.factory(
     'Institution',
     function(itemFactory) {
       var Institution = itemFactory('institution');

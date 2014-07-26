@@ -3,21 +3,37 @@
 
 <div ng-if="Session.activeUser !== undefined">
 
-  <h4>Settings</h4>
-
-  <div tabset name="settingsTabSet">
-
-    <div tab active="interestsTabActive" 
-         ng-if="Session.activeUser.is_community_partner">
-      <div tab-heading>
-        <span ng-class="">
-          Interests
-        </span>
-      </div>
-      <div class="tab-content" active="interestsTabActive">
-        <div cs-community-partner-labels search="search"></div>
-      </div>
+  <div class="panel panel-default">
+    <div class="page-header">
+      <h2>Settings</h2>
     </div>
+    <div class="panel-body">
+
+      <div tabset name="settingsTabSet">
+
+        <div tab active="interestsTabActive">
+          <div tab-heading>
+            Needs/Interests
+          </div>
+          <div class="tab-content" active="interestsTabActive">
+            <div class="col-xs-12" ng-if="user.is_community_partner"
+                 cs-labels search="user.community_partner_profile_search"
+                 grade-levels-title="I am interested in working with the following groups"
+                 engagement-levels-title="I am interested in the following types of engagement (click all that apply)"
+                 subject-areas-title="In which areas do you have expertise?"
+                 type="communityPartner"
+                 >
+            </div>
+            <div class="col-xs-12" ng-if="user.is_educator"
+                 cs-labels search="user.community_partner_profile_search"
+                 grade-levels-title="Grade levels I teach."
+                 engagement-levels-title="Engagement Preferences (click all that apply)"
+                 subject-areas-title="Subject areas I teach (click all that apply)"
+                 type="educator"
+                 >
+            </div>
+          </div>
+        </div>
 
     <div tab active="personalTabActive">
       <div tab-heading>

@@ -183,7 +183,7 @@
 
   module.controller(
     'SettingsController',
-    function($scope, $location, Session, Messages, $q, CommunityPartnerUtils,
+    function($scope, $location, Session, Messages, $q,
              Question, Answer, $fileUploader, $http, makeDialog, Authenticator, $rootScope) {
 
       var turnOffLocationChangeHandler;
@@ -229,38 +229,7 @@
             $scope.questions = questions;
           });
       }
-      // Grab a community partner's passive search.
-      if ($scope.user && $scope.user.is_community_partner) {
-        $scope.interestsTabActive = true;
-        var searchesPromise = $scope.user.getSearches();
-        var searchPromise = CommunityPartnerUtils.searchesPromiseToSearchPromise(
-          searchesPromise);
-        searchPromise.then(
-          function(search) {
-            if (search) {
-              $scope.search = search;
-            } else {
-              // Apparently the user didn't have a search.
-              $scope.search = new Search({
-                searcher_user_id: $scope.user.id,
-                searcher_role: 'partner',
-                searching_for_role: 'educator',
-                active: true,
-                labels: [],
-                latitude: undefined,
-                longitude: undefined,
-                distance: undefined
-              });
-            }
-          },
-          function(message) {
-            Messages.error(message);
-          });
-      }
 
-      if (Session.activeUser) {
-        $scope.editedUser = Session.activeUser.clone();
-      }
       $scope.$on('personalSettingsForm', function(event, value) {
         $scope.personalSettingsForm = value.personalSettingsForm;
       });

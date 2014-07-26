@@ -95,24 +95,6 @@
     });
 
   module.controller(
-    'CommunityPartnerHomeController',
-    function($scope, Session, Search, Messages, CommunityPartnerUtils) {
-      $scope.properties = {};
-      if (Session.activeUser && Session.activeUser.is_community_partner) {
-        var searchesPromise = Session.activeUser.getSearches();
-        var searchPromise = CommunityPartnerUtils.searchesPromiseToSearchPromise(
-          searchesPromise);
-        searchPromise.then(
-          function(search) {
-            $scope.search = search;
-          }, 
-          function(message) {
-            Messages.error(message);
-          });
-      }
-    });
-
-  module.controller(
     'AdministratorHomeController',
     function($scope, $location, getStatistics) {
       $scope.searchText = '';

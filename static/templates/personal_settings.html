@@ -2,7 +2,7 @@
   <label for="name"
          class="control-label cs-form-label">Name</label>
   <div class="cs-form-control">
-    <input ng-model="editedUser.name"
+    <input ng-model="user.name"
            required
            type="text"
            name="name"
@@ -18,7 +18,7 @@
   <label for="bio"
          class="control-label cs-form-label">Bio</label>
   <div class="cs-form-control">
-    <textarea ng-model="editedUser.bio"
+    <textarea ng-model="user.bio"
               name="bio"
               required
               class="form-control"></textarea>
@@ -32,7 +32,7 @@
     <label for="location"
            class="control-label cs-form-label">ZIP Code</label>
     <div class="cs-form-control">
-      <input ng-model="editedUser.zipcode"
+      <input ng-model="user.zipcode"
              name="zipcode"
              id="zipcode"
              required
@@ -46,7 +46,7 @@
     </div>
   </div>
 
-<div cs-institutions user="editedUser"
+<div cs-institutions user="user"
      is-community-partner="isCommunityPartner"
      is-educator="isEducator"
      >
