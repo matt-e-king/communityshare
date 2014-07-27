@@ -9,8 +9,28 @@
   <div ng-repeat="search in searches">
     <div class="panel panel-default">
       <div class="page-header">
-        <h3>Search Results</h3>
-        <a ng-click="search.show = false;" ng-show="search.show">Hide</a>
+        <h3>
+          <span ng-if="search.isProfile(Session.activeUser)">Matches to your Profile</span>
+          <span ng-if="!search.isProfile(Session.activeUser)">Matches to your Search</span>
+        </h3>
+        <div>
+          <span ng-show="search.show">
+            <a class="clickable" ng-click="search.show = false;">
+              Hide Matches</a>
+          </span>
+          <span ng-show="!search.show">
+            <a ng-click="getMatches(search)" class="clickable">Show Matches</a>
+          </span>
+          -
+          <span ng-if="!search.isProfile(Session.activeUser)">
+            <a class="clickable" ng-click="deleteSearch(search)">
+              Delete Search</a>
+          </span>
+          <span ng-if="search.isProfile(Session.activeUser)">
+            <a class="clickable" ng-click="editProfile()">
+              Edit Profile</a>
+          </span>
+        </div>
       </div>
       <div class="panel-body">
         <p>Search results based on these filters:</p>
@@ -19,9 +39,6 @@
                 class="btn btn-small">
           {{label}}
         </button>
-        <div ng-show="!search.show">
-          <a ng-click="getMatches(search)" class="clickable">Show Matches</a>
-        </div>
 
         <div ng-show="search.show">
           <div alert alert-info ng-show="search.infoMessage">

@@ -111,15 +111,17 @@ class User(Base, Serializable):
     @property
     def is_educator(self):
         output = False
-        if self.educator_profile_search:
-            output = (len(self.educator_profile_search.labels) > 0)
+        search = self.educator_profile_search
+        if (search and search.active):
+            output = (len(search.labels) > 0)
         return output
 
     @property
     def is_community_partner(self):
         output = False
-        if self.community_partner_profile_search:
-            output = (len(self.community_partner_profile_search.labels) > 0)
+        search = self.community_partner_profile_search
+        if (search and search.active):
+            output = (len(search.labels) > 0)
         return output
 
     def is_password_correct(self, password):
@@ -168,15 +170,17 @@ class User(Base, Serializable):
         return associations
 
     def serialize_educator_profile_search(self, requester):
-        if self.educator_profile_search:
-            serialized = self.educator_profile_search.serialize(requester, exclude='searcher_user')
+        search = self.educator_profile_search
+        if (search and search.active):
+            serialized = search.serialize(requester, exclude='searcher_user')
         else:
             serialized = None
         return serialized
 
     def serialize_community_partner_profile_search(self, requester):
-        if self.community_partner_profile_search:
-            serialized = self.community_partner_profile_search.serialize(requester, exclude='searcher_user')
+        search = self.community_partner_profile_search
+        if (search and search.active):
+            serialized = search.serialize(requester, exclude='searcher_user')
         else:
             serialized = None
         return serialized
@@ -204,18 +208,20 @@ class User(Base, Serializable):
             ia.user = self
 
     def deserialize_educator_profile_search(self, data):
+        search = self.educator_profile_search
         if data is not None:
-            if self.educator_profile_search:
-                profile_search_id = self.educator_profile_search.id
+            if search and search.active:
+                profile_search_id = search.id
             else:
                 profile_search_id = None
             data['id'] = profile_search_id
             self.educator_profile_search = Search.admin_deserialize(data)
 
     def deserialize_community_partner_profile_search(self, data):
+        search = self.community_partner_profile_search
         if data is not None:
-            if self.community_partner_profile_search:
-                profile_search_id = self.community_partner_profile_search.id
+            if search and search.active:
+                profile_search_id = search.id
             else:
                 profile_search_id = None
             data['id'] = profile_search_id

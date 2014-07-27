@@ -91,6 +91,12 @@
         }
         this.created = new Date(this.created);
       };
+      Search.prototype.isProfile = function(user) {
+        var isProfile = (
+          (user.community_partner_profile_search.id === this.id) ||
+            (user.educator_profile_search.id === this.id));
+        return isProfile;
+      };
       Search.getResults = function(searchId) {
         var deferred = $q.defer();
         var url = '/api/search/' + searchId + '/results';

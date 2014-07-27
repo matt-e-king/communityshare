@@ -9,7 +9,7 @@
 
   module.controller(
     'MatchesController',
-    function($scope, Session, Search, $location, $modal, labelMapping) {
+    function($scope, Session, Search, $location, $modal, labelMapping, makeDialog) {
       $scope.Session = Session;
       $scope.labelMapping = labelMapping;
       $scope.labelClasses = {
@@ -26,7 +26,7 @@
         $location.path('/conversation/' + conversation.id);
       };
 
-      var searchesPromise = Search.get_many({'searcher_user_id': user.id});
+      var searchesPromise = Search.get_many({'searcher_user_id': user.id}, true);
       searchesPromise.then(
         function(searches) {
           $scope.infoMessage = '';
@@ -79,6 +79,28 @@
           function(conversation) {
             if (conversation) {
               $location.path('/conversation/' + conversation.id);
+            }
+          });
+      };
+      $scope.editProfile = function() {
+        $location.path('settings');
+      };
+      $scope.deleteSearch = function(search) {
+        var title = 'Delete Search';
+        var msg = 'Do you really want to delete this search?  Others will no longer be able to find you by matching to the contents of this search.'
+        var btns = [{result:'yes', label: 'Yes'},
+                    {result:'no', label: 'No', cssClass: 'btn-primary'}];
+        var d = makeDialog(title, msg, btns);
+        d.result.then(
+          function(result) {
+            if (result === 'yes') {
+              var deletePromise = search.destroy();
+              deletePromise.then(
+                function() {
+                },
+                function(message) {
+                    Messages.error(message);
+                });
             }
           });
       };
