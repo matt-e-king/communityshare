@@ -2,7 +2,7 @@
   <label for="email"
          class="control-label cs-form-label">Email</label>
   <div class="cs-form-control">
-    <input ng-model="editedUser.email"
+    <input ng-model="user.email"
            required
            name="email"
            id="email"
@@ -12,7 +12,7 @@
     <p ng-show="accountSettingsForm.email.$invalid && !accountSettingsForm.email.$pristine" class="help-block">
       Please enter a valid email.
     </p>
-    <p ng-show="!editedUser.email_confirmed">
+    <p ng-show="!user.email_confirmed">
       Email not confirmed.<br/>
       <a class="clickable" ng-click="resendEmailConfirmation()">
         Send email confirmation email.</a>

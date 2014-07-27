@@ -2,7 +2,7 @@
   <label for="year_of_birth"
          class="control-label cs-form-label">Year of Birth</label>
   <div class="cs-form-control">
-    <input ng-model="editedUser.year_of_birth"
+    <input ng-model="user.year_of_birth"
            name="year_of_birth"
            id="year_of_birth"
            class="form-control"
@@ -15,15 +15,15 @@
          class="control-label cs-form-label">Gender</label>
   <div class="cs-form-control">
     <input type="radio" name="gender"
-           ng-model="editedUser.gender"
+           ng-model="user.gender"
            value="Female"/>
     Female<br/>
     <input type="radio" name="gender"
-           ng-model="editedUser.gender"
+           ng-model="user.gender"
            value="Male"/>
     Male<br/>
     <input type="radio" name="gender"
-           ng-model="editedUser.gender"
+           ng-model="user.gender"
            ng-value="custom_gender"/>
     Other (enter below)<br/>
     <input ng-model="custom_gender"
@@ -38,11 +38,11 @@
          class="control-label cs-form-label">Ethnicity</label>
   <div class="cs-form-control">
     <input type="radio" name="ethnicity"
-           ng-model="editedUser.ethnicity"
+           ng-model="user.ethnicity"
            value="Hispanic or Latino"/>
     Hispanic or Latino<br/>
     <input type="radio" name="ethnicity"
-           ng-model="editedUser.ethnicity"
+           ng-model="user.ethnicity"
            value="Not Hispanic or Latino"/>
     Not Hispanic or Latino<br/>
   </div>
@@ -52,7 +52,7 @@
   <label for="website"
          class="control-label cs-form-label">Website</label>
   <div class="cs-form-control">
-    <input ng-model="editedUser.website"
+    <input ng-model="user.website"
            name="website"
            id="website"
            class="form-control"
@@ -64,7 +64,7 @@
   <label for="phone_number"
          class="control-label cs-form-label">Phone Number</label>
   <div class="cs-form-control">
-    <input ng-model="editedUser.phone_number"
+    <input ng-model="user.phone_number"
            name="phone_number"
            id="phone_number"
            class="form-control"
@@ -76,7 +76,7 @@
   <label for="twitter_handle"
          class="control-label cs-form-label">Twitter Handle</label>
   <div class="cs-form-control">
-    <input ng-model="editedUser.twitter_handle"
+    <input ng-model="user.twitter_handle"
            name="twitter_handle"
            id="twitter_handle"
            class="form-control"
@@ -88,7 +88,7 @@
   <label for="linkedin_link"
          class="control-label cs-form-label">LinkedIn Profile URL</label>
   <div class="cs-form-control">
-    <input ng-model="editedUser.linkedin_link"
+    <input ng-model="user.linkedin_link"
            name="linkedin_link"
            id="linkedin_link"
            class="form-control"

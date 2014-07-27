@@ -311,14 +311,9 @@
       };
 
       $scope.save = function() {
-        var saveUserPromise = $scope.editedUser.save();
+        var saveUserPromise = $scope.user.save();
         var savedImages = uploader.uploadAll();
-        var saveSearchPromise;
-        var allPromises = [saveSearchPromise];
-        if ($scope.search) {
-          saveSearchPromise = $scope.search.save();
-          allPromises.push(saveSearchPromise);
-        }
+        var allPromises = [saveUserPromise];
         if ($scope.questions) {
           var saveAnswerPromises = [];
           for (var i=0; i<$scope.questions.length; i++) {
@@ -336,11 +331,6 @@
             Session.activeUser.updateFromData(user.toData());
           },
           onError);
-        if (saveSearchPromise) {
-          saveSearchPromise.then(
-            function() {},
-            onError);
-        }
         combinedPromise.then(
           function() {
             $location.path('/home');
