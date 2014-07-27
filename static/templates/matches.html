@@ -6,7 +6,7 @@
   <div alert alert-info ng-show="infoMessage">{{infoMessage}}</div>
   <div alert alert-danger ng-show="errorMessage">{{errorMessage}}</div>
   
-  <div ng-repeat="search in searches">
+  <div ng-repeat="search in searches" ng-show="search.labels.length > 0">
     <div class="panel panel-default">
       <div class="page-header">
         <h3>
