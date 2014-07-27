@@ -27,7 +27,7 @@
           
         </div>
         
-        <div class="col-xs-12" cs-labels search="user.community_partner_profile_search"
+        <div class="col-xs-12" cs-labels search="user.educator_profile_search"
              grade-levels-title="Grade levels I teach."
              engagement-levels-title="Engagement Preferences (click all that apply)"
              subject-areas-title="Subject areas I teach (click all that apply)"
@@ -43,7 +43,7 @@
     <div class="signup-bottom">
       <div class="pull-right">
         <button class="btn btn-primary"
-                ng-disabled="!institutionMethods.isValid()"
+                ng-disabled="(!institutionMethods.isValid()) || (user.educator_profile_search.labels.length === 0)"
                 ng-click="submit()">
           Next</button>
       </div>

@@ -39,7 +39,7 @@
              type="communityPartner"
              >
         </div>
-        
+
       </div>
     </div>
 
@@ -47,7 +47,7 @@
       <div class="signup-bottom">
         <div class="pull-right">
           <button class="btn btn-primary"
-                  ng-disabled="!institutionMethods.isValid()"
+                  ng-disabled="(!institutionMethods.isValid()) || (user.community_partner_profile_search.labels.length === 0)"
                   ng-click="submit()">
             Next</button>
         </div>
