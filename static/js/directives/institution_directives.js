@@ -11,11 +11,32 @@
        return {
          scope: {
            user: '=',
-           isEducator: '=',
-           isCommunityPartner: '='
+           methods: '=',
+           isEducator: '@',
+           isCommunityPartner: '@'
          },
          templateUrl: './static/templates/institution_adder.html',
          controller: function($scope) {
+           if ($scope.methods !== undefined) {
+             $scope.methods.isValid = function() {
+               var valid = true;
+               var nIAs = 0;
+               if ((!$scope.noInstitutions) && $scope.user) {
+                 for (var i=0; i<$scope.user.institution_associations.length; i++) {
+                   var ia = $scope.user.institution_associations[i];
+                   if (!(ia.isValid && ia.isValid())) {
+                     valid = false;
+                   } else if (ia.role) {
+                     nIAs += 1;
+                   } 
+                 }
+                 if (nIAs === 0) {
+                   valid = false;
+                 }
+               }
+               return valid;
+             };
+           }
            $scope.updateInstitutions = function() {
              if ($scope.noInstitutions) {
                $scope.user.institution_associations = [];
@@ -54,7 +75,7 @@
             ];
            }
            if ($scope.user.institution_associations.length === 0) {
-             $scope.user.institution_associations.push({});
+             $scope.user.institution_associations.push({institution: {}});
            }
            institutionsPromise.then(
              function(institutions) {
@@ -74,10 +95,25 @@
           institutionTypes: '=',
           roles: '=',
           disabled: '=',
-          methods: '=',
           index: '@'
         },
         templateUrl: 'static/templates/institution_association.html',
+        controller: function($scope) {
+          $scope.institutionAssociation.isValid = function() {
+            var withValues = 0;
+            if ($scope.institutionAssociation.role) {
+              withValues += 1;
+            }
+            if ($scope.institutionAssociation.institution.name) {
+              withValues += 1;
+            }
+            if ($scope.institutionAssociation.institution.institution_type) {
+              withValues += 1;
+            }
+            var valid = ((withValues===0) || (withValues===3));
+            return valid;
+          }
+        }
       };
     });
   

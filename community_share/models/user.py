@@ -110,12 +110,16 @@ class User(Base, Serializable):
         
     @property
     def is_educator(self):
-        output = (len(self.educator_profile_search.labels) > 0)
+        output = False
+        if self.educator_profile_search:
+            output = (len(self.educator_profile_search.labels) > 0)
         return output
 
     @property
     def is_community_partner(self):
-        output = (len(self.community_partner_profile_search.labels) > 0)
+        output = False
+        if self.community_partner_profile_search:
+            output = (len(self.community_partner_profile_search.labels) > 0)
         return output
 
     def is_password_correct(self, password):

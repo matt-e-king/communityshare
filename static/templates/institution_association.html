@@ -1,38 +1,54 @@
-<input ng-model="institutionAssociation.institution.name"
-       name="institution{{index}}"
-       id="institution{{index}}"
-       class="form-control org-input"
-       placeholder="Organization Name"
-       typeahead="i.name for i in institutions | filter:$viewValue | limitTo: 100"
-       ng-disabled="disabled"
-       type="text"/>
-<input ng-if="roles.length === 0"
-       ng-model="institutionAssociation.role"
-       name="role{{index}}"
-       id="role{{index}}"
-       class="form-control org-input"
-       placeholder="Position/Title"
-       ng-disabled="disabled"
-       type="text"/>
-<select ng-if="roles.length > 0"
-        ng-model="institutionAssociation.role"
-        name="role{{index}}"
-        id="role{{index}}"
-        class="form-control"
-        ng-options="role for role in roles"
-        ng-disabled="disabled"
-        >
-  <option value="" selected>Role</option>
-</select>
-<select ng-model="institutionAssociation.institution.institution_type"
-        name="institution_type{{index}}"
-        id="institution_type{{index}}"
-        class="form-control"
-        ng-options="typ for typ in institutionTypes | filter:$viewValue | limitTo: 100"
-        ng-disabled="disabled"
-        >
-  <option value="" selected>Type of Organization</option>
-</select>
+<div ng-class="{true: 'has-error'}[(!institutionAssociation.isValid()) && (!institutionAssociation.institution.name)]">
+  <input ng-model="institutionAssociation.institution.name"
+         name="institution{{index}}"
+         id="institution{{index}}"
+         class="form-control org-input"
+         placeholder="Organization Name"
+         typeahead="i.name for i in institutions | filter:$viewValue | limitTo: 100"
+         ng-disabled="disabled"
+         type="text"/>
+  <p ng-show="(!institutionAssociation.isValid()) && (!institutionAssociation.institution.name)">
+    An organization name is required
+  </p>
+</div>
+<div ng-class="{true: 'has-error'}[(!institutionAssociation.isValid()) && (!institutionAssociation.role)]">
+  <input ng-if="roles.length === 0"
+         ng-model="institutionAssociation.role"
+         name="role{{index}}"
+         id="role{{index}}"
+         class="form-control org-input"
+         placeholder="Position/Title"
+         ng-disabled="disabled"
+         type="text"/>
+  <select ng-if="roles.length > 0"
+          ng-model="institutionAssociation.role"
+          name="role{{index}}"
+          id="role{{index}}"
+          class="form-control"
+          ng-options="role for role in roles"
+          ng-disabled="disabled"
+          >
+    <option value="" selected>Role</option>
+  </select>
+  <p ng-show="(!institutionAssociation.isValid()) && (!institutionAssociation.role)">
+    A role is required
+  </p>
+</div>
+<div ng-class="{true: 'has-error'}[(!institutionAssociation.isValid()) && (!institutionAssociation.institution.institution_type)]">
+
+  <select ng-model="institutionAssociation.institution.institution_type"
+          name="institution_type{{index}}"
+          id="institution_type{{index}}"
+          class="form-control"
+          ng-options="typ for typ in institutionTypes | filter:$viewValue | limitTo: 100"
+          ng-disabled="disabled"
+          >
+    <option value="" selected>Type of Organization</option>
+  </select>
+  <p ng-show="(!institutionAssociation.isValid()) && (!institutionAssociation.institution.institution_type)">
+    An organization type is required
+  </p>
+</div>
 
 <a class="cs-form-button"
    ng-if="institutionAssociation.remove && (institutionAssociation.institution.name || institutionAssociation.role || institutionAssociation.institution.institution_type)"

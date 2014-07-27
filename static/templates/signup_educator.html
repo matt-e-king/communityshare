@@ -13,7 +13,9 @@
       <div class="panel-body">
         <h2 class="text-center">Organization Information</h2>
         <div class="col-md-9 col-md-offset-2">
-          <div cs-institutions user="user" is-educator="true">
+          <div cs-institutions user="user" is-educator="true"
+               methods="institutionMethods"
+               >
           </div>
         </div>
         
@@ -41,7 +43,8 @@
     <div class="signup-bottom">
       <div class="pull-right">
         <button class="btn btn-primary"
-                  ng-click="submit()">
+                ng-disabled="!institutionMethods.isValid()"
+                ng-click="submit()">
           Next</button>
       </div>
     </div>

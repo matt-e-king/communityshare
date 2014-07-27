@@ -71,6 +71,7 @@
                                    $q, Question, Answer) {
     $scope.user = user;
     $scope.search = search;
+    $scope.institutionMethods = {};
 
     // Get questions to display during signup.
     $scope.questions = [];
@@ -105,6 +106,14 @@
         function(message) {
           Messages.error(message);
         });
+
+      $scope.readyToSubmit = function() {
+        var ready = false;
+        if ($scope.institutionMethods.isValid && $scope.institutionMethods.isValid()) {
+          ready = true;
+        }
+        return ready;
+      };
     };
   };
 
