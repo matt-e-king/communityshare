@@ -35,13 +35,13 @@
               <span class="icon-bar"></span>
           </button>
           <div ng-switch on="Session.activeUser !== undefined">
-            <a class="navbar-brand" href="#/" ng-switch-when="false">
+            <a class="navbar-brand brand" href="#/" ng-switch-when="false">
               <!-- FIXME: Should point to a locally served file. -->
-              <img src="http://i.imgur.com/iIE2wPf.png"  id="logo-id" />
+              <img src="http://imgur.com/ryZeICk.png"  id="logo-id" />
             </a>
             <a class="navbar-brand" href="#/home" ng-switch-when="true">
               <!-- FIXME: Should point to a locally served file. -->
-              <img src="http://i.imgur.com/iIE2wPf.png"  id="logo-id" />
+              <img src="http://imgur.com/ryZeICk.png"  id="logo-id" />
             </a>
           </div>
         </div>
@@ -59,12 +59,11 @@
             <li ng-show="Session.activeUser == undefined">
               <a href="#login" ng-show="!Session.activeUser">Login</a></li>
           </ul>
-          
+
         </div><!--/.nav-collapse -->
       </div><!--/.container-fluid -->
     </div>
-    
-    <div class="container">
+
       <div class="message-container" ng-controller="MessageController">
         <div alert ng-repeat="alert in messages.messages"
              class="animated-alert"
@@ -73,15 +72,13 @@
           {{ "{{" }}alert.text{{ "}}" }}</div>
       </div>
 
-      <!-- Stuff on side -->
-
+      <!-- Side menu stuff -->
+      <div class="centered-home">
       <div class="container-fluid">
         <div class="row">
 
-          <!-- Only show the side nav bar when logged in and finished account creation -->
           <div ng-controller="NavigationController">
-            <div ng-show="Session.activeUser.accountCreationStatus === 'done'"
-                 class="col-sm-2 col-md-3">
+            <div ng-show="Session.activeUser" class="col-sm-2 col-md-3">
               <div id="side-bar">
                 <img src="http://lorempixel.com/200/200/people/" class="img-responsive img-circle centered">
                 <ul class="side-nav" id="side-nav-items">
@@ -98,15 +95,13 @@
             </div>
           </div>
           <!-- Main component for a primary marketing message or call to action -->
-          <div class="ng-view col-sm-10 col-md-9">
+          <div class="ng-view col-sm-10 col-md-9 col-lg-12">
           </div>
         </div>
       </div>
-      
-    </div> <!-- /container -->
-    
+    </div> <!--centered -->
     <div class="footer">
-      <div class="navbar navbar-default">
+      <div class="navbar navbar-fixed-bottom navbar-footer">
         <div class="text-muted text-right">
           To report abuse/inappropriate content contact
           <a href="mailto:{{config.ABUSE_EMAIL_ADDRESS}}">{{config.ABUSE_EMAIL_ADDRESS}}</a><br/>
@@ -153,6 +148,8 @@
     <script src="./static/js/directives/label_directives.js?q={{COMMIT_HASH}}"></script>
     <script src="./static/js/directives/institution_directives.js?q={{COMMIT_HASH}}"></script>
     <script src="./static/js/directives/survey_directives.js?q={{COMMIT_HASH}}"></script>
+
+
 
   </body>
 
