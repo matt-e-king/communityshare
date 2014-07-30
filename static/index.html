@@ -31,8 +31,8 @@
                   >
             <span class="sr-only">Toggle navigation</span>
             <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
           </button>
           <div ng-switch on="Session.activeUser !== undefined">
             <a class="navbar-brand brand" href="#/" ng-switch-when="false">
@@ -64,38 +64,36 @@
       </div><!--/.container-fluid -->
     </div>
 
-      <div class="message-container" ng-controller="MessageController">
-        <div alert ng-repeat="alert in messages.messages"
-             class="animated-alert"
-             type="{{ "{{" }} alert.type {{ "}}" }}"
-             close="messages.removeMessage(alert)">
-          {{ "{{" }}alert.text{{ "}}" }}</div>
-      </div>
+    <div class="message-container" ng-controller="MessageController">
+      <div alert ng-repeat="alert in messages.messages"
+           class="animated-alert"
+           type="{{ "{{" }} alert.type {{ "}}" }}"
+           close="messages.removeMessage(alert)">
+        {{ "{{" }}alert.text{{ "}}" }}</div>
+    </div>
 
-      <!-- Side menu stuff -->
-      <div class="centered-home">
+    <!-- Side menu stuff -->
+    <div class="centered-home">
       <div class="container-fluid">
-        <div class="row">
-
-          <div ng-controller="NavigationController">
-            <div ng-show="Session.activeUser" class="col-sm-2 col-md-3">
-              <div id="side-bar">
-                <img src="http://lorempixel.com/200/200/people/" class="img-responsive img-circle centered">
-                <ul class="side-nav" id="side-nav-items">
-                  <li class="side-nav-links"><a href="/#/search">Search</a>
-                  </li>
-                  <li class="side-nav-links"><a href="/#/messages">Messages</a>
-                  </li>
-                  <li class="side-nav-links"><a href="/#/shares">Shares</a>
-                  </li>
-                  <li class="side-nav-links"><a href="/#/matches">Matches</a>
-                  </li>
-                </ul>
-              </div>
+        <div class="row" ng-controller="NavigationController">
+          <div ng-show="Session.activeUser" class="col-sm-2 col-md-3 col-lg-3">
+            <div id="side-bar">
+              <img src="http://lorempixel.com/200/200/people/" class="img-responsive img-circle centered">
+              <ul class="side-nav" id="side-nav-items">
+                <li class="side-nav-links"><a href="/#/search">Search</a>
+                </li>
+                <li class="side-nav-links"><a href="/#/messages">Messages</a>
+                </li>
+                <li class="side-nav-links"><a href="/#/shares">Shares</a>
+                </li>
+                <li class="side-nav-links"><a href="/#/matches">Matches</a>
+                </li>
+              </ul>
             </div>
           </div>
           <!-- Main component for a primary marketing message or call to action -->
-          <div class="ng-view col-sm-10 col-md-9 col-lg-12">
+          <div ng-class="{true:'col-sm-10 col-md-9 col-lg-9'}[(Session.activeUser !== undefined)]">
+            <div class="ng-view"></div>
           </div>
         </div>
       </div>
@@ -148,8 +146,6 @@
     <script src="./static/js/directives/label_directives.js?q={{COMMIT_HASH}}"></script>
     <script src="./static/js/directives/institution_directives.js?q={{COMMIT_HASH}}"></script>
     <script src="./static/js/directives/survey_directives.js?q={{COMMIT_HASH}}"></script>
-
-
 
   </body>
 
