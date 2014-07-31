@@ -67,16 +67,6 @@
       controller: 'ConfirmEmailController'
     });
 
-    $routeProvider.when('/home', {
-      templateUrl: './static/templates/home.html',
-      controller: 'HomeController',
-      resolve: {
-        activeUser: function(activeUserLoader) {
-          return activeUserLoader();
-        }
-      }
-    });
-
     $routeProvider.when('/searchusers', {
       templateUrl: './static/templates/search_users.html',
       controller: 'SearchUsersController',

@@ -149,7 +149,7 @@
             if (nextLocation) {
               $location.path(nextLocation);
             } else {
-              $location.path("/home");
+              $location.path("/");
             }
           },
           function(message) {
