@@ -93,7 +93,7 @@
                 deferred.resolve(items);
               },
               function(response) {
-                deferred.reject(response.message);
+                deferred.reject(response.data.message);
               }
             );
 
