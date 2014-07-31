@@ -42,8 +42,13 @@
             return output;
           };
           $scope.searches.sort(compareSearchDate);
-          if ($scope.searches.length > 0) {
-            $scope.getMatches($scope.searches[0]);
+          var gotSomeMatches = false;
+          for (var i=0; i<$scope.searches.length; i++) {
+            var search = $scope.searches[i];
+            if ((!gotSomeMatches) && (search.labels.length > 0)) {
+              $scope.getMatches(search);
+              gotSomeMatches = true;
+            }
           }
         },
         function() {
