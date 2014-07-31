@@ -88,7 +88,9 @@
           if (conversation.otherUser) {
             if ((shares.length === 0)) {
               $scope.share = conversation.makeShare();
-              $scope.events = $scope.share.events;
+              if ($scope.share) {
+                $scope.events = $scope.share.events;
+              }
             } else {
               $scope.share = shares[0];
               if ($scope.share.events.length === 0) {
