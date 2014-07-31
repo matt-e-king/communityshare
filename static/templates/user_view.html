@@ -15,7 +15,11 @@
       <div class="col-sm-2 col-md-3">
         <img ng-src="{{user.picture_url}}" class="img-responsive img-circle centered">
         <div class="text-center">
-          <button class="btn btn-primary btn-lg profile-btns">Message</button>
+          <button 
+             ng-show="Session.activeUser.id !== user.id"
+             class="btn btn-primary btn-lg profile-btns"
+             ng-click="startConversation(Session.activeUser, user,  undefined, true);">
+            Message</button>
           <button class="btn btn-warning btn-lg profile-btns">View Shares</button>
         </div>
       </div>

@@ -267,4 +267,70 @@
       return Institution;
     });
 
+  // A function that bring up a modal to send a message to someone.
+  module.factory(
+    'startConversation',
+    function($modal, $location, Conversation, Messages) {
+      var startConversation = function(thisUser, otherUser, search, directToConversation) {
+        var userId = otherUser.id;
+        var searchId;
+        if (search) {
+          searchId = search.id;
+        }
+        // See if we have a conversation with this user
+        var conversationsPromise = Conversation.get_many(
+          {user_id: thisUser.id,
+           other_user_id: otherUser.id
+          }, true);
+        // Options for the new conversation modal.
+        var newConversationOpts = {
+          templateUrl: './static/templates/new_conversation.html',
+          controller: 'NewConversationController',
+          resolve: {
+            userId: function() {return userId;},
+            searchId: function() {return searchId;}
+          }
+        };
+        var withNewConversation = function(conversation) {
+          if (conversation && directToConversation) {
+            $location.path('/conversation/' + conversation.id);
+          }
+        };
+        conversationsPromise.then(
+          function(conversations) {
+            // If we have one conversation with that user go
+            // directly to that page.
+            if (conversations.length === 1) {
+              $location.path('/conversation/' + conversations[0].id);
+            }
+            // If we have no conversations pop up the new converation
+            // modal.
+            else if (conversations.length === 0) {
+              var m = $modal.open(newConversationOpts);
+              m.result.then(withNewConversation);
+            }
+            // If we have more than one conversation (which shouldn't happen
+            // with our current UI) we display a choose conversation modal.
+            else {
+              var opts = {
+                templateUrl: './static/templates/choose_conversation.html',
+                controller: function($scope) {
+                  $scope.conversations = conversations;
+                  $scope.user = user;
+                  $scope.showConversation = function(conversation) {
+                    $location.path('/conversation/' + conversation.id);
+                  }
+                }
+              };
+            }
+          },
+          function(errorMessage) {
+            console.log('got an errorMessage: ' + errorMessage);
+            Messages.info(errorMessage);
+          }
+        );
+      };
+      return startConversation;
+    });
+
 })();

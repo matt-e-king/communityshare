@@ -15,11 +15,12 @@
   module.controller(
     'UserController',
     function($scope, $routeParams, User, Session, Question, Conversation,
-             Evnt) {
+             Evnt, startConversation) {
       $scope.Session = Session;
       var userId = $routeParams.userId;
       var userPromise = User.get(userId);
       $scope.message = 'Loading user...';
+      $scope.startConversation = startConversation;
       userPromise.then(
         function(user) {
           $scope.message = '';
@@ -333,7 +334,7 @@
           onError);
         combinedPromise.then(
           function() {
-            $location.path('/home');
+            $location.path('/');
           });
       };
       

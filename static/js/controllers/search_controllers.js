@@ -9,7 +9,8 @@
 
   module.controller(
     'MatchesController',
-    function($scope, Session, Search, $location, $modal, labelMapping, makeDialog) {
+    function($scope, Session, Search, $location, labelMapping, makeDialog,
+             startConversation) {
       $scope.Session = Session;
       $scope.labelMapping = labelMapping;
       $scope.labelClasses = {
@@ -70,23 +71,7 @@
             search.errorMessage = errorMessage;
           });
       };
-      $scope.startConversation = function(userId, searchId) {
-        var opts = {
-          templateUrl: './static/templates/new_conversation.html',
-          controller: 'NewConversationController',
-          resolve: {
-            userId: function() {return userId;},
-            searchId: function() {return searchId;}
-          }
-        };
-        var m = $modal.open(opts);
-        m.result.then(
-          function(conversation) {
-            if (conversation) {
-              $location.path('/conversation/' + conversation.id);
-            }
-          });
-      };
+      $scope.startConversation = startConversation;
       $scope.editProfile = function() {
         $location.path('settings');
       };
@@ -131,23 +116,6 @@
       };
       $scope.labelMapping = labelMapping;
 
-      $scope.startConversation = function(userId) {
-        var opts = {
-          templateUrl: './static/templates/new_conversation.html',
-          controller: 'NewConversationController',
-          resolve: {
-            userId: function() {return userId;},
-            searchId: function() {return searchId;}
-          }
-        };
-        var m = $modal.open(opts);
-        m.result.then(
-          function(conversation) {
-            if (conversation) {
-              $location.path('/conversation/' + conversation.id);
-            }
-          });
-      };
       if (searchId !== undefined) {
         var searchesPromise = Search.getResults(searchId);
         searchesPromise.then(
