@@ -111,19 +111,26 @@
           }
         }
       };
-      LabelDisplay.prototype.toggle = function(label) {
-        if (this.active[label]) {
-          this.active[label] = false;
-          var index = this.search.labels.indexOf(label);
-          if (index >= 0) {
-            this.search.labels.splice(index, 1);
-          }
-        } else {
-          this.active[label] = true;
+      LabelDisplay.prototype.setSelected = function(label) {
+        this.active[label] = true;
+        var index = this.search.labels.indexOf(label);
+        if (index === -1) {
           this.search.labels.push(label);
         }
-        console.log('labels is');
-        console.log(this.search.labels);
+      };
+      LabelDisplay.prototype.setUnselected = function(label) {
+        this.active[label] = false;
+        var index = this.search.labels.indexOf(label);
+        if (index >= 0) {
+          this.search.labels.splice(index, 1);
+        }
+      };
+      LabelDisplay.prototype.toggle = function(label) {
+        if (this.active[label]) {
+          this.setUnselected(label);
+        } else {
+          this.setSelected(label);
+        }
       };
       return LabelDisplay;
     });
@@ -155,8 +162,6 @@
      });
 
   var LabelsController = function($scope, LabelDisplay, getAllLabels) {
-    console.log('scope is');
-    console.log($scope);
     // Problem with search getting overridden.
     $scope.display = new LabelDisplay($scope.search, $scope.type);
     $scope.newLabel = {
@@ -176,8 +181,11 @@
       onUpdate: function() {
         var newLabelName = $scope.newLabel.name;
         if (newLabelName) {
-          $scope.display.all.subjectAreas.push(newLabelName);
-          $scope.display.active[newLabelName] = true;
+          var index = $scope.display.all.subjectAreas.indexOf(newLabelName);
+          if (index === -1) {
+            $scope.display.all.subjectAreas.push(newLabelName);
+          }
+          $scope.display.setSelected(newLabelName);
         }
         $scope.newLabel.name = '';
       }
