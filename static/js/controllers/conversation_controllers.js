@@ -99,18 +99,9 @@
         var m = $modal.open(opts);
       };
       var sortShares = function(shares) {
-        $scope.futureShares = [];
-        $scope.pastShares = [];
-        for (var i=0; i<shares.length; i++) {
-          var share = shares[i];
-          if (share.largest_datetime_start > new Date()) {
-            $scope.futureShares.push(share);
-          } else {
-            $scope.pastShares.push(share);
-          }
-        }
-        $scope.futureShares.sort(function(a, b) {return a.datetime_start > b.datetime_start;});
-        $scope.pastShares.sort(function(a, b) {return a.datetime_start > b.datetime_start;});        
+        var sortedShares = Share.sortShares(shares);
+        $scope.futureShares = sortedShares.future;
+        $scope.pastShares = sortedShares.past;
       };
       sharesPromise.then(
         function(shares) {

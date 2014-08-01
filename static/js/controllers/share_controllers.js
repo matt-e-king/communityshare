@@ -21,6 +21,9 @@
             $scope.errorMessage = '';
             $scope.infoMessage = '';
             $scope.shares = shares;
+            var sortedShares = Share.sortShares(shares);
+            $scope.futureShares = sortedShares.future;
+            $scope.pastShares = sortedShares.past;
           },
           function(errorMessage) {
             $scope.errorMessage = errorMessage;

@@ -69,6 +69,25 @@
         });
         this.events.push(evnt);
       };
+      Share.sortShares = function(shares) {
+        var futureShares = [];
+        var pastShares = [];
+        for (var i=0; i<shares.length; i++) {
+          var share = shares[i];
+          if (share.largest_datetime_start > new Date()) {
+            futureShares.push(share);
+          } else {
+            pastShares.push(share);
+          }
+        }
+        futureShares.sort(function(a, b) {return a.datetime_start > b.datetime_start;});
+        pastShares.sort(function(a, b) {return a.datetime_start > b.datetime_start;});
+        return {
+          future: futureShares,
+          past: pastShares
+        };
+      };
+
       return Share;
     });
 
