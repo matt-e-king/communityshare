@@ -20,7 +20,7 @@
       <div ng-repeat="conversation in conversations">
         <div class="row clickable" ng-click="showConversation(conversation.id)">
           <div class="col-lg-2">
-            <img ng-src="{{conversation.otherUser.picture_url}}" class=" img-circle">
+            <img ng-src="{{conversation.otherUser.picture_url}}" class=" img-circle img-responsive">
           </div>
           <div class="col-lg-10">
             <h4>{{conversation.otherUser.name}}</h4>

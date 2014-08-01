@@ -6023,14 +6023,6 @@ body {
 .clickable {
   cursor: pointer;
 }
-.labelbox {
-  padding: 5px;
-  margin: 5px;
-  float: left;
-  border: solid;
-  border-width: 1px;
-  border-radius: 3px;
-}
 .search-summary {
   border: solid;
   border-width: 1px;
@@ -6362,18 +6354,21 @@ body {
   background-color: #FDDF88;
   color: #fff;
   border: solid;
-  border-width: 2px;
+  border-color: #FDDF88;
+  border-width: 0px;
 }
 .light-green-button {
   background-color: #BDE787;
   color: #fff;
   border: solid;
+  border-color: #BDE787;
   border-width: 2px;
 }
 .light-blue-button {
   background-color: #A7CAE5;
   color: #fff;
   border: solid;
+  border-color: #A7CAE5;
   border-width: 2px;
 }
 .share-result {
@@ -6441,10 +6436,6 @@ body {
   border-width: 2px;
   border-color: black;
   color: black;
-}
-.labelbox-selected {
-  border: solid;
-  border-width: 2px;
 }
 /*Hompage specific styles*/
 .signup-btn {
