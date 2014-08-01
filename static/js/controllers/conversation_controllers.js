@@ -26,6 +26,8 @@
       var conversationsPromise = Conversation.get_many({'user_id': user.id}, true);
       conversationsPromise.then(
         function(conversations) {
+          conversations.sort(function(a, b) {
+            return a.datetime_last_message < b.datetime_last_message;});
           $scope.conversations = conversations;
         },
         function(errorMessage) {
