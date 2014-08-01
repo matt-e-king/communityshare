@@ -13,9 +13,14 @@
       var Share = itemFactory('share');
       Share.prototype.updateFromData = function(shareData) {
         this._baseUpdateFromData(shareData);
+        this.largest_datetime_start = undefined;
         if (this.events) {
           for (var i=0; i<this.events.length; i++) {
             this.events[i] = EvntBase.make(this.events[i]);
+            if ((this.largest_datetime_start === undefined) ||
+                (this.events[i].datetime_start > this.largest_datetime_start)) {
+              this.largest_datetime_start = this.events[i].datetime_start;
+            }
           }
         } else {
           this.events = [];

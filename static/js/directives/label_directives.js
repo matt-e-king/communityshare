@@ -17,7 +17,7 @@
           },
           subjectAreas: {
             communityPartnerSuggested: [
-              'Science', 'Technology', 'Engineering', 'Match',
+              'Science', 'Technology', 'Engineering', 'Math',
               'Visual Arts', 'Digital Media', 'Film & Photography', 'Literature',
               'Performing Arts'
             ],

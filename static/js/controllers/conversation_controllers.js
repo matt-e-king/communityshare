@@ -82,27 +82,37 @@
       $scope.messageHighlightClasses[$scope.otherUser.id] = 'highlight2';
       $scope.newMessage = makeNewMessage();
       $timeout(refreshConversation, 5000);
+      $scope.createNewShare = function() {
+        var share = conversation.makeShare();
+        $scope.editShare(share);
+      };
+      $scope.editShare = function(share) {
+        var opts = {
+          templateUrl: './static/templates/share_edit.html',
+          controller: 'EditShareController',
+          resolve: {
+            share: function() {return share;},
+          }
+        };
+        var m = $modal.open(opts);
+      };
+      var sortShares = function(shares) {
+        $scope.futureShares = [];
+        $scope.pastShares = [];
+        for (var i=0; i<shares.length; i++) {
+          var share = shares[i];
+          if (share.largest_datetime_start > new Date()) {
+            $scope.futureShares.push(share);
+          } else {
+            $scope.pastShares.push(share);
+          }
+        }
+        $scope.futureShares.sort(function(a, b) {return a.datetime_start > b.datetime_start;});
+        $scope.pastShares.sort(function(a, b) {return a.datetime_start > b.datetime_start;});        
+      };
       sharesPromise.then(
         function(shares) {
-          shares.sort(function(a, b) { return a.id - b.id; });
-          if (conversation.otherUser) {
-            if ((shares.length === 0)) {
-              $scope.share = conversation.makeShare();
-              if ($scope.share) {
-                $scope.events = $scope.share.events;
-              }
-            } else {
-              $scope.share = shares[0];
-              if ($scope.share.events.length === 0) {
-                $scope.share.addNewEvent();
-              }
-              $scope.events = $scope.share.events;
-            }
-          } else {
-            if (shares) {
-              $scope.share = shares[0];
-            }
-          }            
+          sortShares(shares);
         },
         showErrorMessage
       );
@@ -117,25 +127,15 @@
           showErrorMessage
         );
       };
-      $scope.editShare = function() {
-        var opts = {
-          templateUrl: './static/templates/share_edit.html',
-          controller: 'EditShareController',
-          resolve: {
-            share: function() {return $scope.share;},
-          }
-        };
-        var m = $modal.open(opts);
-      };
       $scope.now = new Date();
       $scope.reviewEvent = function(event) {
         $location.path('/event/' + event.id);
       };
-      $scope.confirmShare = function() {
+      $scope.confirmShare = function(share) {
         // Saving with no changes acts as an approve.
-        $scope.share.save();
+        share.save();
       };
-      $scope.cancelShare = function() {
+      $scope.cancelShare = function(share) {
         var title = 'Cancel Share';
         var msg = 'Do you really want to cancel this share with ' +
           $scope.otherUser.name;
@@ -146,11 +146,9 @@
           function(result) {
             if (result === 'yes') {
               // FIXME: Send email to otherUser saying they want to cancel it.
-              var deletePromise = $scope.share.destroy();
+              var deletePromise = share.destroy();
               deletePromise.then(
                 function() {
-                  $scope.share = conversation.makeShare();
-                  $scope.events = $scope.share.events;
                 },
                 function(message) {
                   var baseMessage = 'Failed to cancel share';
