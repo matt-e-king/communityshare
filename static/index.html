@@ -35,11 +35,7 @@
             <span class="icon-bar"></span>
           </button>
           <div ng-switch on="Session.activeUser !== undefined">
-            <a class="navbar-brand brand" href="#/" ng-switch-when="false">
-              <!-- FIXME: Should point to a locally served file. -->
-              <img src="http://imgur.com/ryZeICk.png"  id="logo-id" />
-            </a>
-            <a class="navbar-brand" href="#/" ng-switch-when="true">
+            <a class="navbar-brand brand">
               <!-- FIXME: Should point to a locally served file. -->
               <img src="http://imgur.com/ryZeICk.png"  id="logo-id" />
             </a>
@@ -76,7 +72,8 @@
     <div class="centered-home">
       <div class="container-fluid">
         <div class="row" ng-controller="NavigationController">
-          <div ng-show="Session.activeUser" class="col-sm-2 col-md-3 col-lg-3">
+          <div ng-show="Session.activeUser && Session.activeUser.accountCreationStatus === 'done'"
+               class="col-sm-2 col-md-3 col-lg-3">
             <div id="side-bar">
               <img src="http://lorempixel.com/200/200/people/" class="img-responsive img-circle centered">
               <ul class="side-nav" id="side-nav-items">
