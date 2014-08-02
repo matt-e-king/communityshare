@@ -1,3 +1,4 @@
+<div class="search-options-containter">
 <h3>{{gradeLevelsTitle}}</h3>
 <div class="btn-group">
   <button ng-repeat="label in display.all.gradeLevels" ng-click="toggleLabel(label)"
@@ -8,20 +9,11 @@
     {{label}}
   </button>
 </div>
-
-<h3>{{engagementLevelsTitle}}</h3>
-<div class="btn-group">
-  <button ng-repeat="label in display.all.engagementLevels" ng-click="toggleLabel(label)"
-          ng-show="display.active[label] || !onlyShowActive"
-          ng-class="{true: 'labelbox-selected', false: ''}[display.active[label]]"
-          class="btn btn-sm search-btn light-blue-button"
-          >
-    {{label}}
-  </button>
 </div>
 
+<div class="search-options-containter">
 <h3>{{subjectAreasTitle}}</h3>
-<div class="btn-group">
+<div class="btn-group pull-right">
   <button ng-repeat="label in display.all.subjectAreas" ng-click="toggleLabel(label)"
           ng-show="display.active[label] || !onlyShowActive"
           ng-class="{true: 'labelbox-selected', false: ''}[display.active[label]]"
@@ -35,14 +27,29 @@
   <form class="form-inline">
     <div class="form-group">
       <input
-         class="form-control" type="text"
+         class="form-control add-form-field" type="text"
          cs-new-label methods="newLabelMethods" ng-model="newLabel.name"
          typeahead="label for label in allLabels | filter:$viewValue | limitTo:8"
          typeahead-on-select="typeaheadSelect()"
-         placeholder="Add More"
+         placeholder="Add More..."
          >
     </div>
-    <button ng-click="newLabelMethods.onUpdate()" 
-            class="btn btn-success">Add</button>
+    <button ng-click="newLabelMethods.onUpdate()"
+            class="btn add-search-btn text-center">Add</button>
   </form>
+</div>
+</div>
+
+
+<div class="last-search-container">
+<h3>{{engagementLevelsTitle}}</h3>
+<div class="btn-group">
+  <button ng-repeat="label in display.all.engagementLevels" ng-click="toggleLabel(label)"
+          ng-show="display.active[label] || !onlyShowActive"
+          ng-class="{true: 'labelbox-selected', false: ''}[display.active[label]]"
+          class="btn btn-sm search-btn light-blue-button"
+          >
+    {{label}}
+  </button>
+</div>
 </div>
