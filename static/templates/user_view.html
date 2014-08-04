@@ -2,9 +2,9 @@
 </div>
 
 <div ng-if="Session.activeUser !== undefined">
-  
+
   <div ng-show="message" class="alert alert-info">{{message}}</div>
-  
+
   <div class="panel panel-default" ng-show="user">
     <div class="gradient-header">
       <h1>{{user.name}}</h1>
@@ -15,18 +15,20 @@
       <div class="col-sm-2 col-md-3">
         <img ng-src="{{user.picture_url}}" class="img-responsive img-circle centered">
         <div class="text-center">
-          <button class="btn btn-primary btn-lg profile-btns">Message</button>
-          <button class="btn btn-warning btn-lg profile-btns">View Shares</button>
+          <button class="btn primary-btn btn-lg profile-btns">Message</button>
+          <button class="btn profile-share-btn btn-lg profile-btns">View Shares</button>
         </div>
       </div>
-      
+
       <div class="col-sm-10 col-md-9">
-        <h3 ng-repeat="ia in user.institution_associations">
-          {{ia.role}} * {{ia.institution.name}}</h3>
+        <div class="profile-bio">
+        <h3 ng-repeat="ia in user.institution_associations" class="position">
+          {{ia.role}}  &#183; {{ia.institution.name}}</h3>
         <p>{{user.bio}}</p>
+      </div>
 
         <div ng-if="user.is_community_partner">
-          <div cs-labels search="user.community_partner_profile_search"
+          <div class="profile-tags" cs-labels search="user.community_partner_profile_search"
                grade-levels-title="Grade Levels"
                engagement-levels-title="Engagement Preferences"
                subject-areas-title="Areas of Expertise"
@@ -37,10 +39,10 @@
         </div>
 
         <div ng-if="user.is_educator">
-          <div cs-labels search="user.educator_profile_search"
+          <div class="profile-tags" cs-labels search="user.educator_profile_search"
                grade-levels-title="Grade Levels"
-               engagement-levels-title="Engagement Preferences"
                subject-areas-title="Subject Areas I teach"
+               engagement-levels-title="Engagement Preferences"
                type="educator"
                only-show-active="true"
                >
@@ -87,7 +89,7 @@
         </table>
       </div>
     </div>
-    
+
     <div class="panel panel-default" ng-show="events">
       <div class="panel-heading">
         <h5 class="panel-title">Events</h5>
