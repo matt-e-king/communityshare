@@ -4,7 +4,7 @@
 <div ng-if="Session.activeUser !== undefined">
 
   <div class="panel panel-default">
-    <div class="page-header">
+    <div class="gradient-header">
       <h2>Messages</h2>
     </div>
     <div class="panel-body">
@@ -16,11 +16,13 @@
       <div ng-show="conversations.length == 0">
         You have no messages.
       </div>
-      
+
       <div ng-repeat="conversation in conversations">
+        <div class="message-archive-container">
         <div class="row clickable" ng-click="showConversation(conversation.id)">
-          <div class="col-lg-2">
-            <img ng-src="{{conversation.otherUser.picture_url}}" class=" img-circle img-responsive">
+          <div class="col-xs-4 col col-md-2">
+            <img ng-src="{{conversation.otherUser.picture_url}}"
+                 class=" img-circle img-responsive message-archive-image">
           </div>
           <div class="col-lg-10">
             <h4>{{conversation.otherUser.name}}</h4>
@@ -34,4 +36,4 @@
     </div>
   </div>
 </div>
-  
+</div>

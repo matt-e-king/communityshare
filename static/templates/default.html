@@ -13,7 +13,7 @@
 
       <div class="col-xs-12 col-md-7 text-center value-prop">
         <h1>Reaching Out</h1>
-        <h2>Working together to benefit the children in </br> your community</h2>
+        <h2>Working together to benefit the children in <br/> your community</h2>
       </div>
 
       <div class="col-xs-12 col-md-4 well pull-right signup-div">
@@ -96,7 +96,7 @@
               Passwords do not match.
             </p>
           </div>
-
+          
           <div class="col-xs-12 text-center">
             <h2>Sign Up As An</h2>
           </div>
@@ -109,7 +109,7 @@
               <h3>Educator</h3>
             </label>
           </div>
-
+          
 
           <div class="col-xs-6">
             <label class="radio inline">
@@ -119,10 +119,21 @@
               <h3>Community Partner</h3>
             </label>
           </div>
-
+          
 
           <div class="col-xs-12">
-
+            
+            <p> By clicking Sign Up, you agree to our <a ng-click="showTerms()" class="clickable">
+                Terms of Service</a>.</p>
+          </div>
+          <div alert alert-error ng-show="errorMessage">{{errorMessage}}</div>
+          
+          <div class="col-xs-8 text-center">
+            <button type="submit" class="btn btn-primary btn-lg text-center signup-btn"
+                    ng-disabled="signUpForm.$invalid || (user_type === undefined)"
+                    ng-click="completeSplash()">
+              Sign Up
+            </button>
             <p> By clicking Sign Up, you agree to our <a ng-click="showTerms()" class="clickable">
                 Terms of Service</a>.</p>
           </div>
@@ -138,5 +149,5 @@
         </form>
       </div>
     </div>
-  </div> <!--BG - Image-->
+  </div>
 </div>

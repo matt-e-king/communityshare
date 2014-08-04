@@ -18,8 +18,8 @@
       
       <div ng-show="conversation.messages.length >=2" class="alert alert-warning">
         Don't forget to Create a Share.
-      </div> 
-      
+      </div>
+
       <div id="chat-body">
         <div ng-repeat="message in conversation.messages" class="conversation-block">
           <div class="chat-unit">
@@ -45,18 +45,18 @@
       </div>
 
       <form novalidate login-with-auto-fill action="" role="form" name="newConversationForm" class="form-horizontal" ng-if="conversation.otherUser">
-        
+
         <div class="form-group">
           <div class="chat-box">
             <textarea ng-model="newMessage.content" required name="content" id="content" class="form-control" ng-class="Session.activeUser.id" type="text">
             </textarea>
-                <p ng-show="newConversationForm.content.$invalid && !newConversationForm.content.$pristine" class="help-block">
-                  A message is required.
-                </p>
+            <p ng-show="newConversationForm.content.$invalid && !newConversationForm.content.$pristine" class="help-block">
+              A message is required.
+            </p>
           </div>
         </div>
       </form>
-
+      
       <div class="chat-button-area">
         <div class="col-lg-6">
           <div ng-if="conversation.otherUser">
