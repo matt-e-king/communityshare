@@ -117,6 +117,7 @@
         if (index === -1) {
           this.search.labels.push(label);
         }
+        this.search.dirty = true;
       };
       LabelDisplay.prototype.setUnselected = function(label) {
         this.active[label] = false;
@@ -124,6 +125,7 @@
         if (index >= 0) {
           this.search.labels.splice(index, 1);
         }
+        this.search.dirty = true;
       };
       LabelDisplay.prototype.toggle = function(label) {
         if (this.active[label]) {

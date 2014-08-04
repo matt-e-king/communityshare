@@ -199,20 +199,28 @@
       var turnOffLocationChangeHandler;
 
       var onLocationChange = function(event, newUrl, oldUrl) {
-        var title = 'Changes not Saved';
-        var msg = 'Do you really want to leave this page without saving your changes?';
-        var btns = [{result:'yes', label: 'Yes'},
-                    {result:'no', label: 'No', cssClass: 'btn-primary'}];
-        var d = makeDialog(title, msg, btns);
-        d.result.then(
-          function(result) {
-            if (result === 'yes') {
-              turnOffLocationChangeHandler();
-              var relUrl = newUrl.replace(/^.*\#/, "");
-              $location.path(relUrl);
-            }
-          });
-        event.preventDefault();
+        if (($scope.personalSettingsForm && $scope.personalSettingsForm.$dirty) || 
+            ($scope.accountSettingsForm && $scope.accountSettingsForm.$dirty) || 
+            ($scope.user.community_partner_profile_search &&
+             $scope.user.community_partner_profile_search.dirty) ||
+            ($scope.user.educator_profile_search &&
+             $scope.user.educator_profile_search.dirty))
+            {
+          var title = 'Changes not Saved';
+          var msg = 'Do you really want to leave this page without saving your changes?';
+          var btns = [{result:'yes', label: 'Yes'},
+                      {result:'no', label: 'No', cssClass: 'btn-primary'}];
+          var d = makeDialog(title, msg, btns);
+          d.result.then(
+            function(result) {
+              if (result === 'yes') {
+                turnOffLocationChangeHandler();
+                var relUrl = newUrl.replace(/^.*\#/, "");
+                $location.path(relUrl);
+              }
+            });
+          event.preventDefault();
+        }
       };
 
       turnOffLocationChangeHandler = $rootScope.$on('$locationChangeStart', onLocationChange);
