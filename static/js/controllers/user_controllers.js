@@ -196,16 +196,18 @@
     function($scope, $location, Session, Messages, $q,
              Question, Answer, $fileUploader, $http, makeDialog, Authenticator, $rootScope) {
 
+      var justSaved = false;
+
       var turnOffLocationChangeHandler;
 
       var onLocationChange = function(event, newUrl, oldUrl) {
-        if (($scope.personalSettingsForm && $scope.personalSettingsForm.$dirty) || 
+        if (!justSaved && (($scope.personalSettingsForm && $scope.personalSettingsForm.$dirty) || 
             ($scope.accountSettingsForm && $scope.accountSettingsForm.$dirty) || 
             ($scope.user.community_partner_profile_search &&
              $scope.user.community_partner_profile_search.dirty) ||
             ($scope.user.educator_profile_search &&
-             $scope.user.educator_profile_search.dirty))
-            {
+             $scope.user.educator_profile_search.dirty)))
+        {
           var title = 'Changes not Saved';
           var msg = 'Do you really want to leave this page without saving your changes?';
           var btns = [{result:'yes', label: 'Yes'},
@@ -342,6 +344,7 @@
           onError);
         combinedPromise.then(
           function() {
+            justSaved = true;
             $location.path('/');
           });
       };
