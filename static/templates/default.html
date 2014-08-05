@@ -120,7 +120,6 @@
             </label>
           </div>
           
-
           <div class="col-xs-12">
             
             <p> By clicking Sign Up, you agree to our <a ng-click="showTerms()" class="clickable">
@@ -129,17 +128,6 @@
           <div alert alert-error ng-show="errorMessage">{{errorMessage}}</div>
           
           <div class="col-xs-8 text-center">
-            <button type="submit" class="btn btn-primary btn-lg text-center signup-btn"
-                    ng-disabled="signUpForm.$invalid || (user_type === undefined)"
-                    ng-click="completeSplash()">
-              Sign Up
-            </button>
-            <p> By clicking Sign Up, you agree to our <a ng-click="showTerms()" class="clickable">
-                Terms of Service</a>.</p>
-          </div>
-          <div alert alert-error ng-show="errorMessage">{{errorMessage}}</div>
-
-          <div class="col-xs-12 text-center">
             <button type="submit" class="btn btn-primary btn-lg text-center signup-btn"
                     ng-disabled="signUpForm.$invalid || (user_type === undefined)"
                     ng-click="completeSplash()">
