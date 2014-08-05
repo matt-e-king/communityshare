@@ -25,7 +25,8 @@ class User(Base, Serializable):
         'name', 'is_administrator', 'institution_associations',
         'zipcode', 'website', 'twitter_handle', 'linkedin_link',
         'year_of_birth', 'gender', 'ethnicity', 'bio', 'phonenumber',
-        'educator_profile_search', 'community_partner_profile_search'
+        'educator_profile_search', 'community_partner_profile_search',
+        'wants_update_emails',
     ]
     STANDARD_READABLE_FIELDS = [
         'id', 'name', 'is_administrator', 'last_active', 'is_educator',
@@ -42,7 +43,7 @@ class User(Base, Serializable):
         'zipcode', 'phonenumber', 'website', 'twitter_handle', 'linkedin_link',
         'year_of_birth', 'gender', 'ethnicity', 'bio', 'picture_url',
         'email_confirmed', 'active', 'educator_profile_search',
-        'community_partner_profile_search'
+        'community_partner_profile_search', 'wants_update_emails',
     ]
 
     PERMISSIONS = {
@@ -63,6 +64,7 @@ class User(Base, Serializable):
     last_active = Column(DateTime)
     educator_profile_search_id = Column(Integer)
     community_partner_profile_search_id = Column(Integer)
+    wants_update_emails = Column(Boolean, nullable=False, default=False)
 
     picture_filename = Column(String(100))
     bio = Column(String(1000))
@@ -74,7 +76,7 @@ class User(Base, Serializable):
     year_of_birth = Column(Integer)
     gender = Column(String(100))
     ethnicity = Column(String(100))
-    
+
     searches = relationship(
         "Search",
         primaryjoin="Search.searcher_user_id == User.id",

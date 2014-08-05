@@ -1,4 +1,7 @@
-<div cs-main-view has-permission="{{(!(Session.activeUser === undefined))}}">
+<div cs-forbidden ng-if="Session.activeUser === undefined">
+</div>
+
+<div ng-if="Session.activeUser !== undefined">
   <div class="row">
     
     <div class="col-sm-2 col-md-3">
@@ -97,7 +100,19 @@
               </div>
               
               <label class="checkbox-inline">
-                <input type="checkbox" value="1"> CommunityShare invites you to stay informed about our progress in connecting educators and community members and adding new features to the CommunityShare site through periodic email updates. Click here to opt-out now or at any time by visiting your profile. You will still receive emails in relation to your correspondence with community partners/educators.
+                <input type="checkbox" 
+                       ng-model="user.wants_update_emails" checked>
+
+                       CommunityShare invites you to stay informed
+                       about our progress in connecting educators and
+                       community members and adding new features to
+                       the CommunityShare site through periodic email
+                       updates. Uncheck here to opt-out now or at any
+                       time by visiting your profile. You will still
+                       receive emails in relation to your
+                       correspondence with community
+                       partners/educators.
+
               </label>
               
             </div>

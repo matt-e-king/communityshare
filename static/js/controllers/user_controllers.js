@@ -139,37 +139,40 @@
     function($scope, Session, $fileUploader, $http, $location) {
       $scope.Session = Session;
       $scope.user = Session.activeUser;
-      $scope.submit = function() {
-        var userPromise = $scope.user.save();
-        userPromise.then(
-          function(user) {
-            $location.path('matches');
-          },
-          function(errorMessage) {
-            $scope.errorMessage = errorMessage;
-          });
-      };
-      $scope.validImage = true;
-      var uploader = $scope.uploader = $fileUploader.create({
-        scope: $scope,
-        url: '/api/user/'+$scope.user.id+'/picture',
-        headers: $http.defaults.headers.common,
-        filters: [
-          function (item) {
-            var is_image = (item.type.substring(0, 5) == 'image');
-            $scope.validImage = is_image;
-            uploader.queue.splice(0, uploader.queue.length);
-            return is_image;
+      if (Session.activeUser) {
+        $scope.user.wants_update_emails = true;
+        $scope.submit = function() {
+          var userPromise = $scope.user.save();
+          userPromise.then(
+            function(user) {
+              $location.path('matches');
+            },
+            function(errorMessage) {
+              $scope.errorMessage = errorMessage;
+            });
+        };
+        $scope.validImage = true;
+        var uploader = $scope.uploader = $fileUploader.create({
+          scope: $scope,
+          url: '/api/user/'+$scope.user.id+'/picture',
+          headers: $http.defaults.headers.common,
+          filters: [
+            function (item) {
+              var is_image = (item.type.substring(0, 5) == 'image');
+              $scope.validImage = is_image;
+              uploader.queue.splice(0, uploader.queue.length);
+              return is_image;
+            }
+          ]
+        });
+        
+        // Make sure we only have one file in the uploader queue
+        uploader.bind('afteraddingfile', function (event, item) {
+          if (uploader.queue.length > 1) {
+            uploader.queue.splice(0, uploader.queue.length-1);
           }
-        ]
-      });
-
-      // Make sure we only have one file in the uploader queue
-      uploader.bind('afteraddingfile', function (event, item) {
-        if (uploader.queue.length > 1) {
-          uploader.queue.splice(0, uploader.queue.length-1);
-        }
-      });
+        });
+      }
     });
 
   module.controller(
