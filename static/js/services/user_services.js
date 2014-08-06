@@ -138,7 +138,9 @@
             labels: []
           });
         }
-        if ((this.educator_profile_search.labels.length === 0) &&
+        if (this.is_administrator) {
+          this.accountCreationStatus = 'done';
+        } else if ((this.educator_profile_search.labels.length === 0) &&
             (this.community_partner_profile_search.labels.length == 0)) {
           this.accountCreationStatus = 'choice';
         } else if (!this.bio) {

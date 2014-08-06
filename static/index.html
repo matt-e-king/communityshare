@@ -86,6 +86,10 @@
                 </li>
                 <li class="side-nav-links"><a href="/#/matches">Matches</a>
                 </li>
+                <li class="side-nav-links"
+                    ng-show="Session.activeUser.is_administrator">
+                  <a href="/#/admin">Admin</a>
+                </li>
               </ul>
             </div>
           </div>

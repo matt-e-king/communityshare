@@ -95,9 +95,9 @@
     });
 
   module.controller(
-    'AdministratorHomeController',
+    'AdminController',
     function($scope, $location, getStatistics) {
-      $scope.searchText = '';
+      $scope.searchText = {value: ''};
       $scope.now = new Date();
       $scope.tomorrow = new Date();
       $scope.tomorrow.setDate($scope.tomorrow.getDate()+1);
@@ -107,7 +107,7 @@
       $scope.daysAgo30.setDate($scope.daysAgo7.getDate()-29);
       $scope.searchForUsers = function() {
         var searchParams = {
-          'searchText': $scope.searchText
+          'searchText': $scope.searchText.value
         };
         $location.path('/searchusers').search(searchParams);
       };
@@ -161,7 +161,7 @@
       $scope.Session = Session;
       $scope.infoMessage = 'Searching for matching users...';
       $scope.users = undefined;
-      $scope.searchText = $routeParams.searchText;
+      $scope.searchText = {value: $routeParams.searchText};
       var start = $routeParams.created_start;
       if (start) {
         start = parseyyyyMMdd(start);
@@ -174,14 +174,14 @@
       $scope.stop = stop;
       var searchForUsers = function() {
         var combinedPromise;
-        if ($scope.searchText) {
+        if ($scope.searchText.value) {
           var searchNameParams = {
-            'name.ilike': '%' + $scope.searchText + '%',
+            'name.ilike': '%' + $scope.searchText.value + '%',
             'date_created.greaterthan': start,
             'date_created.lessthan': stop
           };
           var searchEmailParams = {
-            'email.ilike': '%' + $scope.searchText + '%',
+            'email.ilike': '%' + $scope.searchText.value + '%',
             'date_created.greaterthan': start,
             'date_created.lessthan': stop
           };
@@ -242,7 +242,7 @@
       searchForUsers();
       $scope.newSearch = function() {
         var searchParams = {
-          'searchText': $scope.searchText
+          'searchText': $scope.searchText.value
         };
         $location.search(searchParams);
       };

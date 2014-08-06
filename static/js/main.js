@@ -137,6 +137,17 @@
       }
     });
 
+    $routeProvider.when('/admin', {
+      templateUrl: './static/templates/admin.html',
+      controller: 'AdminController',
+      resolve: {
+        activeUser: function(activeUserLoader) {
+          return activeUserLoader();
+        }
+      }
+    });
+      
+
     $routeProvider.when('/search/:searchId/results', {
       templateUrl: './static/templates/search_results.html',
       controller: 'SearchResultsController',
