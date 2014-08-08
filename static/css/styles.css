@@ -3752,6 +3752,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   background-image: none;
   border: 1px solid transparent;
   border-radius: 4px;
+  color:green;
 }
 .navbar-toggle:focus {
   outline: none;
