@@ -1,3 +1,4 @@
+<div class="org-info">
 <div ng-class="{true: 'has-error'}[(!institutionAssociation.isValid()) && (!institutionAssociation.institution.name)]">
   <input ng-model="institutionAssociation.institution.name"
          name="institution{{index}}"
@@ -39,7 +40,7 @@
   <select ng-model="institutionAssociation.institution.institution_type"
           name="institution_type{{index}}"
           id="institution_type{{index}}"
-          class="form-control"
+          class="form-control org-input"
           ng-options="typ for typ in institutionTypes | filter:$viewValue | limitTo: 100"
           ng-disabled="disabled"
           >
@@ -55,3 +56,5 @@
    ng-click="institutionAssociation.remove()">
   Delete Institution
 </a>
+
+</div>

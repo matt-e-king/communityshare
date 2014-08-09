@@ -20,6 +20,8 @@
 
   <body>
 
+    <img src="http://imgur.com/eg07rvx.png" id="bg" alt="">
+
     <!-- Static navbar -->
     <div class="navbar navbar-default navbar-fixed-top" role="navigation"
          ng-controller="NavigationController">
@@ -74,7 +76,7 @@
       <div class="container-fluid">
         <div class="row" ng-controller="NavigationController">
           <div ng-show="Session.activeUser && Session.activeUser.accountCreationStatus === 'done'"
-               class="col-sm-2 col-md-3 col-lg-3">
+               class="col-sm-4 col-md-4 hidden-xs">
             <div id="side-bar">
               <img src="http://lorempixel.com/200/200/people/" class="img-responsive img-circle centered">
               <ul class="side-nav" id="side-nav-items">
@@ -93,8 +95,39 @@
               </ul>
             </div>
           </div>
+
+<!-- FIXME: You should be able to toggle this menu using the "hamburger" menu icon. Preferrable with a transition.  -->
+<!--
+          <div ng-controller="NavigationController">
+            <div ng-show="Session.activeUser" class="visible-xs col-sm-4 col-xs-6 off-canvas off-canvas-ease-in">
+              <div class="off-canvas-menu">
+                <img src="http://lorempixel.com/200/200/people/" class="img-responsive img-circle centered">
+                <ul class="side-nav" id="side-nav-items">
+                  <li class="side-nav-links"><a href="/#/search">Search</a>
+                  </li>
+                  <li class="side-nav-links"><a href="/#/messages">Messages</a>
+                  </li>
+                  <li class="side-nav-links"><a href="/#/shares">Shares</a>
+                  </li>
+                  <li class="side-nav-links"><a href="/#/matches">Matches</a>
+                  </li>
+                </ul>
+              </hr>
+              <div class="off-canvas-sec-nav centered">
+                <ul class="side-nav" id="side-nav-items"> -->
+                <!-- FIXME: You should be able to toggle this menu using the  -->
+                <!--  <li><a href="">Settings</a></li>
+                  <li><a href="">Resources</a></li>
+                  <li><a href="">Help</a></li>
+                  <li><a href="">Log Out</a></li>
+                </ul>
+              </div>
+            </div>
+          </div> -->
+
+
           <!-- Main component for a primary marketing message or call to action -->
-          <div ng-class="{true:'col-sm-10 col-md-9 col-lg-9'}[(Session.activeUser !== undefined)]">
+          <div ng-class="{true:'col-sm-8 col-md-8 col-xs-12 col-lg-9'}[(Session.activeUser !== undefined)]">
             <div class="ng-view"></div>
           </div>
         </div>
