@@ -10,6 +10,12 @@
       'communityshare.services.share',
       'communityshare.services.statistics'
     ]);
+
+  module.controller(
+    'MainController',
+    function($scope, Session) {
+      $scope.Session = Session;
+    });
   
   module.controller(
     'HomeController',
@@ -96,7 +102,8 @@
 
   module.controller(
     'AdminController',
-    function($scope, $location, getStatistics) {
+    function(Session, $scope, $location, getStatistics) {
+      $scope.Session = Session;
       $scope.searchText = {value: ''};
       $scope.now = new Date();
       $scope.tomorrow = new Date();

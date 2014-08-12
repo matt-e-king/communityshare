@@ -6,6 +6,48 @@
   ]);
 
   module.directive(
+    'csRegistrationWrapper',
+    function() {
+      return {
+        templateUrl: '/static/templates/registration_wrapper.html',
+        transclude: true
+      }
+    });
+
+  module.directive(
+    'csStandardWrapper',
+    function() {
+      return {
+        templateUrl: '/static/templates/standard_wrapper.html',
+        transclude: true
+      }
+    });
+
+  module.directive(
+    'csSideNav',
+    function() {
+      return {
+        templateUrl: '/static/templates/sidenav.html'
+      };
+    });
+
+  module.directive(
+    'csNavBar',
+    function() {
+      return {
+        templateUrl: '/static/templates/navbar.html'
+      };
+    });
+
+  module.directive(
+    'csFooter',
+    function() {
+      return {
+        templateUrl: '/static/templates/footer.html'
+      };
+    });
+
+  module.directive(
     'csUserAgreement',
     function() {
       return {

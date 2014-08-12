@@ -1,3 +1,5 @@
+<div cs-standard-wrapper>
+
 <div cs-forbidden ng-if="Session.activeUser === undefined">
 </div>
 
@@ -26,12 +28,27 @@
            ></div>
 
       <div class="text-center">
-      <button class="primary-btn btn-lg search-btn"
-              ng-disabled="properties.educatorSearchSettingsForm.$invalid"
-              ng-click="saveSettings()">
-      Submit Search
-      </button>
-</div>
+        <button class="primary-btn btn-lg search-btn"
+                ng-disabled="properties.educatorSearchSettingsForm.$invalid"
+                ng-click="saveSettings()">
+          Submit Search
+        </button>
+      </div>
+
+      <div>
+        <h3>Search by name, email or institution</h3>
+        <input ng-model="searchText.value"
+               name="searchText"
+               id="searchText"
+               class="form-control"
+               placeholder="Name, Email or Institution"
+               type="text"/>
+        <button class="primary-btn btn-lg search-btn"
+                ng-click="userSearch()">
+          Submit
+        </button>
+      </div>
     </div>
   </div>
+</div>
 </div>
