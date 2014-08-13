@@ -11,69 +11,239 @@
     </div>
     <div class="panel-body">
 
-      <div tabset name="settingsTabSet">
+      <div class="col-xs-12" ng-if="user.is_community_partner"
+           cs-labels search="user.community_partner_profile_search"
+           grade-levels-title="I am interested in working with the following groups"
+           engagement-levels-title="I am interested in the following types of engagement (click all that apply)"
+           subject-areas-title="In which areas do you have expertise?"
+           type="communityPartner"
+           >
+      </div>
+      <div class="col-xs-12" ng-if="user.is_educator"
+           cs-labels search="user.educator_profile_search"
+           grade-levels-title="Grade levels I teach."
+           engagement-levels-title="Engagement Preferences (click all that apply)"
+           subject-areas-title="Subject areas I teach (click all that apply)"
+           type="educator"
+           >
+      </div>
 
-        <div tab active="interestsTabActive">
-          <div tab-heading>
-            Needs/Interests
+      <form novalidate action="" role="form" name="personalSettingsForm"
+            class="form-horizontal" emit-scope="personalSettingsForm">
+
+        <input ng-model="user.email"
+               required
+               name="email"
+               id="email"
+               disabled
+               class="form-control"
+               type="email"
+               placeholder="Email"
+               />
+        <p ng-show="accountSettingsForm.email.$invalid && !accountSettingsForm.email.$pristine" class="help-block">
+          Please enter a valid email.
+        </p>
+        <p ng-show="!user.email_confirmed">
+          Email not confirmed.<br/>
+          <a class="clickable" ng-click="resendEmailConfirmation()">
+            Send email confirmation email.</a>
+        </p>
+        
+        <h3>Image</h3>
+        <input ng-file-select type="file" name="picture" id="picture"/>
+        <div ng-show="!validImage">Not a valid image file</div>
+        <image ng-show="(uploader.queue.length === 0)" ng-src="{{user.picture_url}}" height="100"/>
+        <div ng-show="uploader.isHTML5">
+          <div ng-repeat="item in uploader.queue"
+               ng-thumb="{ file: item.file, height: 100 }"></div>
+        </div>
+           
+        <div class="form-group">
+          <label for="name"
+                 class="control-label cs-form-label">Name</label>
+          <div class="cs-form-control">
+            <input ng-model="user.name"
+                   required
+                   type="text"
+                   name="name"
+                   id="name"
+                   class="form-control"/>
+            <p ng-show="personalSettingsForm.name.$invalid" class="help-block">
+              A name is required.
+            </p>
           </div>
-          <div class="tab-content" active="interestsTabActive">
-            <div class="col-xs-12" ng-if="user.is_community_partner"
-                 cs-labels search="user.community_partner_profile_search"
-                 grade-levels-title="I am interested in working with the following groups"
-                 engagement-levels-title="I am interested in the following types of engagement (click all that apply)"
-                 subject-areas-title="In which areas do you have expertise?"
-                 type="communityPartner"
-                 >
-            </div>
-            <div class="col-xs-12" ng-if="user.is_educator"
-                 cs-labels search="user.educator_profile_search"
-                 grade-levels-title="Grade levels I teach."
-                 engagement-levels-title="Engagement Preferences (click all that apply)"
-                 subject-areas-title="Subject areas I teach (click all that apply)"
-                 type="educator"
-                 >
-            </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="bio"
+                 class="control-label cs-form-label">Bio</label>
+          <div class="cs-form-control">
+            <textarea ng-model="user.bio"
+                      name="bio"
+                      required
+                      class="form-control"></textarea>
+            <p ng-show="personalSettingsForm.bio.$invalid" class="help-block">
+              A brief description of yourself is required.
+            </p>
           </div>
         </div>
 
-    <div tab active="personalTabActive">
-      <div tab-heading>
-        <span ng-class="{'tab-heading-error': personalSettingsForm.$invalid}">
-          Personal
-        </span>
-      </div>
-      <div class="tab-content">
-        <form novalidate action="" role="form" name="personalSettingsForm"
-              class="form-horizontal" emit-scope="personalSettingsForm">
-          <div cs-account-settings></div>
-          <div cs-personal-settings></div>
-          <div cs-more-personal-settings>boo</div>
-        </form>
-      </div>
+        <div class="form-group">
+          <label for="location"
+                 class="control-label cs-form-label">ZIP Code</label>
+          <div class="cs-form-control">
+            <input ng-model="user.zipcode"
+                   name="zipcode"
+                   id="zipcode"
+                   required
+                   class="form-control"
+                   ng-pattern="/^\d{5}(-\d{4})?$/"
+                   type="text"/>
+            <p ng-show="personalSettingsForm.zipcode.$invalid"
+               class="help-block">
+              Please enter a valid ZIP code.
+            </p>
+          </div>
+        </div>
 
+        <div cs-institutions user="user"
+             is-community-partner="isCommunityPartner"
+             is-educator="isEducator"
+             >
+        </div>
+
+        <label class="checkbox-inline">
+          <input type="checkbox" 
+                 ng-model="user.wants_update_emails" checked>
+          CommunityShare invites you to stay informed
+          about our progress in connecting educators and
+          community members and adding new features to
+          the CommunityShare site through periodic email
+          updates. Uncheck here to opt-out.  You will still
+          receive emails in relation to your
+          correspondence with community
+          partners/educators.
+        </label>
+
+        <div class="form-group">
+          <label for="year_of_birth"
+                 class="control-label cs-form-label">Year of Birth</label>
+          <div class="cs-form-control">
+            <input ng-model="user.year_of_birth"
+                   name="year_of_birth"
+                   id="year_of_birth"
+                   class="form-control"
+                   type="integer"/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="gender"
+                 class="control-label cs-form-label">Gender</label>
+          <div class="cs-form-control">
+            <input type="radio" name="gender"
+                   ng-model="user.gender"
+                   value="Female"/>
+            Female<br/>
+            <input type="radio" name="gender"
+                   ng-model="user.gender"
+                   value="Male"/>
+            Male<br/>
+            <input type="radio" name="gender"
+                   ng-model="user.gender"
+                   ng-value="custom_gender"/>
+            Other (enter below)<br/>
+            <input ng-model="custom_gender"
+                   name="custom_gender"
+                   class="form-control"
+                   type="text"/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="ethnicity"
+                 class="control-label cs-form-label">Ethnicity</label>
+          <div class="cs-form-control">
+            <input type="radio" name="ethnicity"
+                   ng-model="user.ethnicity"
+                   value="Hispanic or Latino"/>
+            Hispanic or Latino<br/>
+            <input type="radio" name="ethnicity"
+                   ng-model="user.ethnicity"
+                   value="Not Hispanic or Latino"/>
+            Not Hispanic or Latino<br/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="website"
+                 class="control-label cs-form-label">Website</label>
+          <div class="cs-form-control">
+            <input ng-model="user.website"
+                   name="website"
+                   id="website"
+                   class="form-control"
+                   type="text"/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="phone_number"
+                 class="control-label cs-form-label">Phone Number</label>
+          <div class="cs-form-control">
+            <input ng-model="user.phone_number"
+                   name="phone_number"
+                   id="phone_number"
+                   class="form-control"
+                   type="text"/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="twitter_handle"
+                 class="control-label cs-form-label">Twitter Handle</label>
+          <div class="cs-form-control">
+            <input ng-model="user.twitter_handle"
+                   name="twitter_handle"
+                   id="twitter_handle"
+                   class="form-control"
+                   type="text"/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="linkedin_link"
+                 class="control-label cs-form-label">LinkedIn Profile URL</label>
+          <div class="cs-form-control">
+            <input ng-model="user.linkedin_link"
+                   name="linkedin_link"
+                   id="linkedin_link"
+                   class="form-control"
+                   type="text"/>
+          </div>
+        </div>
+
+      </form>
     </div>
 
+    <div ng-show="personalSettingsForm.$invalid">
+      Personal Settings are invalid
+    </div>
+    <div ng-show="accountSettingsForm.$invalid">
+      Account Settings are invalid
+    </div>
+    
+    <input type="submit" value="Save" class="btn btn-primary"
+           ng-disabled="personalSettingsForm.$invalid || accountSettingsForm.$invalid"
+           ng-click="save()"/>
+    
+    
+    <br/>
+    <br/>
+    <h4> Account Deletion </h4>
+    
+    <input type="submit" value="Delete Account" class="btn btn-default"
+           ng-click="deleteAccount()"/>
+    
   </div>
-  
-  <div ng-show="personalSettingsForm.$invalid">
-    Personal Settings are invalid
-  </div>
-  <div ng-show="accountSettingsForm.$invalid">
-    Account Settings are invalid
-  </div>
-  
-  <input type="submit" value="Save" class="btn btn-primary"
-         ng-disabled="personalSettingsForm.$invalid || accountSettingsForm.$invalid"
-         ng-click="save()"/>
-
-
-  <br/>
-  <br/>
-  <h4> Account Deletion </h4>
-  
-  <input type="submit" value="Delete Account" class="btn btn-default"
-         ng-click="deleteAccount()"/>
-
-</div>
 </div>

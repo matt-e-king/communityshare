@@ -69,46 +69,6 @@
       };
     });
 
-  module.directive(
-    'csSignupSettings',
-    function() {
-      return {
-        templateUrl: 'static/templates/signup_common.html'
-      };
-    });
-
-  module.directive(
-    'csPersonalSettings',
-    function() {
-      return {
-        templateUrl: 'static/templates/personal_settings.html'
-      };
-    });
-
-  module.directive(
-    'csMorePersonalSettings',
-    function() {
-      return {
-        templateUrl: 'static/templates/more_personal_settings.html'
-      };
-    });
-
-  module.directive(
-    'csSignupAccountSettings',
-    function() {
-      return {
-        templateUrl: 'static/templates/signup_account_settings.html'
-      };
-    });
-
-  module.directive(
-    'csAccountSettings',
-    function() {
-      return {
-        templateUrl: 'static/templates/account_settings.html'
-      };
-    });
-
   module.directive('csParserHook', function() {
     return {
       require: 'ngModel',

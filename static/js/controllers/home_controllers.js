@@ -4,7 +4,6 @@
   var module = angular.module(
     'communityshare.controllers.home',
     [
-      'communityshare.directives.home',
       'communityshare.services.search',
       'communityshare.services.modal',
       'communityshare.services.share',
