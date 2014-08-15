@@ -89,7 +89,9 @@
         for (var key in data) {
           this[key] = data[key];
         }
-        this.created = new Date(this.created);
+        if (this.created) {
+          this.created = new Date(this.created);
+        }
       };
       Search.prototype.isProfile = function(user) {
         var isProfile = (
