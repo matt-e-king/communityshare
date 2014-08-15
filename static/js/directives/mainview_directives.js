@@ -35,7 +35,8 @@
     'csNavBar',
     function() {
       return {
-        templateUrl: '/static/templates/navbar.html'
+        templateUrl: '/static/templates/navbar.html',
+        replace: true
       };
     });
 
