@@ -24,10 +24,20 @@
     });
 
   module.directive(
+    'csSplashWrapper',
+    function() {
+      return {
+        templateUrl: '/static/templates/splash_wrapper.html',
+        transclude: true
+      }
+    });
+
+  module.directive(
     'csSideNav',
     function() {
       return {
-        templateUrl: '/static/templates/sidenav.html'
+        templateUrl: '/static/templates/sidenav.html',
+        replace: true
       };
     });
 
@@ -44,7 +54,8 @@
     'csFooter',
     function() {
       return {
-        templateUrl: '/static/templates/footer.html'
+        templateUrl: '/static/templates/footer.html',
+        replace: true
       };
     });
 
