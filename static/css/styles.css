@@ -5900,9 +5900,6 @@ body {
 .modal {
   display: block;
 }
-.padded-link {
-  padding-top: 30px;
-}
 .message-container {
   position: fixed;
   top: 10px;
@@ -6237,6 +6234,9 @@ body {
   text-shadow: none;
   color: #FFFFFF;
 }
+.splash-link {
+  color: black;
+}
 .signup-bottom {
   width: 80%;
   float: none;
@@ -6277,6 +6277,12 @@ body {
   -webkit-box-shadow: 0px 5px 3px 0px rgba(50, 50, 50, 0.37);
   -moz-box-shadow: 0px 5px 3px 0px rgba(50, 50, 50, 0.37);
   box-shadow: 0px 5px 3px 0px rgba(50, 50, 50, 0.37);
+}
+.signup-div .help-block {
+  color: #FFFFFF;
+}
+.signup-as-block {
+  padding-bottom: 20px;
 }
 .signup-form {
   border: none;
