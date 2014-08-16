@@ -34,11 +34,11 @@
   module.controller(
     'RequestResetPasswordController',
     function($scope, Authenticator) {
-      $scope.email = '';
+      $scope.email = {value: ''};
       $scope.successfulRequest = false;
       $scope.failedRequest = false;
       $scope.requestResetPassword = function() {
-        var promise = Authenticator.requestResetPassword($scope.email);
+        var promise = Authenticator.requestResetPassword($scope.email.value);
         promise.then(
           function() {
             $scope.successfulRequest = true;
