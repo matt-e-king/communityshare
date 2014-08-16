@@ -103,15 +103,16 @@
       $scope.newUser = new User();
       $scope.passwordMethods = {};
       $scope.pg = 'default';
+      $scope.user_type = {value: ''}
       $scope.completeSplash = function() {
         $scope.newUser.name = $scope.newUser.firstName + ' ' + $scope.newUser.lastName;
         var userPromise = signUp($scope.newUser, $scope.newUser.password);
         userPromise.then(
           function() {
             $scope.errorMessage = '';
-            if ($scope.user_type == 'communityPartner') {
+            if ($scope.user_type.value == 'communityPartner') {
               $location.path('/signup/communitypartner');
-            } else if ($scope.user_type == 'educator') {
+            } else if ($scope.user_type.value == 'educator') {
               $location.path('/signup/educator');
             }
           },
