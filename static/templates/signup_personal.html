@@ -20,7 +20,8 @@
               <div class="col-sm-3 text-center">
                 <!-- FIXME: Remove imgur logo.  Put somewhere static.  Check copyright. -->
                 <img ng-show="(uploader.queue.length == 0) && (!user.picture_url)"
-                     src="http://imgur.com/rQ7NKxD.png" class="img-responsive img-circle"></img>
+                     src="http://communityshare_assets.s3.amazonaws.com/default_avatar.png" 
+                     class="img-responsive img-circle"></img>
                 <image ng-show="(uploader.queue.length === 0)" ng-src="{{user.picture_url}}" height="100"
                        class="img-responsive img-circle"/>
                 <div ng-show="uploader.isHTML5">
