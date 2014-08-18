@@ -43,6 +43,10 @@ def make_app():
     def css_static(filename):
         return send_from_directory(app.root_path + '/../static/css/', filename)
 
+    @app.route('/static/templates/footer.html')
+    def footer_template():
+        return render_template('templates/footer.html', config=config)
+
     @app.route('/static/templates/<path:filename>')
     def templates_static(filename):
         return send_from_directory(app.root_path + '/../static/templates/', filename)
