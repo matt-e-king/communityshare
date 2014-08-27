@@ -29,7 +29,7 @@ Go to {url} for more details.
 '''
 
 ACCOUNT_DELETION_TEMPLATE = '''You have requested to delete your Community Share account.
-If you did not make this request, or it was done erroneously please contact an administrator
+If you did not make this request, or it was done accidentally please contact an administrator
 at {admin_email}.
 '''
 
