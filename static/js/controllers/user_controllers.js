@@ -139,17 +139,21 @@
     function($scope, Session, $fileUploader, $http, $location) {
       $scope.Session = Session;
       $scope.user = Session.activeUser;
+      $scope.submitAttempted = false;
       if (Session.activeUser) {
         $scope.user.wants_update_emails = true;
-        $scope.submit = function() {
-          var userPromise = $scope.user.save();
-          userPromise.then(
-            function(user) {
-              $location.path('matches');
-            },
-            function(errorMessage) {
-              $scope.errorMessage = errorMessage;
-            });
+        $scope.submit = function(personalSettingsForm) {
+          $scope.submitAttempted = true;
+          if (personalSettingsForm.$valid) {
+            var userPromise = $scope.user.save();
+            userPromise.then(
+              function(user) {
+                $location.path('matches');
+              },
+              function(errorMessage) {
+                $scope.errorMessage = errorMessage;
+              });
+          }
         };
         $scope.validImage = true;
         var uploader = $scope.uploader = $fileUploader.create({

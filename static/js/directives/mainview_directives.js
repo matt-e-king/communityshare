@@ -111,4 +111,52 @@
       };
     });
 
+
+  // These directive based upon:
+  // http://stackoverflow.com/questions/21466495/using-angularjs-how-do-i-set-all-form-fields-to-dirty-at-once
+
+  module.directive('formSubmitted', function () {
+    return {
+      restrict: 'A',
+      require: 'form',
+      link: function (scope, element, attrs, ctrl) {
+        scope.submitted = false;
+        element.on('submit', function () {
+          scope.$apply(function () {
+            scope.submitted = true;
+          });
+        });
+      }
+    };
+  });
+  
+  module.directive(
+    'inputErrorHelper',
+    function ($compile, $interpolate) {
+      return {
+        restrict: 'A',
+        require: '^form',
+        scope: {
+          label: '@',
+          inputTag: '@'
+        },
+        
+        link: function (scope, element, attrs, formController) {
+          
+          var fieldName = element.attr('name');
+          var formScope = element.scope();
+          
+          formScope.$watch('submitted', function (submitted) {
+            if (submitted) {
+              formController[fieldName].showError = true;
+            }
+          });
+          element.bind('blur', function(event) {
+            scope.$apply(function() {
+              formController[fieldName].showError = true;
+            });
+          });
+        }
+      };
+    });
 })();
