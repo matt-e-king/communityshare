@@ -89,33 +89,37 @@
       });
 
     $scope.submit = function() {
-      // Save changes made to user.
-      var userPromise = user.save();
-      var allPromises = [userPromise];
-      // And save the answers to questions.
-      for (var i=0; i<$scope.questions.length; i++) {
-        var question = $scope.questions[i];
-        if (question.answer.text) {
-          allPromises.push(question.answer.save());
+      if (!$scope.institutionMethods.isValid()) {
+        $scope.institutionMethods.form.submitted = true;
+      } else {
+        // Save changes made to user.
+        var userPromise = user.save();
+        var allPromises = [userPromise];
+        // And save the answers to questions.
+        for (var i=0; i<$scope.questions.length; i++) {
+          var question = $scope.questions[i];
+          if (question.answer.text) {
+            allPromises.push(question.answer.save());
+          }
         }
-      }
-      $q.all(allPromises).then(
-        function(data) {
-          var search = data[0];
-          $location.path('/signup/personal');
-        },
-        function(message) {
-          Messages.error(message);
-        });
-
-      $scope.readyToSubmit = function() {
-        var ready = false;
-        if ($scope.institutionMethods.isValid && $scope.institutionMethods.isValid()) {
-          ready = true;
-        }
-        return ready;
+        $q.all(allPromises).then(
+          function(data) {
+            var search = data[0];
+            $location.path('/signup/personal');
+          },
+          function(message) {
+            Messages.error(message);
+          });
+        
+        $scope.readyToSubmit = function() {
+          var ready = false;
+          if ($scope.institutionMethods.isValid && $scope.institutionMethods.isValid()) {
+            ready = true;
+          }
+          return ready;
+        };
       };
-    };
+    }
   };
 
   module.controller(

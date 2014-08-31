@@ -1,11 +1,5 @@
-<div>
-  <div ng-repeat="ia in user.institution_associations" cs-institution-association-edit
-       institution-association="ia", index="{{$index+1}}"
-       institutions="options.institutions"
-       disabled="noInstitutions"
-       institution-types="options.institutionTypes"
-       roles="options.roles"
-       >
+<form novalidate name="institutionsForm">
+  <div ng-repeat="ia in user.institution_associations" cs-institution-association-edit>
   </div>
   
   <label class="checkbox-inline"
@@ -17,4 +11,4 @@
   <a class="pull-right" ng-click="user.addNewInstitutionAssociation();">
     + Add Organization Association</a>
 
-</div>
+</form>

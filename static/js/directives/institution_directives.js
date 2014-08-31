@@ -17,31 +17,18 @@
          },
          templateUrl: './static/templates/institution_adder.html',
          controller: function($scope) {
-           if ($scope.methods !== undefined) {
-             $scope.methods.isValid = function() {
-               var valid = true;
-               var nIAs = 0;
-               if ((!$scope.noInstitutions) && $scope.user) {
-                 for (var i=0; i<$scope.user.institution_associations.length; i++) {
-                   var ia = $scope.user.institution_associations[i];
-                   if (!(ia.isValid && ia.isValid())) {
-                     valid = false;
-                   } else if (ia.role) {
-                     nIAs += 1;
-                   } 
-                 }
-                 if (nIAs === 0) {
-                   valid = false;
-                 }
-               }
-               return valid;
-             };
-           }
            $scope.updateInstitutions = function() {
              if ($scope.noInstitutions) {
                $scope.user.institution_associations = [];
                $scope.user.addNewInstitutionAssociation();
+               $scope.institutionsForm.submitted = false;
              }
+           };
+           $scope.$watch('institutionsForm', function(f) {
+             $scope.methods.form = $scope.institutionsForm;
+           });
+           $scope.methods.isValid = function() {
+             return $scope.institutionsForm.$valid || $scope.noInstitutions;
            };
            // FIXME: Not scaleable.  Change to get the most popular.
            var institutionsPromise = Institution.get_many();
@@ -50,13 +37,13 @@
                              institutionTypes: [],
                             };
            if ($scope.isCommunityPartner) {
-             $scope.options.institutionTypes = [
+             $scope.institutionTypes = [
                'Corporation', 'Freelancer', 'Nonprofit', 'Academic',
                'Government', 'Other'
                ];
-             $scope.options.roles = [];
+             $scope.roles = [];
            } else if ($scope.isEducator) {
-             $scope.options.institutionTypes = [
+             $scope.institutionTypes = [
                'Public District School',
                'Public Charter',
                'Private School',
@@ -66,7 +53,7 @@
                'After School Program',
                'Other',
              ];
-            $scope.options.roles = [
+            $scope.roles = [
               'Classroom teacher',
               'Curriculum Coordinator',
               'Administator',
@@ -79,7 +66,7 @@
            }
            institutionsPromise.then(
              function(institutions) {
-               $scope.options.institutions = institutions;
+               $scope.institutions = institutions;
              });
          }
        };
@@ -89,30 +76,11 @@
     'csInstitutionAssociationEdit',
     function() {
       return {
-        scope: {
-          institutionAssociation: '=',
-          institutions: '=',
-          institutionTypes: '=',
-          roles: '=',
-          disabled: '=',
-          index: '@'
-        },
         templateUrl: 'static/templates/institution_association.html',
         controller: function($scope) {
-          $scope.institutionAssociation.isValid = function() {
-            var withValues = 0;
-            if ($scope.institutionAssociation.role) {
-              withValues += 1;
-            }
-            if ($scope.institutionAssociation.institution.name) {
-              withValues += 1;
-            }
-            if ($scope.institutionAssociation.institution.institution_type) {
-              withValues += 1;
-            }
-            var valid = ((withValues===0) || (withValues===3));
-            return valid;
-          }
+          $scope.$watch('institutionsForm.submitted', function() {
+            $scope.submitted = $scope.institutionsForm.submitted;
+          });
         }
       };
     });

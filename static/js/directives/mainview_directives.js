@@ -137,25 +137,30 @@
         restrict: 'A',
         require: '^form',
         scope: {
-          label: '@',
-          inputTag: '@'
+          inputTag: '@',
+          fieldName: '@'
         },
         
         link: function (scope, element, attrs, formController) {
           
           var inputTagType = scope.inputTag || 'input';
           var inputElement = element.find(inputTagType);
-          var fieldName = inputElement.attr('name');
-          var formScope = inputElement.scope();
+          var fieldName = scope.fieldName || inputElement.attr('name');
+          var formScope = element.scope();
           
+          scope.makeDirty = function() {
+            var field = formController[fieldName]
+            field.$setViewValue(field.$viewValue);
+          }
+
           formScope.$watch('submitted', function (submitted) {
             if (submitted) {
-              formController[fieldName].showError = true;
+              scope.makeDirty();
             }
           });
           inputElement.bind('blur', function(event) {
             scope.$apply(function() {
-              formController[fieldName].showError = true;
+              scope.makeDirty();
             });
           });
         }
