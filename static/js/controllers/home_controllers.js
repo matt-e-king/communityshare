@@ -179,31 +179,12 @@
       $scope.start = start;
       $scope.stop = stop;
       var searchForUsers = function() {
-        var combinedPromise;
-        if ($scope.searchText.value) {
-          var searchNameParams = {
-            'name.ilike': '%' + $scope.searchText.value + '%',
-            'date_created.greaterthan': start,
-            'date_created.lessthan': stop
-          };
-          var searchEmailParams = {
-            'email.ilike': '%' + $scope.searchText.value + '%',
-            'date_created.greaterthan': start,
-            'date_created.lessthan': stop
-          };
-          var byNamePromise = User.get_many(searchNameParams);
-          var byEmailPromise = User.get_many(searchEmailParams);
-          combinedPromise = $q.all({byName: byNamePromise,
-                                        byEmail: byEmailPromise});
-        } else {
-          var searchParams = {
-            'date_created.greaterthan': start,
-            'date_created.lessthan': stop
-          };
-          combinedPromise = User.get_many(searchParams);
-        }
-
-        combinedPromise.then(
+        var searchParams = {
+          'date_created.greaterthan': start,
+          'date_created.lessthan': stop
+        };
+        var searchPromise = User.search($scope.searchText.value, searchParams);
+        searchPromise.then(
           function(results) {
             var addedIds = {};
             var uniqueUsers = [];

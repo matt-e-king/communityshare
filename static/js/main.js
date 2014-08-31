@@ -17,7 +17,7 @@
     ]);
   
   app.config(function($routeProvider) {
-    
+
     $routeProvider.when('/', {
       templateUrl: './static/templates/default.html',
       controller: 'DefaultController',
@@ -67,16 +67,6 @@
       controller: 'ConfirmEmailController'
     });
 
-    $routeProvider.when('/searchusers', {
-      templateUrl: './static/templates/search_users.html',
-      controller: 'SearchUsersController',
-      resolve: {
-        activeUser: function(activeUserLoader) {
-          return activeUserLoader();
-        }
-      }
-    });
-
     $routeProvider.when('/settings', {
       templateUrl: './static/templates/settings.html',
       controller: 'SettingsController',
@@ -120,6 +110,16 @@
     $routeProvider.when('/search/:searchId/edit', {
       templateUrl: './static/templates/search_edit.html',
       controller: 'SearchEditController',
+      resolve: {
+        activeUser: function(activeUserLoader) {
+          return activeUserLoader();
+        }
+      }
+    });
+
+    $routeProvider.when('/searchusers/:searchText', {
+      templateUrl: './static/templates/search_users.html',
+      controller: 'SearchUsersController',
       resolve: {
         activeUser: function(activeUserLoader) {
           return activeUserLoader();
@@ -237,7 +237,6 @@
     $routeProvider.otherwise({
       templateUrl: './static/templates/unknown.html'
     });
-    
   });
   
 })();

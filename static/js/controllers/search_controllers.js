@@ -186,6 +186,13 @@
             Messages.error(message);
           });
       };
+      
+      $scope.searchText = {value: ''};
+      $scope.userSearch = function() {
+        if ($scope.searchText.value) {
+          $location.path('/searchusers/' + $scope.searchText.value);
+        }
+      }
     });
-  
+
 })();

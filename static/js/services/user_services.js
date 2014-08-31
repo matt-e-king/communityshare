@@ -90,6 +90,28 @@
     'User',
     function(UserBase, $q, $http, Search, Conversation, SessionBase, Evnt) {
 
+      UserBase.search = function(searchText, searchParams) {
+        var deferred = $q.defer();
+        var dataPromise = $http({
+          method: 'GET',
+          url: '/api/usersearch/' + searchText,
+          data: searchParams
+        });
+        dataPromise.then(
+          function(response) {
+            var users = []
+            for (var i=0; i<response.data.data.length; i++) {
+              users.push(UserBase.make(response.data.data[i]));
+            }
+            deferred.resolve(users);
+          },
+          function(response) {
+            deferred.reject(response.message);
+          }
+        );
+        return deferred.promise;
+      };
+
       UserBase.prototype.cleanInstitutionAssociations = function() {
         // Remove any insitutions with no names
         var filteredInstitutionAssociations = [];

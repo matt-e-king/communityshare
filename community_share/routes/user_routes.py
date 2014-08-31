@@ -187,6 +187,15 @@ def register_user_routes(app):
             processed = None
         return processed
 
+    @app.route('/api/usersearch/<string:search_text>', methods=['GET'])
+    def search(search_text):
+        requester = get_requesting_user()
+        date_created_greaterthan = request.args.get('date_created.greaterthan', None)
+        date_created_lessthan = request.args.get('date_created.lessthan', None)
+        users = User.search(search_text, date_created_greaterthan, date_created_lessthan)
+        response = base_routes.make_many_response(requester, users)
+        return response
+        
     @app.route('/api/user/<int:user_id>/picture', methods=['PUT', 'POST', 'PATCH'])
     def post_picture(user_id):
         requester = get_requesting_user()

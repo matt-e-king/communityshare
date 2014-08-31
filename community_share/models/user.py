@@ -12,7 +12,7 @@ from community_share import store, Base, config
 from community_share.models.base import Serializable
 from community_share.models.secret import Secret
 from community_share.models.search import Search
-from community_share.models.institution import InstitutionAssociation
+from community_share.models.institution import InstitutionAssociation, Institution
 
 
 logger = logging.getLogger(__name__)
@@ -166,6 +166,9 @@ class User(Base, Serializable):
                 has_admin_rights = True
         return has_admin_rights
 
+    def serialize(self, requester, exclude=[]):
+        return self._base_serialize(requester, exclude)
+
     def serialize_institution_associations(self, requester):
         associations = [i.serialize(requester)
                         for i in self.institution_associations]
@@ -282,6 +285,23 @@ class User(Base, Serializable):
                 other_user = share.educator
             mail_actions.send_partner_deletion_message(
                 other_user, self, share.conversation)
+
+    @classmethod
+    def search(cls, searchText, date_created_greaterthan, date_created_lessthan):
+        '''
+        searchText can match name, email, institution name
+        '''
+        query = store.session.query(User).outerjoin(InstitutionAssociation).outerjoin(Institution)
+        name_condition = User.name.ilike('%'+searchText+'%')
+        email_condition = User.email.ilike('%'+searchText+'%')
+        institution_condition = Institution.name.ilike('%'+searchText+'%')
+        query = query.filter(or_(name_condition, email_condition, institution_condition))
+        if date_created_greaterthan:
+            query = query.filter(User.date_created > date_created_greaterthan)
+        if date_created_lessthan:
+            query = query.filter(User.date_created < date_created_lessthan)
+        users = query.all()
+        return users
 
 class UserReview(Base, Serializable):
     __tablename__ = 'userreview'
