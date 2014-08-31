@@ -39,6 +39,10 @@
              >
         </div>
 
+        <div ng-show="!enoughLabelsSelected()" alert type="danger">
+          No labels selected
+        </div>
+
       </div>
     </div>
 
@@ -46,7 +50,6 @@
       <div class="signup-bottom">
         <div class="pull-right">
           <button class="btn btn-primary"
-                  ng-disabled="(!institutionMethods.isValid()) || (user.community_partner_profile_search.labels.length === 0)"
                   ng-click="submit()">
             Next</button>
         </div>

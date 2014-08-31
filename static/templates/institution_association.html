@@ -14,13 +14,13 @@
     </p>
   </div>
   <div ng-if="roles.length === 0" class="form-group" data-input-error-helper>
-    <input ng-if="roles.length === 0"
-           ng-model="institutionAssociation.role"
+    <input ng-model="institutionAssociation.role"
            name="role"
            id="role"
            class="form-control org-input"
            placeholder="Position/Title"
            ng-disabled="noInstitutions"
+           required
            type="text"/>
     <p ng-show="institutionForm.role.$error.required && !institutionForm.role.$pristine">
       A role is required
@@ -28,8 +28,7 @@
   </div>
   <div ng-if="roles.length > 0" class="form-group" data-input-error-helper
        data-input-tag="select" field-name="role">
-    <select ng-if="roles.length > 0"
-            ng-model="institutionAssociation.role"
+    <select ng-model="institutionAssociation.role"
             name="role"
             id="role"
             class="form-control org-input"
@@ -43,7 +42,7 @@
       A role is required
     </p>
   </div>
-  <div class="form-group" data-input-error-helper data-input-tag="select"
+  <div class="form-group" data-input-error-helper data-input-tag="select" 
        field-name="institution_type">
     <select ng-model="institutionAssociation.institution.institution_type"
             name="institution_type"

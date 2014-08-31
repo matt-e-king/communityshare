@@ -87,11 +87,15 @@
           question.answer = new Answer({question_id: question.id});
         }
       });
-
+    $scope.enoughLabelsSelected = function() {
+      var cpl = user.community_partner_profile_search.labels;
+      var el = user.educator_profile_search.labels;
+      var enoughSelected = ((cpl.length > 0) || (el.length > 0))
+      return enoughSelected;
+    }
     $scope.submit = function() {
-      if (!$scope.institutionMethods.isValid()) {
-        $scope.institutionMethods.form.submitted = true;
-      } else {
+      $scope.institutionMethods.form.submitted = true;
+      if ($scope.enoughLabelsSelected() && ($scope.institutionMethods.isValid())) {
         // Save changes made to user.
         var userPromise = user.save();
         var allPromises = [userPromise];
@@ -111,13 +115,6 @@
             Messages.error(message);
           });
         
-        $scope.readyToSubmit = function() {
-          var ready = false;
-          if ($scope.institutionMethods.isValid && $scope.institutionMethods.isValid()) {
-            ready = true;
-          }
-          return ready;
-        };
       };
     }
   };

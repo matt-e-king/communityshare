@@ -149,7 +149,7 @@
           var formScope = element.scope();
           
           scope.makeDirty = function() {
-            var field = formController[fieldName]
+            var field = formController[fieldName];
             field.$setViewValue(field.$viewValue);
           }
 
