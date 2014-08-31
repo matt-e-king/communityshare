@@ -40,19 +40,20 @@
                   <p class="text-muted">
                     100 Words or less
                   </p>
-                  <div class="form-group">
+                  <div class="form-group" data-input-error-helper>
                     <textarea ng-model="user.bio"
                               name="bio"
                               required
                               placeholder="What is your history?"
                               rows="5"
-                              data-input-error-helper
                               class="form-control org-input">
                     </textarea>
                     <p ng-show="personalSettingsForm.bio.$invalid && personalSettingsForm.bio.showError"
                        class="help-block">
                       This field is required.
                     </p>
+                  </div>
+                  <div class="form-group" data-input-error-helper>
                     <input ng-model="user.zipcode"
                            name="zipcode"
                            id="zipcode"
@@ -60,49 +61,51 @@
                            class="form-control org-input required"
                            placeholder="Zip Code"
                            ng-pattern="/^\d{5}(-\d{4})?$/"
-                           data-input-error-helper
                            type="text"/>
                     <p ng-show="personalSettingsForm.zipcode.$invalid && personalSettingsForm.zipcode.showError"
                        class="help-block">
                       Please enter a valid ZIP code.
                     </p>
-
+                  </div>
+                  <div class="form-group" data-input-error-helper>
                     <input ng-model="user.phonenumber"
                            name="phonenumber"
                            id="phonenumber"
                            class="form-control org-input required"
                            placeholder="Phone Number"
                            ng-pattern="/^\d{3}-?\d{3}-?\d{4}?$/"
-                           data-input-error-helper
                            type="text"/>
                     <p ng-show="personalSettingsForm.phonenumber.$invalid && personalSettingsForm.phonenumber.showError"
                        class="help-block">
                       Please enter a valid phone number (xxx-xxx-xxxx)
                     </p>
-
-                    <input class="form-control org-input required"
+                  </div>
+                  <div class="form-group">
+                    <input class="form-control org-input"
                            placeholder="Website URL"
                            type="text"
                            id="website"
                            name="website"
                            ng-model="user.website"
                            />
-
+                  </div>
+                  <div class="form-group">
                     <input class="form-control org-input required"
                            placeholder="Twitter Handle"
                            ng-model="user.twitter_handle"
                            />
-
+                  </div>
+                  <div class="form-group">
                     <input class="form-control org-input required"
                            placeholder="LinkedIn Profile URL"
                            ng-model="user.linkedin_link"
                            />
                   </div>
-
-                  <label class="checkbox-inline">
-                    <input type="checkbox" 
-                           ng-model="user.wants_update_emails" checked>
-
+                  <div class="form-group">
+                    <label class="checkbox-inline">
+                      <input type="checkbox" 
+                             ng-model="user.wants_update_emails" checked>
+                      
                     CommunityShare invites you to stay informed
                     about our progress in connecting educators and
                     community members and adding new features to
@@ -113,8 +116,8 @@
                     correspondence with community
                     partners/educators.
 
-                  </label>
-
+                    </label>
+                  </div>
                 </div>
               </div>
               <div class="row">

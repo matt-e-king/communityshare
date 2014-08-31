@@ -143,15 +143,17 @@
         
         link: function (scope, element, attrs, formController) {
           
-          var fieldName = element.attr('name');
-          var formScope = element.scope();
+          var inputTagType = scope.inputTag || 'input';
+          var inputElement = element.find(inputTagType);
+          var fieldName = inputElement.attr('name');
+          var formScope = inputElement.scope();
           
           formScope.$watch('submitted', function (submitted) {
             if (submitted) {
               formController[fieldName].showError = true;
             }
           });
-          element.bind('blur', function(event) {
+          inputElement.bind('blur', function(event) {
             scope.$apply(function() {
               formController[fieldName].showError = true;
             });

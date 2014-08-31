@@ -9,7 +9,7 @@
     <h2 class="text-center">Join Community Share</h2>
     <form role="form" name="signUpForm">
 
-      <div class="form-group">
+      <div class="form-group" data-input-error-helper>
         <input ng-model="newUser.firstName"
                required
                type="text"
@@ -17,13 +17,13 @@
                id="firstName"
                placeholder="First Name"
                class="form-control input-lg signup-form"/>
-        <p ng-show="signUpForm.firstName.$invalid && !signUpForm.firstName.$pristine"
+        <p ng-show="signUpForm.firstName.$invalid && signUpForm.firstName.showError"
            class="help-block">
           First Name is required.
         </p>
       </div>
 
-      <div class="form-group">
+      <div class="form-group" data-input-error-helper>
         <input ng-model="newUser.lastName"
                required
                type="text"
@@ -31,13 +31,13 @@
                id="lastName"
                placeholder="Last Name"
                class="form-control input-lg signup-form"/>
-        <p ng-show="signUpForm.lastName.$invalid && !signUpForm.lastName.$pristine"
+        <p ng-show="signUpForm.lastName.$invalid && signUpForm.lastName.showError"
            class="help-block">
           Last Name is required.
         </p>
       </div>
 
-      <div class="form-group">
+      <div class="form-group" data-input-error-helper>
         <input ng-model="newUser.email"
                required
                name="email"
@@ -45,12 +45,12 @@
                placeholder="Email"
                class="form-control input-lg signup-form"
                type="email"/>
-        <p ng-show="signUpForm.email.$invalid && !signUpForm.email.$pristine" class="help-block">
+        <p ng-show="signUpForm.email.$invalid && signUpForm.email.showError" class="help-block">
           Please enter a valid email.
         </p>
       </div>
 
-      <div class="form-group">
+      <div class="form-group" data-input-error-helper>
         <input ng-model="newUser.password"
                required
                name="password"
@@ -61,7 +61,7 @@
                ng-minlength="8"
                methods="passwordMethods"
                type="password"/>
-        <p ng-show="signUpForm.password.$error.required && !signUpForm.password.$pristine"
+        <p ng-show="signUpForm.password.$error.required && signUpForm.password.showError"
            class="help-block">
           A password is required.
         </p>
