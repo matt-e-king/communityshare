@@ -146,6 +146,7 @@
         $scope.submit = function(personalSettingsForm) {
           $scope.submitAttempted = true;
           if (personalSettingsForm.$valid) {
+            var savedImages = uploader.uploadAll();
             var userPromise = $scope.user.save();
             userPromise.then(
               function(user) {
