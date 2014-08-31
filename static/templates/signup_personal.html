@@ -48,7 +48,7 @@
                               rows="5"
                               class="form-control org-input">
                     </textarea>
-                    <p ng-show="personalSettingsForm.bio.$invalid && personalSettingsForm.bio.showError"
+                    <p ng-show="personalSettingsForm.bio.$invalid && !personalSettingsForm.bio.$pristine"
                        class="help-block">
                       This field is required.
                     </p>
@@ -62,7 +62,7 @@
                            placeholder="Zip Code"
                            ng-pattern="/^\d{5}(-\d{4})?$/"
                            type="text"/>
-                    <p ng-show="personalSettingsForm.zipcode.$invalid && personalSettingsForm.zipcode.showError"
+                    <p ng-show="personalSettingsForm.zipcode.$invalid && !personalSettingsForm.zipcode.$pristine"
                        class="help-block">
                       Please enter a valid ZIP code.
                     </p>
@@ -75,7 +75,7 @@
                            placeholder="Phone Number"
                            ng-pattern="/^\d{3}-?\d{3}-?\d{4}?$/"
                            type="text"/>
-                    <p ng-show="personalSettingsForm.phonenumber.$invalid && personalSettingsForm.phonenumber.showError"
+                    <p ng-show="personalSettingsForm.phonenumber.$invalid && !personalSettingsForm.phonenumber.$pristine"
                        class="help-block">
                       Please enter a valid phone number (xxx-xxx-xxxx)
                     </p>
@@ -129,7 +129,8 @@
                             >Next</button>
                   </div>
                   <div class="pull-left">
-                    <a href="#">Previous</a>
+                    <a ng-if="user.is_community_partner" ng-href="#/signup/communitypartner">Previous</a>
+                    <a ng-if="user.is_educator" ng-href="#/signup/educator">Previous</a>
                   </div>
                 </div>
               </div>
