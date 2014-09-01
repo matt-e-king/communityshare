@@ -93,10 +93,10 @@
           templateUrl: './static/templates/share_edit.html',
           controller: 'EditShareController',
           resolve: {
-            share: function() {return share;},
+            share: function() {return share;}
           }
         };
-        var m = $modal.open(opts);
+        $modal.open(opts);
       };
       var sortShares = function(shares) {
         var sortedShares = Share.sortShares(shares);
@@ -200,7 +200,7 @@
             $scope.message.conversation_id = conversation.id;
             var messagePromise = $scope.message.save();
             messagePromise.then(
-              function(message) {
+              function() {
                 $modalInstance.close(conversation);
               },
               function(message) {

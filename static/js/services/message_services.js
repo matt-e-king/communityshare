@@ -4,7 +4,7 @@
   var module = angular.module(
     'communityshare.services.message',
     [
-    ])
+    ]);
 
   module.factory(
     'Messages',

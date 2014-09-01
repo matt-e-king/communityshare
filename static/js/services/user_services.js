@@ -8,12 +8,6 @@
       'communityshare.services.message'
     ]);
 
-  var isEmail = function(email) {
-    // from http://stackoverflow.com/questions/46155/validate-email-address-in-javascript
-    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(email);
-  };
-
   module.factory(
     'signUp',
     function($q, $http, User, Authenticator, Session, Messages) {
@@ -57,11 +51,11 @@
         this.cleanInstitutionAssociations();
         var data = JSON.parse(JSON.stringify(this));
         if (this.id) {
-          data['educator_profile_search'] = this.educator_profile_search.toData();
-          data['community_partner_profile_search'] = this.community_partner_profile_search.toData();
+          data.educator_profile_search = this.educator_profile_search.toData();
+          data.community_partner_profile_search = this.community_partner_profile_search.toData();
         } else {
-          data['educator_profile_search'] = null;
-          data['community_partner_profile_search'] = null;          
+          data.educator_profile_search = null;
+          data.community_partner_profile_search = null;
         }
         return data;
       };
@@ -72,7 +66,7 @@
     'userLoader',
     function(User, $q) {
       return function(userId) {
-        var deferred = $q.defer()
+        var deferred = $q.defer();
         var userPromise = User.get(userId);
         userPromise.then(
           function(user) {
@@ -82,13 +76,13 @@
             deferred.resolve(undefined);
           });
         return deferred.promise;
-      }
+      };
     });
     
 
   module.factory(
     'User',
-    function(UserBase, $q, $http, Search, Conversation, SessionBase, Evnt) {
+    function(UserBase, $q, $http, Search, Conversation, SessionBase, Evnt, Messages) {
 
       UserBase.search = function(searchText, searchParams) {
         var deferred = $q.defer();
@@ -99,7 +93,7 @@
         });
         dataPromise.then(
           function(response) {
-            var users = []
+            var users = [];
             for (var i=0; i<response.data.data.length; i++) {
               users.push(UserBase.make(response.data.data[i]));
             }
@@ -135,7 +129,7 @@
       };
 
       UserBase.prototype.updateFromData = function(data) {
-        this._baseUpdateFromData(data)
+        this._baseUpdateFromData(data);
         if (this.educator_profile_search) {
           this.educator_profile_search = new Search(
             this.educator_profile_search);
@@ -163,7 +157,7 @@
         if (this.is_administrator) {
           this.accountCreationStatus = 'done';
         } else if ((this.educator_profile_search.labels.length === 0) &&
-            (this.community_partner_profile_search.labels.length == 0)) {
+            (this.community_partner_profile_search.labels.length === 0)) {
           this.accountCreationStatus = 'choice';
         } else if (!this.bio) {
           this.accountCreationStatus = 'personal';
@@ -192,7 +186,7 @@
               _this.conversationsWithMe = [];
               for (var i=0; i<conversations.length; i++) {
                 var conversation = conversations[i];
-                if (conversation.otherUser.id == _this.id) {
+                if (conversation.otherUser.id === _this.id) {
                   _this.conversationsWithMe.push(conversation);
                 }
               }
@@ -340,12 +334,13 @@
                 templateUrl: './static/templates/choose_conversation.html',
                 controller: function($scope) {
                   $scope.conversations = conversations;
-                  $scope.user = user;
+                  //$scope.user = user;
                   $scope.showConversation = function(conversation) {
                     $location.path('/conversation/' + conversation.id);
-                  }
+                  };
                 }
               };
+              $modal.open(opts);
             }
           },
           function(errorMessage) {

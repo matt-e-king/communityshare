@@ -47,7 +47,7 @@
 
   module.factory(
     'Authenticator',
-    function($q, $http, User, SessionBase, $cookies, $cookieStore, Conversation, Messages) {
+    function($q, $http, User, SessionBase, $cookies, $cookieStore) {
       var Authenticator = {};
       Authenticator.clean = function() {
         $http.defaults.headers.common.Authorization = '';
@@ -155,7 +155,7 @@
             if (response.data && response.data.message) {
               message += ': ' + response.data.message;
             }
-            respose.reject(message);
+            response.reject(message);
           });
         return deferred.promise;
       };

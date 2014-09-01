@@ -738,7 +738,7 @@ app.factory('$fileUploader', ['$compile', '$rootScope', '$http', '$window', func
                 var resizeCanvas = function() {
                   canvas.width = element[0].offsetWidth;
                   canvas.height = element[0].offsetHeight;
-                }
+                };
                 resizeCanvas();
                 var reader = new FileReader();
 
@@ -754,8 +754,8 @@ app.factory('$fileUploader', ['$compile', '$rootScope', '$http', '$window', func
                 function onLoadImage() {
                   var height = this.height/this.width * canvas.width;
                   var width = this.width/this.height * canvas.height;
-                  var height = Math.min(height, canvas.height);
-                  var width = Math.min(width, canvas.width);
+                  height = Math.min(height, canvas.height);
+                  width = Math.min(width, canvas.width);
                   canvas.getContext('2d').drawImage(this, 0, 0, width, height);
                 }
             }

@@ -28,7 +28,7 @@
 
   module.factory(
     'Conversation',
-    function(SessionBase, itemFactory, UserBase, Message, Messages, Share, Evnt) {
+    function(SessionBase, itemFactory, UserBase, Message, Messages, Share) {
       var Conversation = itemFactory('conversation');
       Conversation.prototype.toData = function() {
         var fields = ['id', 'title', 'search_id', 'userA_id', 'userB_id'];

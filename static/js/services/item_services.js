@@ -6,7 +6,7 @@
     [
       'ngResource',
       'ngCookies'
-    ])
+    ]);
 
   module.factory(
     'itemFactory',
@@ -23,12 +23,12 @@
         Item.prototype.toData = function() {
           var data = JSON.parse(JSON.stringify(this));          
           return data;
-        }
+        };
         Item.prototype.clone = function() {
           var data = this.toData();
           var item = new Item(data);
           return item;
-        }
+        };
         Item.makeUrl = function(id) {
           var url = '/api/' + resourceName;
           if (id !== undefined) {
@@ -45,7 +45,7 @@
             item.updateFromData(itemData);
           }
           return item;
-        }
+        };
 
         Item.get = function(id, forceRefresh) {
           var deferred = $q.defer();
@@ -74,7 +74,7 @@
 
           var searchHash = JSON.stringify(searchParams);
           var items = Item.searchCache[searchHash];
-          if ((items === undefined) | forceRefresh) {
+          if ((items === undefined) || forceRefresh) {
           
             var dataPromise = $http({
               method: 'GET',
@@ -84,7 +84,7 @@
 
             dataPromise.then(
               function(response) {
-                var items = []
+                var items = [];
                 for (var i=0; i<response.data.data.length; i++) {
                   var item = Item.make(response.data.data[i]);
                   items.push(item);
@@ -128,7 +128,7 @@
             });
           dataPromise.then(
             function(response) {
-              _this.updateFromData(response.data.data)
+              _this.updateFromData(response.data.data);
               // Properties of the current user can also be set.
               if (response.data.user !== undefined) {
                 SessionBase.activeUser.updateFromData(response.data.user);
@@ -136,7 +136,7 @@
               deferred.resolve(_this);
             },
             function(response) {
-              var message = ''
+              var message = '';
               if (response.data.message) {
                 message = response.data.message;
               }
@@ -154,7 +154,7 @@
               url: Item.makeUrl(this.id)
             });
           dataPromise.then(
-            function(response) {
+            function() {
               _this.active = false;
               Item.cache[_this.id] = undefined;
               // Remove the items from the cached searches.
@@ -168,7 +168,7 @@
               deferred.resolve();
             },
             function(response) {
-              var message = ''
+              var message = '';
               if (response.data.message) {
                 message = response.data.message;
               }

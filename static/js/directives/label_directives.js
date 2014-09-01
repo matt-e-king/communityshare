@@ -23,7 +23,7 @@
             ],
             educatorSuggested: [
               'Social Studies', 'English/Language Arts', 'Foreign Languages', 'PE/Health/Sports',
-              'Mathematics', 'Goverment', 'Science',
+              'Mathematics', 'Goverment', 'Science'
             ],
             other: []
           },
@@ -68,7 +68,7 @@
         return {'educatorSuggested': educatorSuggestedLabels,
                 'communityPartnerSuggested': communityPartnerSuggestedLabels,
                 'communityPartnerAndEducatorSuggested': communityPartnerAndEducatorSuggestedLabels,
-                'all': allLabels}
+                'all': allLabels};
       };
 
       return makeBaseLabels;
@@ -96,7 +96,7 @@
         var baseLabels = makeBaseLabels();
         this.all = {};
         this.active = {};
-        if (type == 'educator') {
+        if (type === 'educator') {
           this.all = baseLabels.educatorSuggested;
         } else {
           this.all = baseLabels.communityPartnerSuggested;
@@ -106,7 +106,7 @@
           this.active[label] = true;
           var key = labelMapping[label];
           if (key === undefined) {
-            key = 'subjectAreas'
+            key = 'subjectAreas';
             this.all[key].push(label);
           }
         }
@@ -139,7 +139,7 @@
 
   module.directive(
     'csNewLabel',
-     function(Session) {
+     function() {
        return {
          scope: {
            methods: '='
@@ -151,7 +151,7 @@
              }
            };
          },
-         link: function(scope, elm, attrs) {
+         link: function(scope, elm) {
            elm.bind('keydown', function(event) {
              var ENTERCODE = 13;
              var TABCODE = 9;
@@ -215,7 +215,7 @@
 
   module.directive(
     'csLabels',
-    function(Session) {
+    function() {
       return {
         scope: {
           search: '=',
@@ -223,10 +223,10 @@
           engagementLevelsTitle: '@',
           subjectAreasTitle: '@',
           type: '@',
-          onlyShowActive: '@',
+          onlyShowActive: '@'
         },
         templateUrl: './static/templates/labels.html',
-        controller: LabelsController,
+        controller: LabelsController
       };
     });
 

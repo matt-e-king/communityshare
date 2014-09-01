@@ -32,12 +32,11 @@
             $scope.educatorViewMethods.onUserUpdate(user);
           }
         },
-        function(response) {
+        function() {
           $scope.message = 'Could not find user with id=' + userId;
         });
       $scope.communityPartnerViewMethods = {};
       $scope.educatorViewMethods = {};
-      var question_types = [];
       var questionsPromise = Question.get_many_with_answers(
         userId,
         {'question_type.in': ['signup_community_partner', 'signup', 'signup_educator']}
@@ -90,9 +89,9 @@
     $scope.enoughLabelsSelected = function() {
       var cpl = user.community_partner_profile_search.labels;
       var el = user.educator_profile_search.labels;
-      var enoughSelected = ((cpl.length > 0) || (el.length > 0))
+      var enoughSelected = ((cpl.length > 0) || (el.length > 0));
       return enoughSelected;
-    }
+    };
     $scope.submit = function() {
       $scope.institutionMethods.form.submitted = true;
       if ($scope.enoughLabelsSelected() && ($scope.institutionMethods.isValid())) {
@@ -107,16 +106,14 @@
           }
         }
         $q.all(allPromises).then(
-          function(data) {
-            var search = data[0];
+          function() {
             $location.path('/signup/personal');
           },
           function(message) {
             Messages.error(message);
           });
-        
-      };
-    }
+      }
+    };
   };
 
   module.controller(
@@ -146,10 +143,10 @@
         $scope.submit = function(personalSettingsForm) {
           $scope.submitAttempted = true;
           if (personalSettingsForm.$valid) {
-            var savedImages = uploader.uploadAll();
+            uploader.uploadAll();
             var userPromise = $scope.user.save();
             userPromise.then(
-              function(user) {
+              function() {
                 $location.path('matches');
               },
               function(errorMessage) {
@@ -164,7 +161,7 @@
           headers: $http.defaults.headers.common,
           filters: [
             function (item) {
-              var is_image = (item.type.substring(0, 5) == 'image');
+              var is_image = (item.type.substring(0, 5) === 'image');
               $scope.validImage = is_image;
               uploader.queue.splice(0, uploader.queue.length);
               return is_image;
@@ -173,7 +170,7 @@
         });
         
         // Make sure we only have one file in the uploader queue
-        uploader.bind('afteraddingfile', function (event, item) {
+        uploader.bind('afteraddingfile', function () {
           if (uploader.queue.length > 1) {
             uploader.queue.splice(0, uploader.queue.length-1);
           }
@@ -209,7 +206,7 @@
 
       var turnOffLocationChangeHandler;
 
-      var onLocationChange = function(event, newUrl, oldUrl) {
+      var onLocationChange = function(event, newUrl) {
         if (!justSaved && (($scope.personalSettingsForm && $scope.personalSettingsForm.$dirty) || 
             ($scope.accountSettingsForm && $scope.accountSettingsForm.$dirty) || 
             ($scope.user.community_partner_profile_search &&
@@ -282,7 +279,7 @@
         headers: $http.defaults.headers.common,
         filters: [
           function (item) {
-            var is_image = (item.type.substring(0, 5) == 'image');
+            var is_image = (item.type.substring(0, 5) === 'image');
             $scope.validImage = is_image;
             uploader.queue.splice(0, uploader.queue.length);
             return is_image;
@@ -291,7 +288,7 @@
       });
 
       // Make sure we only have one file in the uploader queue
-      uploader.bind('afteraddingfile', function (event, item) {
+      uploader.bind('afteraddingfile', function () {
         if (uploader.queue.length > 1) {
           uploader.queue.splice(0, uploader.queue.length-1);
         }
@@ -332,7 +329,7 @@
 
       $scope.save = function() {
         var saveUserPromise = $scope.user.save();
-        var savedImages = uploader.uploadAll();
+        uploader.uploadAll();
         var allPromises = [saveUserPromise];
         if ($scope.questions) {
           var saveAnswerPromises = [];

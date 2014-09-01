@@ -11,7 +11,7 @@
       return {
         templateUrl: '/static/templates/registration_wrapper.html',
         transclude: true
-      }
+      };
     });
 
   module.directive(
@@ -20,7 +20,7 @@
       return {
         templateUrl: '/static/templates/standard_wrapper.html',
         transclude: true
-      }
+      };
     });
 
   module.directive(
@@ -29,7 +29,7 @@
       return {
         templateUrl: '/static/templates/splash_wrapper.html',
         transclude: true
-      }
+      };
     });
 
   module.directive(
@@ -119,7 +119,7 @@
     return {
       restrict: 'A',
       require: 'form',
-      link: function (scope, element, attrs, ctrl) {
+      link: function (scope, element) {
         scope.submitted = false;
         element.on('submit', function () {
           scope.$apply(function () {
@@ -132,7 +132,7 @@
   
   module.directive(
     'inputErrorHelper',
-    function ($compile, $interpolate) {
+    function () {
       return {
         restrict: 'A',
         require: '^form',
@@ -151,14 +151,14 @@
           scope.makeDirty = function() {
             var field = formController[fieldName];
             field.$setViewValue(field.$viewValue);
-          }
+          };
 
           formScope.$watch('submitted', function (submitted) {
             if (submitted) {
               scope.makeDirty();
             }
           });
-          inputElement.bind('blur', function(event) {
+          inputElement.bind('blur', function() {
             scope.$apply(function() {
               scope.makeDirty();
             });

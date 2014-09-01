@@ -4,13 +4,13 @@
   var module = angular.module(
     'communityshare.controllers.search',
     [
-      'communityshare.controllers.conversation',
+      'communityshare.controllers.conversation'
     ]);
 
   module.controller(
     'MatchesController',
     function($scope, Session, Search, $location, labelMapping, makeDialog,
-             startConversation) {
+             startConversation, Messages) {
       $scope.Session = Session;
       $scope.labelMapping = labelMapping;
       $scope.labelClasses = {
@@ -77,7 +77,7 @@
       };
       $scope.deleteSearch = function(search) {
         var title = 'Delete Search';
-        var msg = 'Do you really want to delete this search?  Others will no longer be able to find you by matching to the contents of this search.'
+        var msg = 'Do you really want to delete this search?  Others will no longer be able to find you by matching to the contents of this search.';
         var btns = [{result:'yes', label: 'Yes'},
                     {result:'no', label: 'No', cssClass: 'btn-primary'}];
         var d = makeDialog(title, msg, btns);
@@ -179,7 +179,7 @@
       $scope.saveSettings = function() {
         var promise = $scope.search.save();
         promise.then(
-          function(search) {
+          function() {
             $location.path('/matches');
           },
           function(message) {
@@ -192,7 +192,7 @@
         if ($scope.searchText.value) {
           $location.path('/searchusers/' + $scope.searchText.value);
         }
-      }
+      };
     });
 
 })();

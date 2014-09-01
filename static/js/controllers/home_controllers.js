@@ -18,7 +18,7 @@
   
   module.controller(
     'HomeController',
-    function($scope, Session, Evnt, Conversation) {
+    function($scope, Session) {
       $scope.Session = Session;
       if (Session.activeUser) {
 
@@ -120,7 +120,6 @@
       var statisticsPromise = getStatistics();
       $scope.statistics = [];
       statisticsPromise.then(function(statistics) {
-        var dates = [];
         for (var dateString in statistics) {
           var date = new Date(dateString);
           statistics[dateString].date = date;

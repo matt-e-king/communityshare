@@ -24,7 +24,7 @@
                $scope.institutionsForm.submitted = false;
              }
            };
-           $scope.$watch('institutionsForm', function(f) {
+           $scope.$watch('institutionsForm', function() {
              $scope.methods.form = $scope.institutionsForm;
            });
            $scope.methods.isValid = function() {
@@ -32,9 +32,8 @@
            };
            // FIXME: Not scaleable.  Change to get the most popular.
            var institutionsPromise = Institution.get_many();
-           var institutionTypes = [];
            $scope.options = {institutions: [],
-                             institutionTypes: [],
+                             institutionTypes: []
                             };
            if ($scope.isCommunityPartner) {
              $scope.institutionTypes = [
@@ -51,14 +50,14 @@
                'Higher Education',
                'Nonprofit',
                'After School Program',
-               'Other',
+               'Other'
              ];
             $scope.roles = [
               'Classroom teacher',
               'Curriculum Coordinator',
               'Administator',
               'Parent',
-              'Other',
+              'Other'
             ];
            }
            if ($scope.user.institution_associations.length === 0) {

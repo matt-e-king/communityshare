@@ -4,7 +4,7 @@
   var module = angular.module(
     'communityshare.controllers.authentication',
     [
-      'communityshare.services.authentication',
+      'communityshare.services.authentication'
     ]);
   
   module.controller(
@@ -48,7 +48,7 @@
             $scope.successfulRequest = false;
             var msg = 'Failed to reset password';
             if (message) {
-              if (message == 'Not found') {
+              if (message === 'Not found') {
                 msg += ': ' + 'Unknown email address';
               } else {
                 msg += ': ' + message;
@@ -61,23 +61,18 @@
 
   module.controller(
     'ConfirmEmailController',
-    function($scope, Authenticator, $routeParams, $location) {
+    function($scope, Authenticator, $routeParams) {
       var key = $routeParams.key;
       $scope.confirmed = false;
       $scope.failedReset = false;
       var promise = Authenticator.confirmEmail(key);
       promise.then(
-        function(user) {
+        function() {
           $scope.confirmed = true;
         },
         function(message) {
           $scope.errorMessage = message;
         });
-    });
-
-  module.controller(
-    'LogoutController',
-    function(Authenticator, Session, $location) {
     });
 
   module.controller(
@@ -95,7 +90,7 @@
         if (user.accountCreationStatus === 'choice') {
           $location.path('signup/choice');
         } else if (user.accountCreationStatus === 'personal') {
-          $location.path('signup/personal')
+          $location.path('signup/personal');
         } else {
           $location.path('matches');
         }
@@ -103,16 +98,16 @@
       $scope.newUser = new User();
       $scope.passwordMethods = {};
       $scope.pg = 'default';
-      $scope.user_type = {value: ''}
+      $scope.user_type = {value: ''};
       $scope.completeSplash = function() {
         $scope.newUser.name = $scope.newUser.firstName + ' ' + $scope.newUser.lastName;
         var userPromise = signUp($scope.newUser, $scope.newUser.password);
         userPromise.then(
           function() {
             $scope.errorMessage = '';
-            if ($scope.user_type.value == 'communityPartner') {
+            if ($scope.user_type.value === 'communityPartner') {
               $location.path('/signup/communitypartner');
-            } else if ($scope.user_type.value == 'educator') {
+            } else if ($scope.user_type.value === 'educator') {
               $location.path('/signup/educator');
             }
           },
@@ -128,7 +123,7 @@
         }*/
       };
       $scope.showTerms = function() {
-        var m = $modal.open({
+        $modal.open({
           templateUrl: './static/templates/terms.html',
           controller: 'TermsController'
         });
@@ -138,7 +133,7 @@
   module.controller(
     'LoginController',
     function($scope, $location, Authenticator) {
-      var nextLocation = $location.search().goto;
+      var nextLocation = $location.search()['goto'];
       $scope.email = undefined;
       $scope.password = undefined;
       $scope.errorMessage = '';
@@ -146,7 +141,7 @@
         var userPromise = Authenticator.authenticateWithEmailAndPassword(
           $scope.email, $scope.password);
         userPromise.then(
-          function(user) {
+          function() {
             if (nextLocation) {
               $location.path(nextLocation);
             } else {

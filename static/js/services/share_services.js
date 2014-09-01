@@ -113,7 +113,6 @@
   };
 
   var combineDateTime = function(date, time) {
-    var offset = time.getTimezoneOffset();
     var combined = new Date(
       date.getFullYear(),
       date.getMonth(),
@@ -137,8 +136,7 @@
             deferred.resolve(undefined);
           });
         return deferred.promise;
-      }
-      
+      };
     });
 
   module.factory(
@@ -155,12 +153,12 @@
           this.datetime_stop = default_datetime;
         }
         this.datetime_start = new Date(this.datetime_start);
-        var split = splitDateTime(this.datetime_start);
-        this.date = split.date;
-        this.time_start = split.time;
+        var splitstart = splitDateTime(this.datetime_start);
+        this.date = splitstart.date;
+        this.time_start = splitstart.time;
         this.datetime_stop = new Date(this.datetime_stop);
-        var split = splitDateTime(this.datetime_stop);
-        this.time_stop = split.time;
+        var splitstop = splitDateTime(this.datetime_stop);
+        this.time_stop = splitstop.time;
         if (this.share) {
           this.share = new Share(this.share);
         }

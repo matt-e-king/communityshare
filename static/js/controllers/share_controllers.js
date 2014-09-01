@@ -36,7 +36,6 @@
     function(Session, $scope, $routeParams, Share) {
       $scope.Session = Session;
       var shareId = $routeParams.shareId;
-      var errorMessage = '';
       if (shareId !== undefined) {
         var sharePromise = Share.get(shareId);
         sharePromise.then(
@@ -56,7 +55,7 @@
 
   module.controller(
     'EditShareController',
-    function($scope, share, $modalInstance, $q) {
+    function($scope, share, $modalInstance) {
       $scope.share = share;
       $scope.events = share.events;
       $scope.cancel = $modalInstance.close;
@@ -120,7 +119,7 @@
 
   module.controller(
     'EventController',
-    function($scope, Session, evnt, Question, Answer) {
+    function($scope, Session, evnt, Question) {
       $scope.Session = Session;
       $scope.evnt = evnt;
       $scope.questions = [];

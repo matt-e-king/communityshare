@@ -6,7 +6,7 @@
     [
       'communityshare.services.item',
       'communityshare.services.user'
-    ])
+    ]);
 
   module.factory(
     'getAllLabels',
@@ -58,16 +58,16 @@
           lcTargetLabels.push(targetLabels[i].toLowerCase());
         }
         var lcRetrievedLabels = [];
-        for (var i=0; i<retrievedLabels.length; i++) {
-          lcRetrievedLabels.push(retrievedLabels[i].toLowerCase());
+        for (var j=0; j<retrievedLabels.length; j++) {
+          lcRetrievedLabels.push(retrievedLabels[j].toLowerCase());
         }
-        for (var i=0; i<lcTargetLabels.length; i++) {
-          var lcTargetLabel = lcTargetLabels[i];
+        for (var k=0; k<lcTargetLabels.length; k++) {
+          var lcTargetLabel = lcTargetLabels[k];
           var index = lcRetrievedLabels.indexOf(lcTargetLabel);
           if (index === -1) {
-            missingLabels.push(targetLabels[i]);
+            missingLabels.push(targetLabels[k]);
           }
-          matchingLabels[targetLabels[i]] = (index >= 0);
+          matchingLabels[targetLabels[k]] = (index >= 0);
           if (index !== -1) {
             matchingLabels[retrievedLabels[index]] = true;
           }
@@ -77,7 +77,7 @@
           'missing': missingLabels
         };
         return comparison;
-      }
+      };
 
       var Search = itemFactory('search');
       Search.prototype.initialize = function() {
@@ -112,7 +112,7 @@
           function(responses) {
             var baseSearch = responses[0];
             var resultsResponse = responses[1];
-            var searches = []
+            var searches = [];
             for (var i=0; i<resultsResponse.data.data.length; i++) {
               var search = new Search(resultsResponse.data.data[i]);
               var comparison = compareLabels(baseSearch.labels, search.labels);
