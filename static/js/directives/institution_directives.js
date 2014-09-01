@@ -78,7 +78,9 @@
         templateUrl: 'static/templates/institution_association.html',
         controller: function($scope) {
           $scope.$watch('institutionsForm.submitted', function() {
-            $scope.submitted = $scope.institutionsForm.submitted;
+            if ($scope.institutionsForm) {
+              $scope.submitted = $scope.institutionsForm.submitted;
+            }
           });
         }
       };

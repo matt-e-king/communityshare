@@ -203,8 +203,8 @@
              Question, Answer, $fileUploader, $http, makeDialog, Authenticator, $rootScope) {
 
       var justSaved = false;
-
       var turnOffLocationChangeHandler;
+      $scope.institutionMethods = {};
 
       var onLocationChange = function(event, newUrl) {
         if (!justSaved && (($scope.personalSettingsForm && $scope.personalSettingsForm.$dirty) || 
