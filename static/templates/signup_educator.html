@@ -4,32 +4,33 @@
   </div>
 
   <div ng-if="Session.activeUser !== undefined">
-    <div class="row">
 
-      <div class="panel panel-default">
+    <div class="panel panel-default">
 
-        <div class="gradient-header">
-          <h1>Welcome to CommunityShare</h1>
-        </div>
-
-        <div class="panel-body">
-          <h3 class="text-center">School Information</h3>
+      <div class="gradient-header">
+        <h1>Welcome to CommunityShare</h1>
+      </div>
+      
+      <div class="panel-body">
+        <h3 class="text-center">School Information</h3>
+        <div class="row">
           <div class="col-md-9 centered">
-            <div class="org-input">
+            <div class="org-signup">
               <div cs-institutions user="user" is-educator="true"
                    methods="institutionMethods"
                    >
               </div>
             </div>
           </div>
+        </div>
+        
+        <div class="row">
+          <div ng-repeat="question in questions" cs-question question="question" class="col-md-9 centered"
+               ng-if="(question.question_type=='signup' || question.question_type=='signup_educator')"
+               answers="answers"></div>
+        </div>
 
-          <div class="row">
-            <div ng-repeat="question in questions" cs-question question="question" class="col-md-9 centered"
-                 ng-if="(question.question_type=='signup' || question.question_type=='signup_educator')"
-                 answers="answers"></div>
-
-          </div>
-
+        <div class="row">
           <div class="col-xs-12" cs-labels search="user.educator_profile_search"
                grade-levels-title="Grade levels I teach."
                engagement-levels-title="Engagement Preferences (click all that apply)"
@@ -37,12 +38,12 @@
                type="educator"
                >
           </div>
-
         </div>
 
-        <div>
-          
+        <div ng-show="!enoughLabelsSelected()" alert type="danger">
+          No labels selected
         </div>
+        
 
         <div class="row">
           <div class="signup-bottom">
@@ -53,9 +54,9 @@
             </div>
           </div>
         </div>
-
+        
       </div>
     </div>
-
+    
   </div>
 </div>

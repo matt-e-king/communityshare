@@ -1,61 +1,62 @@
 <div cs-registration-wrapper>
 
-<div cs-forbidden ng-if="Session.activeUser === undefined">
-</div>
+  <div cs-forbidden ng-if="Session.activeUser === undefined">
+  </div>
 
-<div ng-if="Session.activeUser !== undefined">
+  <div ng-if="Session.activeUser !== undefined">
 
-
-  <div class="col-sm-10 col-md-10">
     <div class="panel panel-default">
+
       <div class="gradient-header">
         <h1>Welcome to CommunityShare</h1>
       </div>
 
       <div class="panel-body">
-        <h2 class="text-center">Organization Information</h2>
-        <div class="col-md-9 centered">
-          <div class="org-signup">
-          <div cs-institutions user="user" is-community-partner="true"
-               methods="institutionMethods"
-               >
-           </div>
+        <h3 class="text-center">Organization Information</h3>
+        <div class="row">
+          <div class="col-md-9 centered">
+            <div class="org-signup">
+              <div cs-institutions user="user" is-community-partner="true"
+                   methods="institutionMethods"
+                   >
+              </div>
+            </div>
           </div>
         </div>
 
         <div class="row">
-        <div ng-repeat="question in questions" cs-question question="question"  class="col-md-9 centered" 
-             ng-if="(question.question_type=='signup' || question.question_type=='signup_community_partner')"
-             answers="answers"></div>
-          <div>
-
+          <div ng-repeat="question in questions" cs-question question="question"
+               class="col-md-9 centered" 
+               ng-if="(question.question_type=='signup' || question.question_type=='signup_community_partner')"
+               answers="answers"></div>
         </div>
-
-        <div cs-labels search="user.community_partner_profile_search"
-             grade-levels-title="I am interested in working with the following groups"
-             engagement-levels-title="I am interested in the following types of engagement (click all that apply)"
-             subject-areas-title="In which areas do you have expertise?"
-             type="communityPartner"
-             >
+        
+        <div class="row">
+          <div class="col-xs-12" 
+               cs-labels search="user.community_partner_profile_search"
+               grade-levels-title="I am interested in working with the following groups"
+               engagement-levels-title="I am interested in the following types of engagement (click all that apply)"
+               subject-areas-title="In which areas do you have expertise?"
+               type="communityPartner"
+               >
+          </div>
         </div>
-
+        
         <div ng-show="!enoughLabelsSelected()" alert type="danger">
           No labels selected
         </div>
 
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="signup-bottom">
-        <div class="pull-right">
-          <button class="btn btn-primary"
-                  ng-click="submit()">
-            Next</button>
+        <div class="row">
+          <div class="signup-bottom">
+            <div class="pull-right">
+              <button class="btn btn-primary"
+                      ng-click="submit()">
+                Next</button>
+            </div>
+          </div>
         </div>
       </div>
+      
     </div>
   </div>
-
-</div>
 </div>
