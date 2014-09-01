@@ -39,17 +39,32 @@
 
     $routeProvider.when('/signup/communitypartner', {
       templateUrl: './static/templates/signup_community_partner.html',
-      controller: 'SignupCommunityPartnerController'
+      controller: 'SignupCommunityPartnerController',
+      resolve: {
+        user: function(activeUserLoader) {
+          return activeUserLoader();
+        }
+      }
     });
 
     $routeProvider.when('/signup/personal', {
       templateUrl: './static/templates/signup_personal.html',
-      controller: 'SignupPersonalController'
+      controller: 'SignupPersonalController',
+      resolve: {
+        user: function(activeUserLoader) {
+          return activeUserLoader();
+        }
+      }
     });
 
     $routeProvider.when('/signup/educator', {
       templateUrl: './static/templates/signup_educator.html',
-      controller: 'SignupEducatorController'
+      controller: 'SignupEducatorController',
+      resolve: {
+        user: function(activeUserLoader) {
+          return activeUserLoader();
+        }
+      }
     });
 
     $routeProvider.when('/requestresetpassword', {
