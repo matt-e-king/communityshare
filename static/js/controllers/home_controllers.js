@@ -166,6 +166,7 @@
       $scope.Session = Session;
       $scope.infoMessage = 'Searching for matching users...';
       $scope.users = undefined;
+      $scope.prevSearchText = $routeParams.searchText;
       $scope.searchText = {value: $routeParams.searchText};
       var start = $routeParams.created_start;
       if (start) {
@@ -227,10 +228,7 @@
       };
       searchForUsers();
       $scope.newSearch = function() {
-        var searchParams = {
-          'searchText': $scope.searchText.value
-        };
-        $location.search(searchParams);
+        $location.path('/searchusers/' + $scope.searchText.value);
       };
     });
 
