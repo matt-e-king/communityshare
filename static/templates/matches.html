@@ -67,7 +67,6 @@
             <div class="col-sm-9 col-xs-7">
               <a ng-href="#/user/{{match.searcher_user_id}}">
                 <h4 class="match-username">{{match.searcher_user.name}}</h4></a>
-              <!-- FIXME: Should Dynamically insert the position title and organization. -->
               <p ng-repeat="ia in match.searcher_user.institution_associations"
                  class="position">
                 {{ia.role}} &#183; {{ia.institutions.name}}
