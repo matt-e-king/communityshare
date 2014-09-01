@@ -119,7 +119,7 @@
           if (this.id === undefined) {
             method = 'POST';
           } else {
-            method = 'PATCH';
+            method = 'PUT';
           }
           var dataPromise = $http({
               method: method,
