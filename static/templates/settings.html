@@ -31,31 +31,50 @@
       <form novalidate action="" role="form" name="personalSettingsForm"
             class="form-horizontal" emit-scope="personalSettingsForm">
 
-        <input ng-model="user.email"
-               required
-               name="email"
-               id="email"
-               disabled
-               class="form-control"
-               type="email"
-               placeholder="Email"
-               />
-        <p ng-show="accountSettingsForm.email.$invalid && !accountSettingsForm.email.$pristine" class="help-block">
-          Please enter a valid email.
-        </p>
-        <p ng-show="!user.email_confirmed">
-          Email not confirmed.<br/>
-          <a class="clickable" ng-click="resendEmailConfirmation()">
-            Send email confirmation email.</a>
-        </p>
         
-        <h3>Image</h3>
-        <input ng-file-select type="file" name="picture" id="picture"/>
-        <div ng-show="!validImage">Not a valid image file</div>
-        <image ng-show="(uploader.queue.length === 0)" ng-src="{{user.picture_url}}" height="100"/>
-        <div ng-show="uploader.isHTML5">
-          <div ng-repeat="item in uploader.queue"
-               ng-thumb="{ file: item.file, height: 100 }"></div>
+        <div class="form-group">
+          <label for="name"
+                 class="control-label cs-form-label">Email</label>
+          <div class="cs-form-control">
+            <input ng-model="user.email"
+                   required
+                   name="email"
+                   id="email"
+                   disabled
+                   class="form-control"
+                   type="email"
+                   placeholder="Email"
+                   />
+            <p ng-show="accountSettingsForm.email.$invalid && !accountSettingsForm.email.$pristine"
+               class="help-block">
+              Please enter a valid email.
+            </p>
+          </div>
+          <p ng-show="!user.email_confirmed">
+            Email not confirmed.<br/>
+            <a class="clickable" ng-click="resendEmailConfirmation()">
+              Send email confirmation email.</a>
+          </p>
+        </div>
+        
+        <div class="form-group">
+          <label for="name"
+                 class="control-label cs-form-label">Image</label>
+          <div class="cs-form-control">
+            <input ng-file-select type="file" name="picture" id="picture"/>
+            <div ng-show="!validImage">Not a valid image file</div>
+            <div class="settings-image-container">
+              <image ng-show="(uploader.queue.length === 0)" ng-src="{{user.picture_url}}"
+                     class="img-responsive img-circle"/>
+              <img ng-show="(uploader.queue.length == 0) && (!user.picture_url)"
+                   src="http://communityshare_assets.s3.amazonaws.com/default_avatar.png" 
+                   class="img-responsive img-circle"></img>
+              <div ng-show="uploader.isHTML5">
+                <div ng-repeat="item in uploader.queue"
+                     ng-thumb="{ file: item.file, height: 100 }"></div>
+              </div>
+            </div>
+          </div>
         </div>
            
         <div class="form-group">
@@ -105,26 +124,6 @@
             </p>
           </div>
         </div>
-
-        <div cs-institutions user="user"
-             methods="institutionMethods"
-             is-community-partner="isCommunityPartner"
-             is-educator="isEducator"
-             >
-        </div>
-
-        <label class="checkbox-inline">
-          <input type="checkbox" 
-                 ng-model="user.wants_update_emails" checked>
-          CommunityShare invites you to stay informed
-          about our progress in connecting educators and
-          community members and adding new features to
-          the CommunityShare site through periodic email
-          updates. Uncheck here to opt-out.  You will still
-          receive emails in relation to your
-          correspondence with community
-          partners/educators.
-        </label>
 
         <div class="form-group">
           <label for="year_of_birth"
@@ -224,19 +223,38 @@
           </div>
         </div>
 
-      </form>
-    </div>
+        <label class="checkbox-inline">
+          <input type="checkbox" 
+                 ng-model="user.wants_update_emails" checked>
+          CommunityShare invites you to stay informed
+          about our progress in connecting educators and
+          community members and adding new features to
+          the CommunityShare site through periodic email
+          updates. Uncheck here to opt-out.  You will still
+          receive emails in relation to your
+          correspondence with community
+          partners/educators.
+        </label>
 
-    <div ng-show="personalSettingsForm.$invalid">
-      Personal Settings are invalid
+      </form>
+
+      <h4>Organizations</h4>
+      <div cs-institutions user="user"
+           methods="institutionMethods"
+           is-community-partner="{{isCommunityPartner}}"
+           is-educator="{{isEducator}}"
+           >
+      </div>
+      
+      <div ng-show="personalSettingsForm.$invalid">
+        Personal Settings are invalid
+      </div>
+      <div ng-show="accountSettingsForm.$invalid">
+        Account Settings are invalid
+      </div>
+      
+      <input type="submit" value="Save" class="btn btn-primary"
+             ng-click="save()"/>
     </div>
-    <div ng-show="accountSettingsForm.$invalid">
-      Account Settings are invalid
-    </div>
-    
-    <input type="submit" value="Save" class="btn btn-primary"
-           ng-disabled="personalSettingsForm.$invalid || accountSettingsForm.$invalid"
-           ng-click="save()"/>
-    
   </div>
 </div>

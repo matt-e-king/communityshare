@@ -6449,3 +6449,7 @@ form.submitAttempted .ng-invalid {
   border-color: red;
   outline-color: red;
 }
+.settings-image-container {
+  height: 120px;
+  width: 120px;
+}

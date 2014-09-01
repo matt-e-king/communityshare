@@ -17,6 +17,8 @@
          },
          templateUrl: './static/templates/institution_adder.html',
          controller: function($scope) {
+           $scope.isEducator = ($scope.isEducator === 'true');
+           $scope.isCommunityPartner = ($scope.isCommunityPartner === 'true');
            $scope.updateInstitutions = function() {
              if ($scope.noInstitutions) {
                $scope.user.institution_associations = [];

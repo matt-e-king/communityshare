@@ -29,9 +29,11 @@ class InstitutionAssociation(Base, Serializable):
 
     def deserialize_institution(self, data):
         name = data.get('name', None)
+        institution_type = data.get('institution_type', None)
         institution = None
         if name:
             self.institution = store.session.query(Institution).filter_by(name=name).first()
+            self.institution.institution_type = institution_type
         if not self.institution:
             self.institution = Institution.admin_deserialize_add(data)
 
