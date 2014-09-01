@@ -1,6 +1,7 @@
 <div class="navbar navbar-default navbar-fixed-top" role="navigation"
      ng-controller="NavigationController">
   <div class="container-fluid">
+
     <div class="navbar-header">
       <button type="button" class="navbar-toggle" data-toggle="collapse"
               data-target=".navbar-collapse"
@@ -18,11 +19,25 @@
         </a>
       </div>
     </div>
+
     <div class="navbar-collapse collapse" collapse="navCollapsed">
       <ul class="nav navbar-nav navbar-right">
+        <li class="hidden-md hidden-sm hidden-lg">
+          <a href="/#/search">Search</a></li>
+        <li class="hidden-md hidden-sm hidden-lg">
+          <a href="/#/messages">Messages</a></li>
+        <li class="hidden-md hidden-sm hidden-lg">
+          <a href="/#/shares">Shares</a></li>
+        <li class="hidden-md hidden-sm hidden-lg">
+          <a href="/#/matches">Matches</a></li>
+        <li class="hidden-md hidden-sm hidden-lg"
+            ng-show="Session.activeUser.is_administrator">
+          <a href="/#/admin">Admin</a>
+        </li>
         <li ng-show="Session.activeUser">
           <a href="#/user/{{Session.activeUser.id}}">
-            {{Session.activeUser.name}}
+            <span class="hidden-md hidden-sm hidden-lg">My Profile</span>
+            <span class="hidden-xs">{{Session.activeUser.name}}</span>
           </a>
         </li>
         <li ng-show="Session.activeUser">
