@@ -134,12 +134,12 @@
     'LoginController',
     function($scope, $location, Authenticator) {
       var nextLocation = $location.search()['goto'];
-      $scope.email = undefined;
-      $scope.password = undefined;
+      $scope.email = {value: undefined};
+      $scope.password = {value: undefined};
       $scope.errorMessage = '';
       $scope.login = function() {
         var userPromise = Authenticator.authenticateWithEmailAndPassword(
-          $scope.email, $scope.password);
+          $scope.email.value, $scope.password.value);
         userPromise.then(
           function() {
             if (nextLocation) {
