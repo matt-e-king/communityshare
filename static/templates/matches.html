@@ -57,6 +57,9 @@
             <div class="col-sm-3 col-xs-5 ">
               <img ng-src="{{match.searcher_user.picture_url}}"
                    class="img-responsive img-circle profile-img centered" />
+              <img ng-show="!match.searcher_user.picture_url"
+                   src="http://communityshare_assets.s3.amazonaws.com/default_avatar.png" 
+                   class="img-responsive img-circle profile-img centered" />                   
               <div class="text-center">
                 <button class="btn primary-btn match-message-btn btn-lg"
                         ng-click="startConversation(Session.activeUser, match.searcher_user, match, false)">
@@ -69,7 +72,7 @@
                 <h4 class="match-username">{{match.searcher_user.name}}</h4></a>
               <p ng-repeat="ia in match.searcher_user.institution_associations"
                  class="position">
-                {{ia.role}} &#183; {{ia.institutions.name}}
+                {{ia.role}} &#183; {{ia.institution.name}}
               </p>
               <p class="show-linebreaks">{{match.searcher_user.bio}}</p>
               <div class="match-labels">
