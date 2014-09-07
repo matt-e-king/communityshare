@@ -162,8 +162,10 @@
 
   module.controller(
     'SearchUsersController',
-    function($scope, $location, $q, User, Session, $routeParams, parseyyyyMMdd) {
+    function($scope, $location, $q, User, Session, $routeParams, parseyyyyMMdd,
+             startConversation) {
       $scope.Session = Session;
+      $scope.startConversation = startConversation;
       $scope.infoMessage = 'Searching for matching users...';
       $scope.users = undefined;
       $scope.prevSearchText = $routeParams.searchText;
