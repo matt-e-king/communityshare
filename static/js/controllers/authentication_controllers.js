@@ -11,15 +11,19 @@
     'ResetPasswordController',
     function($scope, Authenticator, $routeParams, $location) {
       var key = $routeParams.key;
-      $scope.password = '';
-      $scope.repeat_password = '';
+      $scope.password = {
+        password: '',
+        repeat_password: ''
+      };
       $scope.successfulReset = false;
       $scope.failedReset = false;
       // passwordMethods is used for communication between password and
       // password_repeat directives.
       $scope.passwordMethods = {};
       $scope.resetPassword = function() {
-        var promise = Authenticator.resetPassword(key, $scope.password);
+        console.log('password is ');
+        console.log($scope.password);
+        var promise = Authenticator.resetPassword(key, $scope.password.password);
         promise.then(
           function() {
             $location.path('/login').search({});
@@ -134,12 +138,12 @@
     'LoginController',
     function($scope, $location, Authenticator) {
       var nextLocation = $location.search()['goto'];
-      $scope.email = undefined;
-      $scope.password = undefined;
+      $scope.email = {value: undefined};
+      $scope.password = {value: undefined};
       $scope.errorMessage = '';
       $scope.login = function() {
         var userPromise = Authenticator.authenticateWithEmailAndPassword(
-          $scope.email, $scope.password);
+          $scope.email.value, $scope.password.value);
         userPromise.then(
           function() {
             if (nextLocation) {
