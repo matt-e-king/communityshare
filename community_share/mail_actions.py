@@ -343,17 +343,14 @@ To reset your password please click on the following link and follow the instruc
 If you cannot click on the link copy it into the addressbar of your browser.
 '''
     content = content.format(BASEURL=config.BASEURL, secret_key=secret.key)
-    if not user.email_confirmed:
-        error_message = 'The email address is not confirmed.'
-    else:
-        email = mail.Email(
-            from_address=config.DONOTREPLY_EMAIL_ADDRESS,
-            to_address=user.confirmed_email,
-            subject='CommunityShare Password Reset Request',
-            content=content,
-            new_content=content,
+    email = mail.Email(
+        from_address=config.DONOTREPLY_EMAIL_ADDRESS,
+        to_address=user.email,
+        subject='CommunityShare Password Reset Request',
+        content=content,
+        new_content=content,
         )
-        error_message = mail.get_mailer().send(email)
+    error_message = mail.get_mailer().send(email)
     return error_message
 
 def process_password_reset(secret_key, new_password):
