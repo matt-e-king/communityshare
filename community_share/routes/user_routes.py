@@ -178,7 +178,7 @@ def register_user_routes(app):
 
     def process_filename(filename, user_id):
         base, extension = os.path.splitext(filename)
-        if extension in ALLOWED_EXTENSIONS:
+        if extension.lower() in ALLOWED_EXTENSIONS:
             # Maximum filename length = 100
             # Use 50 to be safe
             base = base[:50]
