@@ -1,0 +1,53 @@
+<div class="navbar navbar-default navbar-fixed-top" role="navigation"
+     ng-controller="NavigationController">
+  <div class="container-fluid">
+
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse"
+              data-target=".navbar-collapse"
+              ng-init="navCollapsed=true"
+              ng-click="navCollapsed=!navCollapsed"
+              >
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <div ng-switch on="Session.activeUser !== undefined">
+        <a class="navbar-brand brand">
+          <img src="http://communityshare_assets.s3.amazonaws.com/logo_and_name.png"  id="logo-id" />
+        </a>
+      </div>
+    </div>
+
+    <div class="navbar-collapse collapse" collapse="navCollapsed">
+      <ul class="nav navbar-nav navbar-right">
+        <li class="hidden-md hidden-sm hidden-lg">
+          <a href="/#/search">Search</a></li>
+        <li class="hidden-md hidden-sm hidden-lg">
+          <a href="/#/messages">Messages</a></li>
+        <li class="hidden-md hidden-sm hidden-lg">
+          <a href="/#/shares">Shares</a></li>
+        <li class="hidden-md hidden-sm hidden-lg">
+          <a href="/#/matches">Matches</a></li>
+        <li class="hidden-md hidden-sm hidden-lg"
+            ng-show="Session.activeUser.is_administrator">
+          <a href="/#/admin">Admin</a>
+        </li>
+        <li ng-show="Session.activeUser">
+          <a href="#/user/{{Session.activeUser.id}}">
+            <span class="hidden-md hidden-sm hidden-lg">My Profile</span>
+            <span class="hidden-xs">{{Session.activeUser.name}}</span>
+          </a>
+        </li>
+        <li ng-show="Session.activeUser">
+          <a href="#/settings">Settings</a></li>
+        <li ng-show="Session.activeUser">
+          <a ng-click="logout()" class="clickable">Logout</a></li>
+        <li ng-show="Session.activeUser == undefined">
+          <a href="#login" ng-show="!Session.activeUser">Login</a></li>
+      </ul>
+
+    </div><!--/.nav-collapse -->
+  </div><!--/.container-fluid -->
+</div>

@@ -4,16 +4,21 @@
   var module = angular.module(
     'communityshare.controllers.home',
     [
-      'communityshare.directives.home',
       'communityshare.services.search',
       'communityshare.services.modal',
       'communityshare.services.share',
       'communityshare.services.statistics'
     ]);
+
+  module.controller(
+    'MainController',
+    function($scope, Session) {
+      $scope.Session = Session;
+    });
   
   module.controller(
     'HomeController',
-    function($scope, Session, Evnt, Conversation) {
+    function($scope, Session) {
       $scope.Session = Session;
       if (Session.activeUser) {
 
@@ -24,7 +29,7 @@
             $scope.upcomingShares = events;
           },
           function(message) {
-            var msg = 'Failed to load upcoming shares'
+            var msg = 'Failed to load upcoming shares';
             if (message) {
               msg += ': ' + message;
             }
@@ -38,7 +43,7 @@
             $scope.recentConversations = conversations;
           },
           function(message) {
-            var msg = 'Failed to load recent conversations'
+            var msg = 'Failed to load recent conversations';
             if (message) {
               msg += ': ' + message;
             }
@@ -81,7 +86,7 @@
                     Messages.error(message);
                   });
               }
-            })
+            });
         };
         var searchesPromise = Search.get_many(searchParams);
         searchesPromise.then(
@@ -95,30 +100,10 @@
     });
 
   module.controller(
-    'CommunityPartnerHomeController',
-    function($scope, Session, Search, Messages, CommunityPartnerUtils) {
-      $scope.properties = {};
-      if (Session.activeUser && Session.activeUser.is_community_partner) {
-        var searchesPromise = Session.activeUser.getSearches();
-        var searchPromise = CommunityPartnerUtils.searchesPromiseToSearchPromise(
-          searchesPromise);
-        searchPromise.then(
-          function(search) {
-            $scope.search = search;
-            if (search) {
-              search.makeLabelDisplay();
-            }
-          }, 
-          function(message) {
-            Messages.error(message);
-          });
-      }
-    });
-
-  module.controller(
-    'AdministratorHomeController',
-    function($scope, $location, getStatistics) {
-      $scope.searchText = '';
+    'AdminController',
+    function(Session, $scope, $location, getStatistics) {
+      $scope.Session = Session;
+      $scope.searchText = {value: ''};
       $scope.now = new Date();
       $scope.tomorrow = new Date();
       $scope.tomorrow.setDate($scope.tomorrow.getDate()+1);
@@ -128,14 +113,13 @@
       $scope.daysAgo30.setDate($scope.daysAgo7.getDate()-29);
       $scope.searchForUsers = function() {
         var searchParams = {
-          'searchText': $scope.searchText
+          'searchText': $scope.searchText.value
         };
         $location.path('/searchusers').search(searchParams);
       };
       var statisticsPromise = getStatistics();
       $scope.statistics = [];
       statisticsPromise.then(function(statistics) {
-        var dates = []
         for (var dateString in statistics) {
           var date = new Date(dateString);
           statistics[dateString].date = date;
@@ -149,7 +133,7 @@
           } else {
             return 0;
           }
-        }
+        };
         $scope.statistics.sort(comp);
         var l = $scope.statistics.length;
         $scope.statisticsDate = $scope.statistics[l-1].date;
@@ -164,9 +148,9 @@
         }
         $scope.newUsersIn30Days = $scope.newUsersIn7Days;
         $scope.eventsIn30Days = $scope.eventsIn7Days;
-        for (var i=7; i<30; i++) {
-          $scope.newUsersIn30Days += $scope.statistics[l-1-i].n_new_users;
-          $scope.eventsIn30Days += $scope.statistics[l-1-i].n_events_done;
+        for (var j=7; j<30; j++) {
+          $scope.newUsersIn30Days += $scope.statistics[l-1-j].n_new_users;
+          $scope.eventsIn30Days += $scope.statistics[l-1-j].n_events_done;
         }
       });
     });
@@ -178,28 +162,38 @@
 
   module.controller(
     'SearchUsersController',
-    function($scope, $location, $q, User, Session) {
+    function($scope, $location, $q, User, Session, $routeParams, parseyyyyMMdd) {
       $scope.Session = Session;
       $scope.infoMessage = 'Searching for matching users...';
       $scope.users = undefined;
-      $scope.searchText = $location.search().searchText;
+      $scope.prevSearchText = $routeParams.searchText;
+      $scope.searchText = {value: $routeParams.searchText};
+      var start = $routeParams.created_start;
+      if (start) {
+        start = parseyyyyMMdd(start);
+      }
+      var stop = $routeParams.created_stop;
+      if (stop) {
+        stop = parseyyyyMMdd(stop);
+      }
+      $scope.start = start;
+      $scope.stop = stop;
       var searchForUsers = function() {
-        var searchNameParams = {
-          'name.ilike': '%' + $scope.searchText + '%'
+        var searchParams = {
+          'date_created.greaterthan': start,
+          'date_created.lessthan': stop
         };
-        var searchEmailParams = {
-          'email.ilike': '%' + $scope.searchText + '%'
-        };
-        var byNamePromise = User.get_many(searchNameParams);
-        var byEmailPromise = User.get_many(searchEmailParams);
-        var combinedPromise = $q.all({byName: byNamePromise,
-                                      byEmail: byEmailPromise});
-
-        combinedPromise.then(
+        var searchPromise = User.search($scope.searchText.value, searchParams);
+        searchPromise.then(
           function(results) {
             var addedIds = {};
             var uniqueUsers = [];
-            var users = results.byName.concat(results.byEmail);
+            var users;
+            if (results.byName === undefined) {
+              users = results;
+            } else {
+              users = results.byName.concat(results.byEmail);
+            }
             for (var i=0; i<users.length; i++) {
               var user = users[i];
               if (!(user.id in addedIds)) {
@@ -217,7 +211,7 @@
               } else {
                 return 0;
               }
-            }
+            };
             uniqueUsers.sort(compare);
             $scope.users = uniqueUsers;
             $scope.infoMessage = '';
@@ -231,13 +225,10 @@
             $scope.errorMessage = 'Failed to load users' + msg;
             $scope.infoMessage = '';
           });
-      }
+      };
       searchForUsers();
       $scope.newSearch = function() {
-        var searchParams = {
-          'searchText': $scope.searchText
-        };
-        $location.search(searchParams);
+        $location.path('/searchusers/' + $scope.searchText.value);
       };
     });
 

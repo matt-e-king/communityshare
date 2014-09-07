@@ -22,7 +22,6 @@
                 searchesPromise);
               searchPromise.then(
                 function(search) {
-                  search.makeLabelDisplay()
                   $scope.search = search;
                 },
                 function(message) {
@@ -70,46 +69,6 @@
       };
     });
 
-  module.directive(
-    'csSignupSettings',
-    function() {
-      return {
-        templateUrl: 'static/templates/signup_common.html'
-      };
-    });
-
-  module.directive(
-    'csPersonalSettings',
-    function() {
-      return {
-        templateUrl: 'static/templates/personal_settings.html'
-      };
-    });
-
-  module.directive(
-    'csMorePersonalSettings',
-    function() {
-      return {
-        templateUrl: 'static/templates/more_personal_settings.html'
-      };
-    });
-
-  module.directive(
-    'csSignupAccountSettings',
-    function() {
-      return {
-        templateUrl: 'static/templates/signup_account_settings.html'
-      };
-    });
-
-  module.directive(
-    'csAccountSettings',
-    function() {
-      return {
-        templateUrl: 'static/templates/account_settings.html'
-      };
-    });
-
   module.directive('csParserHook', function() {
     return {
       require: 'ngModel',
@@ -119,7 +78,7 @@
       link: function(scope, elem, attrs, ctrl) {
         var methodName = attrs.csParserHook;
         ctrl.$parsers.push(function(value) {
-          var output = undefined;
+          var output;
           if (scope.methods[methodName]) {
             output = scope.methods[methodName](value);
           }
@@ -151,7 +110,7 @@
         };
 
         ctrl.$parsers.push(function(value) {
-          var output = undefined;
+          var output;
           var matches = isMatch(value, otherValue);
           ctrl.$setValidity('match', matches);
           if (matches) {
@@ -174,7 +133,7 @@
   module.directive('emitScope', function() {
     return {
       link: function(scope, element, attrs) {
-        scope.$emit(attrs['emitScope'], scope);
+        scope.$emit(attrs.emitScope, scope);
       }
     };
   });

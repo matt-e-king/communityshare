@@ -5,17 +5,22 @@
     'communityshare.services.share',
     [
       'communityshare.services.item'
-    ])
+    ]);
 
   module.factory(
     'Share',
-    function(ItemFactory, EvntBase, SessionBase) {
-      var Share = ItemFactory('share');
+    function(itemFactory, EvntBase, SessionBase) {
+      var Share = itemFactory('share');
       Share.prototype.updateFromData = function(shareData) {
         this._baseUpdateFromData(shareData);
+        this.largest_datetime_start = undefined;
         if (this.events) {
           for (var i=0; i<this.events.length; i++) {
             this.events[i] = EvntBase.make(this.events[i]);
+            if ((this.largest_datetime_start === undefined) ||
+                (this.events[i].datetime_start > this.largest_datetime_start)) {
+              this.largest_datetime_start = this.events[i].datetime_start;
+            }
           }
         } else {
           this.events = [];
@@ -64,13 +69,32 @@
         });
         this.events.push(evnt);
       };
+      Share.sortShares = function(shares) {
+        var futureShares = [];
+        var pastShares = [];
+        for (var i=0; i<shares.length; i++) {
+          var share = shares[i];
+          if (share.largest_datetime_start > new Date()) {
+            futureShares.push(share);
+          } else {
+            pastShares.push(share);
+          }
+        }
+        futureShares.sort(function(a, b) {return a.datetime_start > b.datetime_start;});
+        pastShares.sort(function(a, b) {return a.datetime_start > b.datetime_start;});
+        return {
+          future: futureShares,
+          past: pastShares
+        };
+      };
+
       return Share;
     });
 
   module.factory(
     'EvntBase',
-    function(ItemFactory) {
-      var Evnt = ItemFactory('event');
+    function(itemFactory) {
+      var Evnt = itemFactory('event');
       return Evnt;
     });
 
@@ -89,7 +113,6 @@
   };
 
   var combineDateTime = function(date, time) {
-    var offset = time.getTimezoneOffset();
     var combined = new Date(
       date.getFullYear(),
       date.getMonth(),
@@ -103,7 +126,7 @@
     'eventLoader',
     function(Evnt, $q) {
       return function(eventId) {
-        var deferred = $q.defer()
+        var deferred = $q.defer();
         var eventPromise = Evnt.get(eventId);
         eventPromise.then(
           function(event) {
@@ -113,13 +136,12 @@
             deferred.resolve(undefined);
           });
         return deferred.promise;
-      }
-      
+      };
     });
 
   module.factory(
     'Evnt',
-    function(ItemFactory, EvntBase, Share) {
+    function(EvntBase, Share) {
       var default_datetime = new Date();
       default_datetime.setHours(0, 0, 0, 0);
       EvntBase.prototype.updateFromData = function(eventData) {
@@ -131,12 +153,12 @@
           this.datetime_stop = default_datetime;
         }
         this.datetime_start = new Date(this.datetime_start);
-        var split = splitDateTime(this.datetime_start);
-        this.date = split.date;
-        this.time_start = split.time;
+        var splitstart = splitDateTime(this.datetime_start);
+        this.date = splitstart.date;
+        this.time_start = splitstart.time;
         this.datetime_stop = new Date(this.datetime_stop);
-        var split = splitDateTime(this.datetime_stop);
-        this.time_stop = split.time;
+        var splitstop = splitDateTime(this.datetime_stop);
+        this.time_stop = splitstop.time;
         if (this.share) {
           this.share = new Share(this.share);
         }

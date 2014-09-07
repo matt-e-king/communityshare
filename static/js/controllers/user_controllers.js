@@ -15,11 +15,12 @@
   module.controller(
     'UserController',
     function($scope, $routeParams, User, Session, Question, Conversation,
-             Evnt) {
+             Evnt, startConversation) {
       $scope.Session = Session;
       var userId = $routeParams.userId;
       var userPromise = User.get(userId);
-      $scope.message = 'Loading user...'
+      $scope.message = 'Loading user...';
+      $scope.startConversation = startConversation;
       userPromise.then(
         function(user) {
           $scope.message = '';
@@ -31,17 +32,16 @@
             $scope.educatorViewMethods.onUserUpdate(user);
           }
         },
-        function(response) {
+        function() {
           $scope.message = 'Could not find user with id=' + userId;
         });
       $scope.communityPartnerViewMethods = {};
       $scope.educatorViewMethods = {};
-      var question_types = [];
       var questionsPromise = Question.get_many_with_answers(
         userId,
         {'question_type.in': ['signup_community_partner', 'signup', 'signup_educator']}
       );
-      if ($scope.Session.activeUser.is_administrator) {
+      if ($scope.Session.activeUser && $scope.Session.activeUser.is_administrator) {
         var conversationsPromise = Conversation.get_many({user_id: userId});
         conversationsPromise.then(
           function(conversations) {
@@ -67,11 +67,11 @@
 
   // User Signups
 
-  var commonSignupLogic = function($scope, Session, Messages, User, signUp,
-                                   $location, $q, Question, Answer) {
-    $scope.Session = Session;
-    $scope.editedUser = new User();
-    $scope.newSearch.makeLabelDisplay()
+  var commonSignupLogic = function($scope, user, search, Messages, $location,
+                                   $q, Question, Answer) {
+    $scope.user = user;
+    $scope.search = search;
+    $scope.institutionMethods = {};
 
     // Get questions to display during signup.
     $scope.questions = [];
@@ -86,80 +86,112 @@
           question.answer = new Answer({question_id: question.id});
         }
       });
-
-    // passwordMethods hooks up the password matching directives.
-    $scope.passwordMethods = {};
-
+    $scope.enoughLabelsSelected = function() {
+      var cpl = user.community_partner_profile_search.labels;
+      var el = user.educator_profile_search.labels;
+      var enoughSelected = ((cpl.length > 0) || (el.length > 0));
+      return enoughSelected;
+    };
     $scope.submit = function() {
-      var userPromise = signUp($scope.editedUser, $scope.editedUser.password);
-      userPromise.then(
-        function(user) {
-          // After use is created save the passive search.
-          $scope.newSearch.processLabelDisplay();
-          $scope.newSearch.searcher_user_id = user.id;
-          $scope.newSearch.zipcode = user.zipcode;
-          var searchPromise = $scope.newSearch.save();
-          var allPromises = [searchPromise];
-          // And save the answers to questions.
-          for (var i=0; i<$scope.questions.length; i++) {
-            var question = $scope.questions[i];
-            if (question.answer.text) {
-              allPromises.push(question.answer.save());
-            }
+      $scope.institutionMethods.form.submitted = true;
+      if ($scope.enoughLabelsSelected() && ($scope.institutionMethods.isValid())) {
+        // Save changes made to user.
+        var userPromise = user.save();
+        var allPromises = [userPromise];
+        // And save the answers to questions.
+        for (var i=0; i<$scope.questions.length; i++) {
+          var question = $scope.questions[i];
+          if (question.answer.text) {
+            allPromises.push(question.answer.save());
           }
-          $q.all(allPromises).then(
-            function(data) {
-              var search = data[0];
-              $location.path('/search/' + search.id + '/results');
-            },
-            function(message) {
-              Messages.error(message);
-            });
-        },
-        function(message) {
-          Messages.error(message);
-        });
+        }
+        $q.all(allPromises).then(
+          function() {
+            $location.path('/signup/personal');
+          },
+          function(message) {
+            Messages.error(message);
+          });
+      }
     };
   };
 
   module.controller(
     'SignupCommunityPartnerController',
-    function($scope, Session, Messages, User, signUp, $location, $q, Search,
-            Question, Answer) {
+    function($scope, Session, Messages, $location, $q, Search,
+             Question, Answer) {
+      $scope.Session = Session;
+      var user = Session.activeUser;
+      var search;
+      if (user) {
+        search = user.community_partner_profile_search;
+      }
       $scope.isCommunityPartner = true;
-      $scope.newSearch = new Search({
-          searcher_user_id: undefined,
-          searcher_role: 'partner',
-          searching_for_role: 'educator',
-          active: true,
-          labels: [],
-          latitude: undefined,
-          longitude: undefined,
-          distance: undefined
-        });
       // Signup logic common to Community Partners and Educators
-      commonSignupLogic($scope, Session, Messages, User, signUp, $location, $q,
+      commonSignupLogic($scope, user, search, Messages, $location, $q,
                        Question, Answer);
     });
   
   module.controller(
+    'SignupPersonalController',
+    function($scope, Session, $fileUploader, $http, $location) {
+      $scope.Session = Session;
+      $scope.user = Session.activeUser;
+      $scope.submitAttempted = false;
+      if (Session.activeUser) {
+        $scope.user.wants_update_emails = true;
+        $scope.submit = function(personalSettingsForm) {
+          $scope.submitAttempted = true;
+          if (personalSettingsForm.$valid) {
+            uploader.uploadAll();
+            var userPromise = $scope.user.save();
+            userPromise.then(
+              function() {
+                $location.path('matches');
+              },
+              function(errorMessage) {
+                $scope.errorMessage = errorMessage;
+              });
+          }
+        };
+        $scope.validImage = true;
+        var uploader = $scope.uploader = $fileUploader.create({
+          scope: $scope,
+          url: '/api/user/'+$scope.user.id+'/picture',
+          headers: $http.defaults.headers.common,
+          filters: [
+            function (item) {
+              var is_image = (item.type.substring(0, 5) === 'image');
+              $scope.validImage = is_image;
+              uploader.queue.splice(0, uploader.queue.length);
+              return is_image;
+            }
+          ]
+        });
+        
+        // Make sure we only have one file in the uploader queue
+        uploader.bind('afteraddingfile', function () {
+          if (uploader.queue.length > 1) {
+            uploader.queue.splice(0, uploader.queue.length-1);
+          }
+        });
+      }
+    });
+
+  module.controller(
     'SignupEducatorController',
-    function($scope, Session, Messages, User, signUp, $location, $q, Search,
+    function($scope, Session, Messages, $location, $q, Search,
             Question, Answer) {
+      $scope.Session = Session;
+      var user = Session.activeUser;
+      var search;
+      if (user) {
+        search = user.educator_profile_search;
+      }
       $scope.isEducator = true;
-      $scope.newSearch = new Search({
-        searcher_user_id: undefined,
-        searcher_role: 'educator',
-        searching_for_role: 'partner',
-        active: true,
-        labels: [],
-        latitude: undefined,
-        longitude: undefined,
-        distance: undefined
-      });
       $scope.questions = [];
       // Signup logic common to Community Partners and Educators
-      commonSignupLogic($scope, Session, Messages, User, signUp, $location, $q,
+      commonSignupLogic($scope, user, search, Messages, $location, $q,
                        Question, Answer);
     });
 
@@ -167,8 +199,40 @@
 
   module.controller(
     'SettingsController',
-    function($scope, $location, Session, Messages, $q, CommunityPartnerUtils,
-             Question, Answer, $fileUploader, $http, makeDialog, Authenticator) {
+    function($scope, $location, Session, Messages, $q,
+             Question, Answer, $fileUploader, $http, makeDialog, Authenticator, $rootScope) {
+
+      var justSaved = false;
+      var turnOffLocationChangeHandler;
+      $scope.institutionMethods = {};
+
+      var onLocationChange = function(event, newUrl) {
+        if (!justSaved && (($scope.personalSettingsForm && $scope.personalSettingsForm.$dirty) || 
+            ($scope.accountSettingsForm && $scope.accountSettingsForm.$dirty) || 
+            ($scope.user.community_partner_profile_search &&
+             $scope.user.community_partner_profile_search.dirty) ||
+            ($scope.user.educator_profile_search &&
+             $scope.user.educator_profile_search.dirty)))
+        {
+          var title = 'Changes not Saved';
+          var msg = 'Do you really want to leave this page without saving your changes?';
+          var btns = [{result:'yes', label: 'Yes'},
+                      {result:'no', label: 'No', cssClass: 'btn-primary'}];
+          var d = makeDialog(title, msg, btns);
+          d.result.then(
+            function(result) {
+              if (result === 'yes') {
+                turnOffLocationChangeHandler();
+                var relUrl = newUrl.replace(/^.*\#/, "");
+                $location.path(relUrl);
+              }
+            });
+          event.preventDefault();
+        }
+      };
+
+      turnOffLocationChangeHandler = $rootScope.$on('$locationChangeStart', onLocationChange);
+
       $scope.Session = Session;
       if (!Session.activeUser) {
         return;
@@ -190,41 +254,8 @@
           function(questions) {
             $scope.questions = questions;
           });
-      };
-      // Grab a community partner's passive search.
-      if ($scope.user && $scope.user.is_community_partner) {
-        $scope.interestsTabActive = true;
-        var searchesPromise = $scope.user.getSearches();
-        var searchPromise = CommunityPartnerUtils.searchesPromiseToSearchPromise(
-          searchesPromise);
-        searchPromise.then(
-          function(search) {
-            if (search) {
-              $scope.search = search;
-              search.makeLabelDisplay();
-            } else {
-              // Apparently the user didn't have a search.
-              $scope.search = new Search({
-                searcher_user_id: $scope.user.id,
-                searcher_role: 'partner',
-                searching_for_role: 'educator',
-                active: true,
-                labels: [],
-                latitude: undefined,
-                longitude: undefined,
-                distance: undefined
-              });
-            }
-            $scope.search.makeLabelDisplay();
-          },
-          function(message) {
-            Messages.error(message);
-          });
       }
 
-      if (Session.activeUser) {
-        $scope.editedUser = Session.activeUser.clone();
-      }
       $scope.$on('personalSettingsForm', function(event, value) {
         $scope.personalSettingsForm = value.personalSettingsForm;
       });
@@ -233,11 +264,10 @@
       });
 
       var onError = function(message) {
-        var msg = '';
+        var msg = 'Failed to update settings';
         if (message) {
-          msg = ': ' + message;
+          msg += ': ' + message;
         }
-        var msg = 'Failed to update settings' + msg;
         $scope.errorMessage = msg;
         $scope.successMessage = '';
       };
@@ -249,7 +279,7 @@
         headers: $http.defaults.headers.common,
         filters: [
           function (item) {
-            var is_image = (item.type.substring(0, 5) == 'image');
+            var is_image = (item.type.substring(0, 5) === 'image');
             $scope.validImage = is_image;
             uploader.queue.splice(0, uploader.queue.length);
             return is_image;
@@ -258,7 +288,7 @@
       });
 
       // Make sure we only have one file in the uploader queue
-      uploader.bind('afteraddingfile', function (event, item) {
+      uploader.bind('afteraddingfile', function () {
         if (uploader.queue.length > 1) {
           uploader.queue.splice(0, uploader.queue.length-1);
         }
@@ -298,15 +328,9 @@
       };
 
       $scope.save = function() {
-        var saveUserPromise = $scope.editedUser.save();
-        var savedImages = uploader.uploadAll();
-        var saveSearchPromise = undefined;
-        var allPromises = [saveSearchPromise];
-        if ($scope.search) {
-          $scope.search.processLabelDisplay();
-          saveSearchPromise = $scope.search.save();
-          allPromises.push(saveSearchPromise);
-        }
+        var saveUserPromise = $scope.user.save();
+        uploader.uploadAll();
+        var allPromises = [saveUserPromise];
         if ($scope.questions) {
           var saveAnswerPromises = [];
           for (var i=0; i<$scope.questions.length; i++) {
@@ -324,14 +348,10 @@
             Session.activeUser.updateFromData(user.toData());
           },
           onError);
-        if (saveSearchPromise) {
-          saveSearchPromise.then(
-            function() {},
-            onError);
-        }
         combinedPromise.then(
           function() {
-            $location.path('/home');
+            justSaved = true;
+            $location.path('/');
           });
       };
       

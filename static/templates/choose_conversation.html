@@ -1,0 +1,18 @@
+<div class="modal-content">
+  <div class="modal-header">
+    <h4 class="modal-title">Multiple conversations with {{user.name}}</h4>
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+            ng-click="cancel()">
+      &times;</button>
+  </div>
+
+  <div class="modal-body">
+
+    <button ng-repeat="conversation in conversations"
+            ng-click="showConversation(conversation)"
+            >
+      {{conversation.subject}}
+    </button>
+
+  </div>
+</div>

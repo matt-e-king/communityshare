@@ -7,7 +7,7 @@
       'ngResource',
       'communityshare.services.user',
       'communityshare.services.conversation'
-    ])
+    ]);
 
   module.factory(
     'activeUserLoader',
@@ -33,7 +33,7 @@
       };
       SessionBase.getActiveUserPromise = function() {
         return deferred.promise;
-      }
+      };
       SessionBase.clearUser();
       return SessionBase;
     });
@@ -47,16 +47,16 @@
 
   module.factory(
     'Authenticator',
-    function($q, $http, User, SessionBase, $cookies, $cookieStore, Conversation, Messages) {
+    function($q, $http, User, SessionBase, $cookies, $cookieStore) {
       var Authenticator = {};
       Authenticator.clean = function() {
-        $http.defaults.headers.common['Authorization'] = '';
+        $http.defaults.headers.common.Authorization = '';
         $cookieStore.remove('apiKey');
         SessionBase.clearUser();
         SessionBase.setUser(undefined);
       };
       Authenticator.setApiKey = function(key) {
-        $http.defaults.headers.common['Authorization'] = 
+        $http.defaults.headers.common.Authorization = 
           'Basic:api:' + key;
         $cookies.apiKey = key;
       };
@@ -70,7 +70,7 @@
           var apiKey = $cookies.apiKey;
           var email = $cookies.email;
           if ((apiKey) && (email)){
-            Authenticator.setApiKey(apiKey)
+            Authenticator.setApiKey(apiKey);
             var userPromise = User.getByEmail(email);
             userPromise.then(
               function(user) {
@@ -90,9 +90,9 @@
 
       Authenticator.authenticateWithEmailAndPassword =
         function(email, password) {
-          $http.defaults.headers.common['Authorization'] = 
+          $http.defaults.headers.common.Authorization = 
             'Basic:' + email + ':' + password; 
-          var url = 'api/requestapikey'
+          var url = 'api/requestapikey';
           var promiseApiKey = $http({
             url: url,
             method: 'GET'
@@ -151,11 +151,11 @@
             deferred.resolve(undefined);
           },
           function(response) {
-            var message = 'Failed to send email confirmation email'
+            var message = 'Failed to send email confirmation email';
             if (response.data && response.data.message) {
               message += ': ' + response.data.message;
             }
-            respose.reject(message);
+            response.reject(message);
           });
         return deferred.promise;
       };

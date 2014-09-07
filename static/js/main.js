@@ -28,24 +28,43 @@
       }
     });
 
+    $routeProvider.when('/signup/choice', {
+      templateUrl: './static/templates/choose_user_type.html'
+    });
+
     $routeProvider.when('/login', {
       templateUrl: './static/templates/login.html',
       controller: 'LoginController'
     });
 
-    $routeProvider.when('/logout', {
-      templateUrl: './static/templates/logout.html',
-      controller: 'LogoutController'
-    });
-
     $routeProvider.when('/signup/communitypartner', {
       templateUrl: './static/templates/signup_community_partner.html',
-      controller: 'SignupCommunityPartnerController'
+      controller: 'SignupCommunityPartnerController',
+      resolve: {
+        user: function(activeUserLoader) {
+          return activeUserLoader();
+        }
+      }
+    });
+
+    $routeProvider.when('/signup/personal', {
+      templateUrl: './static/templates/signup_personal.html',
+      controller: 'SignupPersonalController',
+      resolve: {
+        user: function(activeUserLoader) {
+          return activeUserLoader();
+        }
+      }
     });
 
     $routeProvider.when('/signup/educator', {
       templateUrl: './static/templates/signup_educator.html',
-      controller: 'SignupEducatorController'
+      controller: 'SignupEducatorController',
+      resolve: {
+        user: function(activeUserLoader) {
+          return activeUserLoader();
+        }
+      }
     });
 
     $routeProvider.when('/requestresetpassword', {
@@ -63,29 +82,29 @@
       controller: 'ConfirmEmailController'
     });
 
-    $routeProvider.when('/home', {
-      templateUrl: './static/templates/home.html',
-      controller: 'HomeController',
-      resolve: {
-        activeUser: function(activeUserLoader) {
-          return activeUserLoader();
-        }
-      }
-    });
-
-    $routeProvider.when('/searchusers', {
-      templateUrl: './static/templates/search_users.html',
-      controller: 'SearchUsersController',
-      resolve: {
-        activeUser: function(activeUserLoader) {
-          return activeUserLoader();
-        }
-      }
-    });
-
     $routeProvider.when('/settings', {
       templateUrl: './static/templates/settings.html',
       controller: 'SettingsController',
+      resolve: {
+        activeUser: function(activeUserLoader) {
+          return activeUserLoader();
+        }
+      }
+    });
+
+    $routeProvider.when('/messages', {
+      templateUrl: './static/templates/messages.html',
+      controller: 'MessagesController',
+      resolve: {
+        activeUser: function(activeUserLoader) {
+          return activeUserLoader();
+        }
+      }
+    });
+
+    $routeProvider.when('/shares', {
+      templateUrl: './static/templates/shares.html',
+      controller: 'SharesController',
       resolve: {
         activeUser: function(activeUserLoader) {
           return activeUserLoader();
@@ -113,6 +132,37 @@
       }
     });
 
+    $routeProvider.when('/searchusers/:searchText', {
+      templateUrl: './static/templates/search_users.html',
+      controller: 'SearchUsersController',
+      resolve: {
+        activeUser: function(activeUserLoader) {
+          return activeUserLoader();
+        }
+      }
+    });
+
+    $routeProvider.when('/matches', {
+      templateUrl: './static/templates/matches.html',
+      controller: 'MatchesController',
+      resolve: {
+        activeUser: function(activeUserLoader) {
+          return activeUserLoader();
+        }
+      }
+    });
+
+    $routeProvider.when('/admin', {
+      templateUrl: './static/templates/admin.html',
+      controller: 'AdminController',
+      resolve: {
+        activeUser: function(activeUserLoader) {
+          return activeUserLoader();
+        }
+      }
+    });
+      
+
     $routeProvider.when('/search/:searchId/results', {
       templateUrl: './static/templates/search_results.html',
       controller: 'SearchResultsController',
@@ -124,7 +174,7 @@
     });
 
     $routeProvider.when('/search', {
-      templateUrl: './static/templates/search_edit.html',
+      templateUrl: './static/templates/search.html',
       controller: 'SearchEditController',
       resolve: {
         activeUser: function(activeUserLoader) {
@@ -202,7 +252,6 @@
     $routeProvider.otherwise({
       templateUrl: './static/templates/unknown.html'
     });
-    
   });
   
 })();

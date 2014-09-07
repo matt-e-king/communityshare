@@ -11,30 +11,63 @@
        return {
          scope: {
            user: '=',
-           isEducator: '=',
-           isCommunityPartner: '='
+           methods: '=',
+           isEducator: '@',
+           isCommunityPartner: '@'
          },
          templateUrl: './static/templates/institution_adder.html',
          controller: function($scope) {
+           $scope.isEducator = ($scope.isEducator === 'true');
+           $scope.isCommunityPartner = ($scope.isCommunityPartner === 'true');
+           $scope.updateInstitutions = function() {
+             if ($scope.noInstitutions) {
+               $scope.user.institution_associations = [];
+               $scope.user.addNewInstitutionAssociation();
+               $scope.institutionsForm.submitted = false;
+             }
+           };
+           $scope.$watch('institutionsForm', function() {
+             $scope.methods.form = $scope.institutionsForm;
+           });
+           $scope.methods.isValid = function() {
+             return $scope.institutionsForm.$valid || $scope.noInstitutions;
+           };
            // FIXME: Not scaleable.  Change to get the most popular.
            var institutionsPromise = Institution.get_many();
-           var institutionTypes = [];
            $scope.options = {institutions: [],
-                             institutionTypes: [],
+                             institutionTypes: []
                             };
            if ($scope.isCommunityPartner) {
-             $scope.options.institutionTypes = [
-               'Company', 'University', 'School'];
+             $scope.institutionTypes = [
+               'Corporation', 'Freelancer', 'Nonprofit', 'Academic',
+               'Government', 'Other'
+               ];
+             $scope.roles = [];
            } else if ($scope.isEducator) {
-             $scope.options.institutionTypes = [
-               'University', 'Public School', 'Charter School', 'Private School'];
+             $scope.institutionTypes = [
+               'Public District School',
+               'Public Charter',
+               'Private School',
+               'Home School',
+               'Higher Education',
+               'Nonprofit',
+               'After School Program',
+               'Other'
+             ];
+            $scope.roles = [
+              'Classroom teacher',
+              'Curriculum Coordinator',
+              'Administator',
+              'Parent',
+              'Other'
+            ];
            }
-           if ($scope.user.institution_associations.length == 0) {
-             $scope.user.institution_associations.push({});
+           if ($scope.user.institution_associations.length === 0) {
+             $scope.user.institution_associations.push({institution: {}});
            }
            institutionsPromise.then(
              function(institutions) {
-               $scope.options.institutions = institutions;
+               $scope.institutions = institutions;
              });
          }
        };
@@ -44,14 +77,14 @@
     'csInstitutionAssociationEdit',
     function() {
       return {
-        scope: {
-          institutionAssociation: '=',
-          institutions: '=',
-          institutionTypes: '=',
-          methods: '=',
-          index: '@'
-        },
-        templateUrl: 'static/templates/institution_association.html'
+        templateUrl: 'static/templates/institution_association.html',
+        controller: function($scope) {
+          $scope.$watch('institutionsForm.submitted', function() {
+            if ($scope.institutionsForm) {
+              $scope.submitted = $scope.institutionsForm.submitted;
+            }
+          });
+        }
       };
     });
   

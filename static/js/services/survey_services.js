@@ -7,15 +7,15 @@
 
   module.factory(
     'Answer',
-    function(ItemFactory) {
-      var Answer = ItemFactory('answer');
+    function(itemFactory) {
+      var Answer = itemFactory('answer');
       return Answer;
     });
 
   module.factory(
     'Question',
-    function(ItemFactory, $q, Answer) {
-      var Question = ItemFactory('question');
+    function(itemFactory, $q, Answer) {
+      var Question = itemFactory('question');
       Question.get_many_with_answers = function(
         user_id, searchParams, answerParams, forceRefresh) {
         var deferred = $q.defer();
@@ -37,19 +37,20 @@
                 answersByQuestionId[answer.question_id] = [];
               }
               answersByQuestionId[answer.question_id].push(answer);
+            }
+            var sort_fn = function(a, b) {
+                return a.created_date - b.created_date;
             };
             for (var j=0; j<questions.length; j++) {
               var question = questions[j];
-              var answers = [];
+              var some_answers = [];
               if (question.id in answersByQuestionId) {
-                answers = answersByQuestionId[question.id];
+                some_answers = answersByQuestionId[question.id];
               }
-              answers.sort(function(a, b) {
-                return a.created_date - b.created_date;
-              });
-              if (answers.length > 0) {
-                question.answer = answers[0];
-                question.answers = answers;
+              some_answers.sort(sort_fn);
+              if (some_answers.length > 0) {
+                question.answer = some_answers[0];
+                question.answers = some_answers;
               } else {
                 question.answer = new Answer({question_id: question.id});
               }
@@ -61,7 +62,7 @@
           }
         );
         return deferred.promise;
-      }
+      };
       return Question;
     });
 

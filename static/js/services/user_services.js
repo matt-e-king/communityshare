@@ -8,31 +8,16 @@
       'communityshare.services.message'
     ]);
 
-  var isEmail = function(email) {
-    // from http://stackoverflow.com/questions/46155/validate-email-address-in-javascript
-    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(email);
-  };
-
   module.factory(
     'signUp',
     function($q, $http, User, Authenticator, Session, Messages) {
       var signUp = function(user, password) {
         var deferred = $q.defer();
-        // Remove any insitutions with no names
-        var filteredInstitutionAssociations = [];
-        for (var i=0; i<user.institution_associations.length; i++) {
-          var institution_association = user.institution_associations[i];
-          if (institution_association.institution && institution_association.institution.name) {
-            filteredInstitutionAssociations.push(institution_association);
-          }
-          user.institution_associations = filteredInstitutionAssociations;
-        }
         var dataPromise = $http({
           method: 'POST',
           url: '/api/usersignup',
           data: {
-            'user': user,
+            'user': user.toData(),
             'password': password
           }});
         Session.clearUser();
@@ -60,8 +45,20 @@
 
   module.factory(
     'UserBase',
-    function(ItemFactory) {
-      var UserBase = ItemFactory('user');
+    function(itemFactory) {
+      var UserBase = itemFactory('user');
+      UserBase.prototype.toData = function() {
+        this.cleanInstitutionAssociations();
+        var data = JSON.parse(JSON.stringify(this));
+        if (this.id) {
+          data.educator_profile_search = this.educator_profile_search.toData();
+          data.community_partner_profile_search = this.community_partner_profile_search.toData();
+        } else {
+          data.educator_profile_search = null;
+          data.community_partner_profile_search = null;
+        }
+        return data;
+      };
       return UserBase;
     });
 
@@ -69,7 +66,7 @@
     'userLoader',
     function(User, $q) {
       return function(userId) {
-        var deferred = $q.defer()
+        var deferred = $q.defer();
         var userPromise = User.get(userId);
         userPromise.then(
           function(user) {
@@ -79,13 +76,47 @@
             deferred.resolve(undefined);
           });
         return deferred.promise;
-      }
+      };
     });
     
 
   module.factory(
     'User',
-    function(UserBase, $q, $http, Search, Conversation, SessionBase, Evnt) {
+    function(UserBase, $q, $http, Search, Conversation, SessionBase, Evnt, Messages) {
+
+      UserBase.search = function(searchText, searchParams) {
+        var deferred = $q.defer();
+        var dataPromise = $http({
+          method: 'GET',
+          url: '/api/usersearch/' + searchText,
+          data: searchParams
+        });
+        dataPromise.then(
+          function(response) {
+            var users = [];
+            for (var i=0; i<response.data.data.length; i++) {
+              users.push(UserBase.make(response.data.data[i]));
+            }
+            deferred.resolve(users);
+          },
+          function(response) {
+            deferred.reject(response.message);
+          }
+        );
+        return deferred.promise;
+      };
+
+      UserBase.prototype.cleanInstitutionAssociations = function() {
+        // Remove any insitutions with no names
+        var filteredInstitutionAssociations = [];
+        for (var i=0; i<this.institution_associations.length; i++) {
+          var institution_association = this.institution_associations[i];
+          if (institution_association.institution && institution_association.institution.name) {
+            filteredInstitutionAssociations.push(institution_association);
+          }
+          this.institution_associations = filteredInstitutionAssociations;
+        }
+      };
 
       UserBase.prototype.addInstitutionAssociationRemoveMethod = function(ia) {
         var _this = this;
@@ -97,8 +128,43 @@
         };
       };
 
-      UserBase.prototype.initialize = function() {
-        var _this = this;
+      UserBase.prototype.updateFromData = function(data) {
+        this._baseUpdateFromData(data);
+        if (this.educator_profile_search) {
+          this.educator_profile_search = new Search(
+            this.educator_profile_search);
+        } else {
+          this.educator_profile_search = new Search({
+            searcher_user_id: this.id,
+            searcher_role: 'educator',
+            searching_for_role: 'partner',
+            zipcode: this.zipcode,
+            labels: []
+          });
+        }
+        if (this.community_partner_profile_search) {
+          this.community_partner_profile_search = new Search(
+            this.community_partner_profile_search);
+        } else {
+          this.community_partner_profile_search = new Search({
+            searcher_user_id: this.id,
+            searcher_role: 'partner',
+            searching_for_role: 'educator',
+            zipcode: this.zipcode,
+            labels: []
+          });
+        }
+        if (this.is_administrator) {
+          this.accountCreationStatus = 'done';
+        } else if ((this.educator_profile_search.labels.length === 0) &&
+            (this.community_partner_profile_search.labels.length === 0)) {
+          this.accountCreationStatus = 'choice';
+        } else if (!this.bio) {
+          this.accountCreationStatus = 'personal';
+        } else {
+          this.accountCreationStatus = 'done';
+        }
+
         if (this.institution_associations === undefined)  {
           this.institution_associations = [];
           this.addNewInstitutionAssociation();
@@ -108,6 +174,10 @@
             this.addInstitutionAssociationRemoveMethod(ia);
           }
         }
+      };
+
+      UserBase.prototype.initialize = function() {
+        var _this = this;
         if (SessionBase.activeUser) {
           var conversationsPromise = Conversation.get_many(
             {user_id: SessionBase.activeUser.id});
@@ -116,7 +186,7 @@
               _this.conversationsWithMe = [];
               for (var i=0; i<conversations.length; i++) {
                 var conversation = conversations[i];
-                if (conversation.otherUser.id == _this.id) {
+                if (conversation.otherUser.id === _this.id) {
                   _this.conversationsWithMe.push(conversation);
                 }
               }
@@ -209,38 +279,77 @@
     });
 
   module.factory(
-    'CommunityPartnerUtils',
-    function(Messages, $q) {
-      var CommunityPartnerUtils = {};
-      CommunityPartnerUtils.searchesPromiseToSearchPromise = function(searchesPromise) {
-        var deferred = $q.defer();
-        searchesPromise.then(
-          function(searches) {
-            var search;
-            if (searches.length > 1) {
-              Messages.error('More than one search for a community partner.');
-              search = searches[0];
-            } else if (searches.length === 0) {
-              Messages.error('No searches for a community partner');
-              search = undefined;
-            } else {
-              search = searches[0];
-            }
-            deferred.resolve(search);
-          },
-          function(message) {
-            deferred.reject(message)
-          });
-        return deferred.promise;
-      };
-      return CommunityPartnerUtils;
+    'Institution',
+    function(itemFactory) {
+      var Institution = itemFactory('institution');
+      return Institution;
     });
 
+  // A function that bring up a modal to send a message to someone.
   module.factory(
-    'Institution',
-    function(ItemFactory) {
-      var Institution = ItemFactory('institution');
-      return Institution;
+    'startConversation',
+    function($modal, $location, Conversation, Messages) {
+      var startConversation = function(thisUser, otherUser, search, directToConversation) {
+        var userId = otherUser.id;
+        var searchId;
+        if (search) {
+          searchId = search.id;
+        }
+        // See if we have a conversation with this user
+        var conversationsPromise = Conversation.get_many(
+          {user_id: thisUser.id,
+           other_user_id: otherUser.id
+          }, true);
+        // Options for the new conversation modal.
+        var newConversationOpts = {
+          templateUrl: './static/templates/new_conversation.html',
+          controller: 'NewConversationController',
+          resolve: {
+            userId: function() {return userId;},
+            searchId: function() {return searchId;}
+          }
+        };
+        var withNewConversation = function(conversation) {
+          if (conversation && directToConversation) {
+            $location.path('/conversation/' + conversation.id);
+          }
+        };
+        conversationsPromise.then(
+          function(conversations) {
+            // If we have one conversation with that user go
+            // directly to that page.
+            if (conversations.length === 1) {
+              $location.path('/conversation/' + conversations[0].id);
+            }
+            // If we have no conversations pop up the new converation
+            // modal.
+            else if (conversations.length === 0) {
+              var m = $modal.open(newConversationOpts);
+              m.result.then(withNewConversation);
+            }
+            // If we have more than one conversation (which shouldn't happen
+            // with our current UI) we display a choose conversation modal.
+            else {
+              var opts = {
+                templateUrl: './static/templates/choose_conversation.html',
+                controller: function($scope) {
+                  $scope.conversations = conversations;
+                  //$scope.user = user;
+                  $scope.showConversation = function(conversation) {
+                    $location.path('/conversation/' + conversation.id);
+                  };
+                }
+              };
+              $modal.open(opts);
+            }
+          },
+          function(errorMessage) {
+            console.log('got an errorMessage: ' + errorMessage);
+            Messages.info(errorMessage);
+          }
+        );
+      };
+      return startConversation;
     });
 
 })();

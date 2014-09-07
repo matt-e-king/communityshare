@@ -4,7 +4,7 @@
   var module = angular.module(
     'communityshare.controllers.authentication',
     [
-      'communityshare.services.authentication',
+      'communityshare.services.authentication'
     ]);
   
   module.controller(
@@ -34,11 +34,11 @@
   module.controller(
     'RequestResetPasswordController',
     function($scope, Authenticator) {
-      $scope.email = '';
+      $scope.email = {value: ''};
       $scope.successfulRequest = false;
       $scope.failedRequest = false;
       $scope.requestResetPassword = function() {
-        var promise = Authenticator.requestResetPassword($scope.email);
+        var promise = Authenticator.requestResetPassword($scope.email.value);
         promise.then(
           function() {
             $scope.successfulRequest = true;
@@ -48,8 +48,8 @@
             $scope.successfulRequest = false;
             var msg = 'Failed to reset password';
             if (message) {
-              if (message == 'Not found') {
-                msg += ': ' + 'Unknown email address'
+              if (message === 'Not found') {
+                msg += ': ' + 'Unknown email address';
               } else {
                 msg += ': ' + message;
               }
@@ -61,13 +61,13 @@
 
   module.controller(
     'ConfirmEmailController',
-    function($scope, Authenticator, $routeParams, $location) {
+    function($scope, Authenticator, $routeParams) {
       var key = $routeParams.key;
       $scope.confirmed = false;
       $scope.failedReset = false;
       var promise = Authenticator.confirmEmail(key);
       promise.then(
-        function(user) {
+        function() {
           $scope.confirmed = true;
         },
         function(message) {
@@ -76,18 +76,58 @@
     });
 
   module.controller(
-    'LogoutController',
-    function(Authenticator, Session) {
-      Authenticator.clean();
-      Session.activeUser = undefined;
+    'TermsController',
+    function($scope, $modalInstance) {
+      $scope.closeTerms = function() {
+        $modalInstance.close();        
+      };
     });
 
   module.controller(
     'DefaultController',
-    function($scope, user, $location) {
+    function($scope, user, $location, User, signUp, Messages, $modal) {
       if (user) {
-        $location.path('home');
+        if (user.accountCreationStatus === 'choice') {
+          $location.path('signup/choice');
+        } else if (user.accountCreationStatus === 'personal') {
+          $location.path('signup/personal');
+        } else {
+          $location.path('matches');
+        }
       }
+      $scope.newUser = new User();
+      $scope.passwordMethods = {};
+      $scope.pg = 'default';
+      $scope.user_type = {value: ''};
+      $scope.completeSplash = function() {
+        $scope.newUser.name = $scope.newUser.firstName + ' ' + $scope.newUser.lastName;
+        var userPromise = signUp($scope.newUser, $scope.newUser.password);
+        userPromise.then(
+          function() {
+            $scope.errorMessage = '';
+            if ($scope.user_type.value === 'communityPartner') {
+              $location.path('/signup/communitypartner');
+            } else if ($scope.user_type.value === 'educator') {
+              $location.path('/signup/educator');
+            }
+          },
+          function(message) {
+            $scope.errorMessage = message;
+          });
+/*        if ($scope.user_type == 'communityPartner') {
+          $scope.pg = 'partner1';
+          $scope.isCommunityPartner = true;
+        } else if ($scope.user_type == 'educator') {
+          $scope.pg = 'educator1';
+          $scope.isEducator = true;
+        }*/
+      };
+      $scope.showTerms = function() {
+        $modal.open({
+          templateUrl: './static/templates/terms.html',
+          controller: 'TermsController'
+        });
+      };
     });
 
   module.controller(
@@ -101,28 +141,32 @@
         var userPromise = Authenticator.authenticateWithEmailAndPassword(
           $scope.email, $scope.password);
         userPromise.then(
-          function(user) {
+          function() {
             if (nextLocation) {
               $location.path(nextLocation);
             } else {
-              $location.path("/home")
+              $location.path("/");
             }
           },
           function(message) {
-            var msg = ''
+            var msg = '';
             if (message) {
               msg = ': ' + message;
             }
             $scope.errorMessage = 'Authentication failed' + msg;
           }
         );
-      }
+      };
     });
 
   module.controller(
     'NavigationController',
-    function($scope, Session) {
+    function($scope, Session, Authenticator, $location) {
       $scope.Session = Session;
+      $scope.logout = function() {
+        Authenticator.clean();
+        $location.path('');
+      };
     });
   
   module.controller(

@@ -12,7 +12,7 @@ from community_share import store, Base, config
 from community_share.models.base import Serializable
 from community_share.models.secret import Secret
 from community_share.models.search import Search
-from community_share.models.institution import InstitutionAssociation
+from community_share.models.institution import InstitutionAssociation, Institution
 
 
 logger = logging.getLogger(__name__)
@@ -21,23 +21,29 @@ class User(Base, Serializable):
     __tablename__ = 'user'
 
     MANDATORY_FIELDS = ['name', 'email']
-    WRITEABLE_FIELDS = ['name', 'is_administrator', 'institution_associations',
-                        'zipcode', 'website', 'twitter_handle', 'linkedin_link',
-                        'year_of_birth', 'gender', 'ethnicity', 'bio']
+    WRITEABLE_FIELDS = [
+        'name', 'is_administrator', 'institution_associations',
+        'zipcode', 'website', 'twitter_handle', 'linkedin_link',
+        'year_of_birth', 'gender', 'ethnicity', 'bio', 'phonenumber',
+        'educator_profile_search', 'community_partner_profile_search',
+        'wants_update_emails',
+    ]
     STANDARD_READABLE_FIELDS = [
         'id', 'name', 'is_administrator', 'last_active', 'is_educator',
         'is_community_partner', 'institution_associations',
         'zipcode', 'website', 'twitter_handle', 'linkedin_link',
         'year_of_birth', 'gender', 'ethnicity', 'bio', 'picture_url',
-        'email_confirmed', 'active']
+        'email_confirmed', 'active', 'educator_profile_search',
+        'community_partner_profile_search']
 
     ADMIN_READABLE_FIELDS = [
         'id', 'name', 'email' , 'date_created', 'last_active',
         'is_administrator', 'is_educator', 'is_community_partner',
         'institution_associations',
-        'zipcode', 'website', 'twitter_handle', 'linkedin_link',
+        'zipcode', 'phonenumber', 'website', 'twitter_handle', 'linkedin_link',
         'year_of_birth', 'gender', 'ethnicity', 'bio', 'picture_url',
-        'email_confirmed', 'active'
+        'email_confirmed', 'active', 'educator_profile_search',
+        'community_partner_profile_search', 'wants_update_emails',
     ]
 
     PERMISSIONS = {
@@ -56,19 +62,34 @@ class User(Base, Serializable):
     date_inactivated = Column(DateTime, nullable=True)
     is_administrator = Column(Boolean, nullable=False, default=False) 
     last_active = Column(DateTime)
+    educator_profile_search_id = Column(Integer)
+    community_partner_profile_search_id = Column(Integer)
+    wants_update_emails = Column(Boolean, nullable=False, default=False)
 
     picture_filename = Column(String(100))
     bio = Column(String(1000))
     zipcode = Column(String(50))
+    phonenumber = Column(String(50))
     website = Column(String(100))
     twitter_handle = Column(String(100))
     linkedin_link = Column(String(100))
     year_of_birth = Column(Integer)
     gender = Column(String(100))
     ethnicity = Column(String(100))
-    
-    searches = relationship("Search", backref="searcher_user")
+
+    searches = relationship(
+        "Search",
+        primaryjoin="Search.searcher_user_id == User.id",
+        backref="searcher_user")
     institution_associations = relationship("InstitutionAssociation")
+    educator_profile_search = relationship(
+        "Search",
+        primaryjoin="Search.id == User.educator_profile_search_id",
+        foreign_keys="User.educator_profile_search_id")
+    community_partner_profile_search = relationship(
+        "Search",
+        primaryjoin="Search.id == User.community_partner_profile_search_id",
+        foreign_keys="User.community_partner_profile_search_id")
 
     pwd_context = passlib.context.CryptContext(
         schemes=['sha512_crypt'],
@@ -91,12 +112,18 @@ class User(Base, Serializable):
         
     @property
     def is_educator(self):
-        output = (len(self.searches_as('educator')) > 0)
+        output = False
+        search = self.educator_profile_search
+        if (search and search.active):
+            output = (len(search.labels) > 0)
         return output
 
     @property
     def is_community_partner(self):
-        output = (len(self.searches_as('partner')) > 0)
+        output = False
+        search = self.community_partner_profile_search
+        if (search and search.active):
+            output = (len(search.labels) > 0)
         return output
 
     def is_password_correct(self, password):
@@ -139,10 +166,29 @@ class User(Base, Serializable):
                 has_admin_rights = True
         return has_admin_rights
 
+    def serialize(self, requester, exclude=[]):
+        return self._base_serialize(requester, exclude)
+
     def serialize_institution_associations(self, requester):
         associations = [i.serialize(requester)
                         for i in self.institution_associations]
         return associations
+
+    def serialize_educator_profile_search(self, requester):
+        search = self.educator_profile_search
+        if (search and search.active):
+            serialized = search.serialize(requester, exclude='searcher_user')
+        else:
+            serialized = None
+        return serialized
+
+    def serialize_community_partner_profile_search(self, requester):
+        search = self.community_partner_profile_search
+        if (search and search.active):
+            serialized = search.serialize(requester, exclude='searcher_user')
+        else:
+            serialized = None
+        return serialized
 
     def serialize_picture_url(self, requester):
         url = ''
@@ -153,6 +199,8 @@ class User(Base, Serializable):
     custom_serializers = {
         'institution_associations': serialize_institution_associations,
         'picture_url': serialize_picture_url,
+        'educator_profile_search': serialize_educator_profile_search,
+        'community_partner_profile_search': serialize_community_partner_profile_search,
     }
          
     def deserialize_institution_associations(self, data_list):
@@ -164,8 +212,30 @@ class User(Base, Serializable):
         for ia in self.institution_associations:
             ia.user = self
 
+    def deserialize_educator_profile_search(self, data):
+        search = self.educator_profile_search
+        if data is not None:
+            if search and search.active:
+                profile_search_id = search.id
+            else:
+                profile_search_id = None
+            data['id'] = profile_search_id
+            self.educator_profile_search = Search.admin_deserialize(data)
+
+    def deserialize_community_partner_profile_search(self, data):
+        search = self.community_partner_profile_search
+        if data is not None:
+            if search and search.active:
+                profile_search_id = search.id
+            else:
+                profile_search_id = None
+            data['id'] = profile_search_id
+            self.community_partner_profile_search = Search.admin_deserialize(data)
+            
     custom_deserializers = {
         'institution_associations': deserialize_institution_associations,
+        'educator_profile_search': deserialize_educator_profile_search,
+        'community_partner_profile_search': deserialize_community_partner_profile_search,
         }
 
     def make_api_key(self):
@@ -215,6 +285,23 @@ class User(Base, Serializable):
                 other_user = share.educator
             mail_actions.send_partner_deletion_message(
                 other_user, self, share.conversation)
+
+    @classmethod
+    def search(cls, searchText, date_created_greaterthan, date_created_lessthan):
+        '''
+        searchText can match name, email, institution name
+        '''
+        query = store.session.query(User).outerjoin(InstitutionAssociation).outerjoin(Institution)
+        name_condition = User.name.ilike('%'+searchText+'%')
+        email_condition = User.email.ilike('%'+searchText+'%')
+        institution_condition = Institution.name.ilike('%'+searchText+'%')
+        query = query.filter(or_(name_condition, email_condition, institution_condition))
+        if date_created_greaterthan:
+            query = query.filter(User.date_created > date_created_greaterthan)
+        if date_created_lessthan:
+            query = query.filter(User.date_created < date_created_lessthan)
+        users = query.all()
+        return users
 
 class UserReview(Base, Serializable):
     __tablename__ = 'userreview'

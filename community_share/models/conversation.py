@@ -23,7 +23,7 @@ class Conversation(Base, Serializable):
     __tablename__ = 'conversation'
 
     MANDATORY_FIELDS = [
-        'title', 'search_id', 'userA_id', 'userB_id',
+        'title', 'userA_id', 'userB_id',
     ]
     WRITEABLE_FIELDS = [
         'title',
@@ -44,7 +44,7 @@ class Conversation(Base, Serializable):
     active = Column(Boolean, default=True, nullable=False)
     date_created = Column(DateTime, nullable=False, default=datetime.utcnow)
     title = Column(String(200), nullable=False)
-    search_id = Column(Integer, ForeignKey('search.id'), nullable=False)
+    search_id = Column(Integer, ForeignKey('search.id'))
     userA_id = Column(Integer, ForeignKey('user.id'), nullable=False)
     userB_id = Column(Integer, ForeignKey('user.id'), nullable=False)
 
@@ -110,6 +110,7 @@ class Conversation(Base, Serializable):
     @classmethod
     def args_to_query(cls, args, requester):
         user_id = args.get('user_id', None)
+        other_user_id = args.get('other_user_id', None)
         with_unviewed_messages = args.get('with_unviewed_messages', None)
         messages_date_created_greaterthan = args.get(
             'messages.date_created.greaterthan', None)
@@ -117,10 +118,17 @@ class Conversation(Base, Serializable):
         if user_id is not None:
             try:
                 user_id = int(user_id)
+                if other_user_id is not None:
+                    other_user_id = int(other_user_id)
                 if (requester.id == user_id) or requester.is_administrator:
                     query = store.session.query(Conversation)
-                    query = query.filter(
-                        or_(Conversation.userA_id==user_id, Conversation.userB_id==user_id))
+                    query = query.filter(or_(
+                        Conversation.userA_id==user_id,
+                        Conversation.userB_id==user_id))
+                    if other_user_id is not None:
+                        query = query.filter(or_(
+                            Conversation.userA_id==other_user_id,
+                            Conversation.userB_id==other_user_id))
                     if with_unviewed_messages:
                         query = query.join(Message)
                         query = query.filter(

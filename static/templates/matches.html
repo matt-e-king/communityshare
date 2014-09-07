@@ -1,0 +1,91 @@
+<div cs-standard-wrapper>
+
+<div cs-forbidden ng-if="Session.activeUser === undefined">
+</div>
+
+<div ng-if="Session.activeUser !== undefined">
+
+  <div alert alert-info ng-show="infoMessage">{{infoMessage}}</div>
+  <div alert alert-danger ng-show="errorMessage">{{errorMessage}}</div>
+
+  <div ng-repeat="search in searches" ng-show="search.labels.length > 0">
+    <div class="panel panel-default">
+      <div class="gradient-header">
+        <h1>
+          <span ng-if="search.isProfile(Session.activeUser)">Matches to your Profile</span>
+          <span ng-if="!search.isProfile(Session.activeUser)">Matches to your Search</span>
+        </h1>
+        <div>
+          <span ng-show="search.show">
+            <a class="clickable search-show-bool" ng-click="search.show = false;">
+              Hide Matches</a>
+          </span>
+          <span ng-show="!search.show">
+            <a ng-click="getMatches(search)" class="clickable">Show Matches</a>
+          </span>
+          -
+          <span ng-if="!search.isProfile(Session.activeUser)">
+            <a class="clickable search-show-bool" ng-click="deleteSearch(search)">
+              Delete Search</a>
+          </span>
+          <span ng-if="search.isProfile(Session.activeUser)">
+            <a class="clickable search-show-bool" ng-click="editProfile()">
+              Edit Profile</a>
+          </span>
+        </div>
+      </div>
+      <div class="panel-body">
+        <p>Search results based on these filters:</p>
+        <button ng-repeat="label in search.labels"
+                ng-class="labelClasses[labelMapping[label]]"
+                class="btn btn-small">
+          {{label}}
+        </button>
+
+        <div ng-show="search.show">
+          <div alert alert-info ng-show="search.infoMessage">
+            {{search.infoMessage}}</div>
+          <div alert alert-danger ng-show="search.errorMessage">
+            {{search.errorMessage}}</div>
+
+          <div ng-show="search.matches.length == 0">
+            No matches found
+          </div>
+
+          <div ng-repeat="match in search.matches" class="row" class="panel-body">
+            <hr/>
+            <div class="col-sm-3 col-xs-5 ">
+              <image ng-src="{{match.searcher_user.picture_url}}"
+                     class="img-responsive img-circle profile-img centered" />
+              <div class="text-center">
+                <button class="btn primary-btn match-message-btn btn-lg"
+                        ng-click="startConversation(Session.activeUser, match.searcher_user, match, false)">
+                  Message
+                </button>
+              </div>
+            </div>
+            <div class="col-sm-9 col-xs-7">
+              <a ng-href="#/user/{{match.searcher_user_id}}">
+                <h4 class="match-username">{{match.searcher_user.name}}</h4></a>
+              <p ng-repeat="ia in match.searcher_user.institution_associations"
+                 class="position">
+                {{ia.role}} &#183; {{ia.institutions.name}}
+              </p>
+              <p class="show-linebreaks">{{match.searcher_user.bio}}</p>
+              <div class="match-labels">
+                <button ng-repeat="label in match.labels"
+                        ng-class="labelClasses[labelMapping[label]] + ' ' + {true: 'labelbox-selected', false: 'labelbox btn-xs'}[match.matchingLabels[label]]"
+                        class="btn btn-sm">
+                  {{label}}
+                </button>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>

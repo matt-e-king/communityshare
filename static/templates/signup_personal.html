@@ -1,0 +1,146 @@
+<div cs-registration-wrapper>
+
+  <div cs-forbidden ng-if="Session.activeUser === undefined">
+  </div>
+
+  <div ng-if="Session.activeUser !== undefined">
+    <div class="row">
+
+      <div class="col-xs-10">
+        <div class="panel panel-default">
+          <div class="gradient-header">
+            <h1>Welcome to CommunityShare</h1>
+          </div>
+          <div class="panel-body">
+            <h2 class="text-center">Personal Information</h2>
+            <form novalidate name="personalSettingsForm" 
+                  data-form-submitted
+                  ng-class="{true: 'submit-attempted', false: ''}[submitAttempted]">
+              <div class="row">
+                <div class="col-sm-3 text-center">
+                  <img ng-show="(uploader.queue.length == 0) && (!user.picture_url)"
+                       src="http://communityshare_assets.s3.amazonaws.com/default_avatar.png" 
+                       class="img-responsive img-circle"></img>
+                  <image ng-show="(uploader.queue.length === 0)" ng-src="{{user.picture_url}}" height="100"
+                         class="img-responsive img-circle"/>
+                  <div ng-show="uploader.isHTML5">
+                    <div ng-repeat="item in uploader.queue"
+                         ng-thumb="{ file: item.file, height: 150}"></div>
+                  </div>
+                  <div ng-show="!validImage">Not a valid image file</div>
+
+                  <!--                 <button ng-file-select type="file"
+                                       name="picture" id="picture"
+                                       class="btn btn-primary signup-btn">Upload</button> -->
+                </div>
+
+                <div class="col-sm-9">
+                  <h3>About Me</h3>
+                  <p class="text-muted">
+                    Choose a profile image.
+                  </p>
+                  <input ng-file-select type="file" class="org-input" name="picture" id="picture" value="Select File"/>
+                  <div class="form-group" data-input-error-helper data-input-tag="textarea">
+                    <textarea ng-model="user.bio"
+                              name="bio"
+                              required
+                              placeholder="Tell us about yourself!"
+                              rows="5"
+                              class="form-control org-input">
+                    </textarea>
+                    <p class="text-muted">
+                      100 Words or less
+                    </p>
+                    <p ng-show="personalSettingsForm.bio.$invalid && !personalSettingsForm.bio.$pristine"
+                       class="help-block">
+                      This field is required.
+                    </p>
+                  </div>
+                  <div class="form-group" data-input-error-helper>
+                    <input ng-model="user.zipcode"
+                           name="zipcode"
+                           id="zipcode"
+                           required
+                           class="form-control org-input required"
+                           placeholder="Zip Code"
+                           ng-pattern="/^\d{5}(-\d{4})?$/"
+                           type="text"/>
+                    <p ng-show="personalSettingsForm.zipcode.$invalid && !personalSettingsForm.zipcode.$pristine"
+                       class="help-block">
+                      Please enter a valid ZIP code.
+                    </p>
+                  </div>
+                  <div class="form-group" data-input-error-helper>
+                    <input ng-model="user.phonenumber"
+                           name="phonenumber"
+                           id="phonenumber"
+                           class="form-control org-input required"
+                           placeholder="Phone Number"
+                           ng-pattern="/^\d{3}-?\d{3}-?\d{4}?$/"
+                           type="text"/>
+                    <p ng-show="personalSettingsForm.phonenumber.$invalid && !personalSettingsForm.phonenumber.$pristine"
+                       class="help-block">
+                      Please enter a valid phone number (xxx-xxx-xxxx)
+                    </p>
+                  </div>
+                  <div class="form-group">
+                    <input class="form-control org-input"
+                           placeholder="Website URL"
+                           type="text"
+                           id="website"
+                           name="website"
+                           ng-model="user.website"
+                           />
+                  </div>
+                  <div class="form-group">
+                    <input class="form-control org-input required"
+                           placeholder="Twitter Handle"
+                           ng-model="user.twitter_handle"
+                           />
+                  </div>
+                  <div class="form-group">
+                    <input class="form-control org-input required"
+                           placeholder="LinkedIn Profile URL"
+                           ng-model="user.linkedin_link"
+                           />
+                  </div>
+                  <div class="form-group">
+                    <label class="checkbox-inline">
+                      <input type="checkbox" 
+                             ng-model="user.wants_update_emails" checked>
+                      
+                    CommunityShare invites you to stay informed
+                    about our progress in connecting educators and
+                    community members and adding new features to
+                    the CommunityShare site through periodic email
+                    updates. Uncheck here to opt-out now or at any
+                    time by visiting your profile. You will still
+                    receive emails in relation to your
+                    correspondence with community
+                    partners/educators.
+
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="signup-bottom">
+                  <div class="pull-right">
+                    <button class="btn btn-primary"
+                            type="submit"
+                            ng-click="submit(personalSettingsForm)"
+                            >Next</button>
+                  </div>
+                  <div class="pull-left">
+                    <a ng-if="user.is_community_partner" ng-href="#/signup/communitypartner">Previous</a>
+                    <a ng-if="user.is_educator" ng-href="#/signup/educator">Previous</a>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,19 @@
+<div>
+  <div id="side-bar">
+    <img src="http://lorempixel.com/200/200/people/" class="img-responsive img-circle centered">
+    <ul class="side-nav" id="side-nav-items">
+      <li class="side-nav-links"><a href="/#/search">Search</a>
+      </li>
+      <li class="side-nav-links"><a href="/#/messages">Messages</a>
+      </li>
+      <li class="side-nav-links"><a href="/#/shares">Shares</a>
+      </li>
+      <li class="side-nav-links"><a href="/#/matches">Matches</a>
+      </li>
+      <li class="side-nav-links"
+          ng-show="Session.activeUser.is_administrator">
+        <a href="/#/admin">Admin</a>
+      </li>
+    </ul>
+  </div>
+</div>

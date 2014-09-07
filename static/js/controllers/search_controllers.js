@@ -4,12 +4,101 @@
   var module = angular.module(
     'communityshare.controllers.search',
     [
-      'communityshare.controllers.conversation',
+      'communityshare.controllers.conversation'
     ]);
 
   module.controller(
+    'MatchesController',
+    function($scope, Session, Search, $location, labelMapping, makeDialog,
+             startConversation, Messages) {
+      $scope.Session = Session;
+      $scope.labelMapping = labelMapping;
+      $scope.labelClasses = {
+        gradeLevels: 'light-yellow-button',
+        engagementLevels: 'light-blue-button',
+        subjectAreas: 'light-green-button',
+        undefined: 'light-green-button'
+      };
+      var user = Session.activeUser;
+      $scope.infoMessage = 'Loading searches...';
+      $scope.errorMessage = '';
+      $scope.title = '';
+      $scope.goToConversation = function(conversation) {
+        $location.path('/conversation/' + conversation.id);
+      };
+
+      var searchesPromise = Search.get_many({'searcher_user_id': user.id}, true);
+      searchesPromise.then(
+        function(searches) {
+          $scope.infoMessage = '';
+          $scope.errorMessage = '';
+          $scope.searches = searches;
+          var compareSearchDate = function(search1, search2) {
+            var output = -1;
+            if (search1.created === search2.created) {
+              output = 0;
+            } else if (search1.created < search2.created) {
+              output = 1;
+            }
+            return output;
+          };
+          $scope.searches.sort(compareSearchDate);
+          var gotSomeMatches = false;
+          for (var i=0; i<$scope.searches.length; i++) {
+            var search = $scope.searches[i];
+            if ((!gotSomeMatches) && (search.labels.length > 0)) {
+              $scope.getMatches(search);
+              gotSomeMatches = true;
+            }
+          }
+        },
+        function() {
+          console.log('failed to get searches');
+        });
+      $scope.getMatches = function(search) {
+        var matchesPromise = Search.getResults(search.id);
+        search.show = true;
+        search.infoMessage = 'Loading matches...';
+        search.errorMessage = '';
+        matchesPromise.then(
+          function(matches) {
+            search.matches = matches;
+            search.infoMessage = '';
+            search.errorMessage = '';
+          },
+          function(errorMessage) {
+            search.infoMessage = '';
+            search.errorMessage = errorMessage;
+          });
+      };
+      $scope.startConversation = startConversation;
+      $scope.editProfile = function() {
+        $location.path('settings');
+      };
+      $scope.deleteSearch = function(search) {
+        var title = 'Delete Search';
+        var msg = 'Do you really want to delete this search?  Others will no longer be able to find you by matching to the contents of this search.';
+        var btns = [{result:'yes', label: 'Yes'},
+                    {result:'no', label: 'No', cssClass: 'btn-primary'}];
+        var d = makeDialog(title, msg, btns);
+        d.result.then(
+          function(result) {
+            if (result === 'yes') {
+              var deletePromise = search.destroy();
+              deletePromise.then(
+                function() {
+                },
+                function(message) {
+                    Messages.error(message);
+                });
+            }
+          });
+      };
+    });
+
+  module.controller(
     'SearchResultsController',
-    function(Session, $scope, $location, $routeParams, $modal, Search, Messages) {
+    function(Session, $scope, $location, $routeParams, $modal, Search, Messages, labelMapping) {
       $scope.Session = Session;
       var searchId = $routeParams.searchId;
       $scope.infoMessage = 'Searching for matches...';
@@ -18,23 +107,15 @@
       $scope.goToConversation = function(conversation) {
         $location.path('/conversation/' + conversation.id);
       };
-      $scope.startConversation = function(userId) {
-        var opts = {
-          templateUrl: './static/templates/new_conversation.html',
-          controller: 'NewConversationController',
-          resolve: {
-            userId: function() {return userId;},
-            searchId: function() {return searchId;}
-          }
-        };
-        var m = $modal.open(opts);
-        m.result.then(
-          function(conversation) {
-            if (conversation) {
-              $location.path('/conversation/' + conversation.id);
-            }
-          });
-      }
+
+      $scope.labelClasses = {
+        gradeLevels: 'light-yellow-button',
+        engagementLevels: 'light-blue-button',
+        subjectAreas: 'light-green-button',
+        undefined: 'light-green-button'
+      };
+      $scope.labelMapping = labelMapping;
+
       if (searchId !== undefined) {
         var searchesPromise = Search.getResults(searchId);
         searchesPromise.then(
@@ -65,13 +146,13 @@
   module.controller(
     'SearchEditController',
     function(Session, $location, $scope, $routeParams, Search, Messages) {
+      $scope.Session = Session;
       var searchId = $routeParams.searchId;
       if (searchId !== undefined) {
         var searchPromise = Search.get(searchId);
         searchPromise.then(
           function(search) {
             $scope.search = search;
-            $scope.search.makeLabelDisplay()
           },
           function(message) {
             Messages.error(message);
@@ -90,22 +171,28 @@
           searcher_user_id: Session.activeUser.id,
           searcher_role: searcher_role,
           searching_for_role: searching_for_role,
-          zipcode: Session.activeUser.zipcode
+          zipcode: Session.activeUser.zipcode,
+          labels: []
         });
-        $scope.search.makeLabelDisplay()
       }
 
       $scope.saveSettings = function() {
-        $scope.search.processLabelDisplay()
         var promise = $scope.search.save();
         promise.then(
-          function(search) {
-            $location.path('/search/' + search.id + '/results');
+          function() {
+            $location.path('/matches');
           },
           function(message) {
             Messages.error(message);
           });
       };
+      
+      $scope.searchText = {value: ''};
+      $scope.userSearch = function() {
+        if ($scope.searchText.value) {
+          $location.path('/searchusers/' + $scope.searchText.value);
+        }
+      };
     });
-  
+
 })();

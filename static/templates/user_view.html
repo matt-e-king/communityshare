@@ -1,52 +1,64 @@
+<div cs-standard-wrapper>
+
 <div cs-forbidden ng-if="Session.activeUser === undefined">
 </div>
 
 <div ng-if="Session.activeUser !== undefined">
-  
+
   <div ng-show="message" class="alert alert-info">{{message}}</div>
-  
-  <div ng-show="user">
-    
-    <h4>{{user.name}}</h4>
 
-    <p class="show-linebreaks">{{user.bio}}</p>
-    
-    <image ng-if="user.picture_url" ng-src="{{user.picture_url}}" class="profile-image"
-           height="200"/>
+  <div class="panel panel-default" ng-show="user">
+    <div class="gradient-header">
+      <h1>{{user.name}}</h1>
+    </div>
 
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <h5 class="panel-title">Info</h5>
+    <div class="panel-body">
+
+      <div class="col-sm-2 col-md-3">
+        <img ng-src="{{user.picture_url}}" class="img-responsive img-circle centered">
+        <div class="text-center">
+          <button 
+             ng-show="Session.activeUser.id !== user.id"
+             class="btn primary-btn btn-lg profile-btns"
+             ng-click="startConversation(Session.activeUser, user,  undefined, true);">
+            Message</button>
+          <button class="btn profile-share-btn btn-warning btn-lg profile-btns">
+            View Shares</button>
+        </div>
       </div>
-      <div class="panel-body">
-        <table class="table">
-          <tr><th>Zipcode</th><td>{{user.zipcode}}</td></tr>
-          <tr><th>Website</th><td>{{user.website}}</td></tr>
-          <tr><th>Twitter</th><td>{{user.twitter_handle}}</td></tr>
-          <tr><th>LinkedIn</th><td>{{user.linkedin_link}}</td></tr>
-        </table>
+
+      <div class="col-sm-10 col-md-9">
+        <div class="profile-bio">
+        <h3 ng-repeat="ia in user.institution_associations" class="position">
+          {{ia.role}}  &#183; {{ia.institution.name}}</h3>
+        <p>{{user.bio}}</p>
+      </div>
+
+        <div ng-if="user.is_community_partner">
+          <div class="profile-tags" cs-labels search="user.community_partner_profile_search"
+               grade-levels-title="Grade Levels"
+               engagement-levels-title="Engagement Preferences"
+               subject-areas-title="Areas of Expertise"
+               type="communityPartner"
+               only-show-active="true"
+               >
+          </div>
+        </div>
+
+        <div ng-if="user.is_educator">
+          <div class="profile-tags" cs-labels search="user.educator_profile_search"
+               grade-levels-title="Grade Levels"
+               subject-areas-title="Subject Areas I teach"
+               engagement-levels-title="Engagement Preferences"
+               type="educator"
+               only-show-active="true"
+               >
+          </div>
+        </div>
+
       </div>
     </div>
 
-    <div class="panel panel-default" ng-show="user.institution_associations">
-      <div class="panel-heading">
-        <h5 class="panel-title">Institutions</h5>
-      </div>
-      <div class="panel-body">
-        <table class="table">
-          <thead>
-            <tr><th>Institution Name</th><th>Role</th></tr>
-          </thead>
-          <tbody>
-            <tr ng-repeat="assoc in user.institution_associations">
-              <td>{{assoc.institution.name}}</td>
-              <td>{{assoc.role}}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    
     <div class="panel panel-default" ng-show="Session.activeUser.is_administrator">
       <div class="panel-heading">
         <h5 class="panel-title">Private Info</h5>
@@ -58,29 +70,6 @@
           <tr><th>Gender</th><td>{{user.gender}}</td></tr>
           <tr><th>Ethnicity</th><td>{{user.ethnicity}}</td></tr>
         </table>
-      </div>
-    </div>
-
-    <div ng-show="user.is_community_partner" cs-community-partner-view
-         user="user"
-         methods="communityPartnerViewMethods">
-    </div>
-
-    <div ng-show="user.is_educator" cs-educator-view
-         user="user"
-         methods="educatorViewMethods">
-    </div>
-
-
-    <div class="panel panel-default" ng-show="questions">
-      <div class="panel-heading">
-        <h5 class="panel-title">Experience</h5>
-      </div>
-      <div class="panel-body">
-        <div ng-repeat="question in questions">
-          <strong>{{question.text}}</strong><br/>
-          {{question.answer.text}}<br/>
-        </div>
       </div>
     </div>
 
@@ -107,7 +96,7 @@
         </table>
       </div>
     </div>
-    
+
     <div class="panel panel-default" ng-show="events">
       <div class="panel-heading">
         <h5 class="panel-title">Events</h5>
@@ -134,4 +123,5 @@
       </div>
     </div>
   </div>
+</div>
 </div>

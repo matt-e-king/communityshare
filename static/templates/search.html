@@ -1,0 +1,54 @@
+<div cs-standard-wrapper>
+
+<div cs-forbidden ng-if="Session.activeUser === undefined">
+</div>
+
+<div ng-if="Session.activeUser !== undefined">
+
+  <div class="panel panel-default">
+    <div class="gradient-header">
+      <h2>Search</h2>
+    </div>
+    <div class="panel-body">
+      <div alert alert-info ng-show="infoMessage">{{infoMessage}}</div>
+      <div alert alert-danger ng-show="errorMessage">{{errorMessage}}</div>
+
+      <div  ng-if="Session.activeUser.is_educator" cs-labels search="search"
+           grade-levels-title="What grade levels would the community partner be working with?"
+           engagement-levels-title="In which ways would they be involved?"
+           subject-areas-title="What areas of expertise are you looking for (click all that apply)?"
+           type="communityPartner"
+           ></div>
+
+      <div ng-if="!Session.activeUser.is_educator" cs-labels search="search"
+           grade-levels-title="Which grade levels are you interested in working with?"
+           engagement-levels-title="In what ways are you interested in volunteering (click all that apply)?"
+           subject-areas-title="In which areas do you have expertise?"
+           type="communityPartnerAndEducator"
+           ></div>
+
+      <div class="text-center">
+        <button class="primary-btn btn-lg search-btn"
+                ng-disabled="properties.educatorSearchSettingsForm.$invalid"
+                ng-click="saveSettings()">
+          Submit Search
+        </button>
+      </div>
+
+      <div>
+        <h3>Search by name, email or institution</h3>
+        <input ng-model="searchText.value"
+               name="searchText"
+               id="searchText"
+               class="form-control"
+               placeholder="Name, Email or Institution"
+               type="text"/>
+        <button class="primary-btn btn-lg search-btn"
+                ng-click="userSearch()">
+          Submit
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>

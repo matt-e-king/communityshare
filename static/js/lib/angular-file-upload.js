@@ -48,7 +48,7 @@ app.directive('ngFileDrop', ['$fileUploader', function ($fileUploader) {
                 });
         }
     };
-}])
+}]);
 
 // It is attached to an element which will be assigned to a class "ng-file-over" or ng-file-over="className"
 app.directive('ngFileOver', function () {
@@ -700,7 +700,7 @@ app.factory('$fileUploader', ['$compile', '$rootScope', '$http', '$window', func
         },
         isHTML5: Uploader.prototype.isHTML5
     };
-}])
+}]);
 
     // Angular File Upload module does not include this directive
     // Only for example
@@ -734,7 +734,12 @@ app.factory('$fileUploader', ['$compile', '$rootScope', '$http', '$window', func
                 if (!helper.isFile(params.file)) return;
                 if (!helper.isImage(params.file)) return;
 
-                var canvas = element.find('canvas');
+                var canvas = element.find('canvas')[0];
+                var resizeCanvas = function() {
+                  canvas.width = element[0].offsetWidth;
+                  canvas.height = element[0].offsetHeight;
+                };
+                resizeCanvas();
                 var reader = new FileReader();
 
                 reader.onload = onLoadFile;
@@ -747,10 +752,11 @@ app.factory('$fileUploader', ['$compile', '$rootScope', '$http', '$window', func
                 }
 
                 function onLoadImage() {
-                    var width = params.width || this.width / this.height * params.height;
-                    var height = params.height || this.height / this.width * params.width;
-                    canvas.attr({ width: width, height: height });
-                    canvas[0].getContext('2d').drawImage(this, 0, 0, width, height);
+                  var height = this.height/this.width * canvas.width;
+                  var width = this.width/this.height * canvas.height;
+                  height = Math.min(height, canvas.height);
+                  width = Math.min(width, canvas.width);
+                  canvas.getContext('2d').drawImage(this, 0, 0, width, height);
                 }
             }
         };

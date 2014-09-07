@@ -38,13 +38,14 @@ labels = {
         'Science', 'Technology', 'Engineering', 'Math',
         'Visual Arts', 'Digital Media', 'Film & Photography', 'Literature',
         'Performing Arts',
+        'Social Studies', 'English/Language Arts', 'Foreign Languages', 'PE/Health/Sports',
+        'Mathematics', 'Goverment',
     ],
     'LevelOfEngagement': [
-        'Guest Speaker', 'Field Trip Host', 'Student Competition Judget',
-        'Individual Mentor', 'Small Group Mentor', 'Curriculuum Development',
-        'Career Day Participant', 'Classroom Materials Provider',
-        'Short-term', 'Long-term'
-    ]
+        'Guest', 'Speaker', 'Field Trip Host', 'Student Competition Judge',
+        'Individual/Group Mentor', 'Share Curriculum Ideas', 'Curriculuum Development',
+        'Career Day Participant', 'Collaborator on a Class Project'
+    ],
 }
 
 def get_labels():
@@ -67,18 +68,31 @@ profile_picture_filenames = [
     'dolphin.jpg', 'llama.jpg', 'shiba.jpg',
 ]
 
-schools = [
-    'School Number 42'
+school_infos = [
+    ('School Number 42', 'School'),
+    ('School Number 101', 'School')
 ]
 
-companies = ['the Big Univeristy',
-             'Acme',
-             'the City Opera',
-             'a Widget Factory',
-             'a Secret Goverment Research Lab',
-             'at home',
-             'a Copper Mine',
-         ]
+educator_roles = [
+    'Classroom Teacher',
+    'Curriculum Coordinator',
+]
+
+partner_roles = [
+    'Intern',
+    'CEO',
+    'Engineer',
+    'Sales Representative',
+]
+
+company_infos = [('Big Univeristy', 'University'),
+                ('Acme', 'Company'),
+                ('City Opera', 'Nonprofit'),
+                ('Widget Factory', 'Company'),
+                ('Secret Goverment Research Lab', 'Goverment'),
+                ('Myself', 'Freelancer'),
+                ('Copper Mine', 'Company'),
+            ]
 specialties = ['robotic molluscs',
                'portmodern composition',
                'mass surveillance',
@@ -94,25 +108,35 @@ hobbies = ['underwater skiing.',
            'training for marathons',
            'juggling'
        ]
-           
+
+def make_institutions(infos):
+    institutions = []
+    for name, institution_type in infos:
+        institution = Institution(
+            name=name,
+            institution_type=institution_type,
+         )
+        institutions.append(institution)
+    return institutions
+
+companies = make_institutions(company_infos)
+schools = make_institutions(school_infos)
 
 def random_item_from_list(ll):
     item = ll[random.randint(0, len(ll)-1)]
     return item
 
 def generate_expert_bio():
-    bio_template = "I work at {0} and specialize in the area of {1}.  My main hobby is {2}."
-    company = random_item_from_list(companies)
+    bio_template = "I specialize in the area of {0}.  My main hobby is {1}."
     specialty = random_item_from_list(specialties)
     hobby = random_item_from_list(hobbies)
-    bio = bio_template.format(company, specialty, hobby)
+    bio = bio_template.format(specialty, hobby)
     return bio
 
 def generate_educator_bio():
-    bio_template = "I work at {0}.  My main hobby is {1}"
-    school = random_item_from_list(schools)
+    bio_template = "My main hobby is {0}"
     hobby = random_item_from_list(hobbies)
-    bio = bio_template.format(school, hobby)
+    bio = bio_template.format(hobby)
     return bio
 
 def make_random_location():
@@ -141,12 +165,24 @@ def make_random_user():
         searcher_role = 'educator'
         searching_for_role = 'partner'
         bio = generate_educator_bio()
+        institution_associations = [
+            InstitutionAssociation(
+                institution=random_item_from_list(schools),
+                role=random_item_from_list(educator_roles)
+            )]
     else:
         searcher_role = 'partner'
         searching_for_role = 'educator'
         bio = generate_expert_bio()
+        n_institutions = random.randint(1, 2)
+        institution_associations = [
+            InstitutionAssociation(
+                institution=random_item_from_list(companies),
+                role=random_item_from_list(partner_roles))
+            for x in range(n_institutions)]
     new_user = User(name=name, email=email, password_hash=password_hash,
                     picture_filename=picture_filename, bio=bio,
+                    institution_associations=institution_associations,
                     is_administrator=False, email_confirmed=True)
     store.session.add(new_user)
     store.session.commit()
@@ -161,6 +197,12 @@ def make_random_user():
     )
     search.labels = Label.name_list_to_object_list(get_labels())
     store.session.add(search)
+    store.session.commit()
+    if search.searcher_role == 'educator':
+        new_user.educator_profile_search = search
+    else:
+        new_user.community_partner_profile_search = search
+    store.session.add(new_user)
     store.session.commit()
         
 def make_labels():
@@ -246,6 +288,10 @@ def setup(n_random_users=100):
         make_random_user()
     creator = get_creator()
     logger.info('Creator of questions is {}'.format(creator.email))
+    questions = setup_data.get_questions(creator)
+    update_questions(questions)
+    store.session.commit()
+    creator = get_creator()
     questions = setup_data.get_questions(creator)
     update_questions(questions)
     store.session.commit()

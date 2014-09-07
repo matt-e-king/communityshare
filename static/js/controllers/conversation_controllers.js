@@ -19,6 +19,25 @@
   };
 
   module.controller(
+    'MessagesController',
+    function($scope, Session, Conversation, $location) {
+      $scope.Session = Session;
+      var user = Session.activeUser;
+      var conversationsPromise = Conversation.get_many({'user_id': user.id}, true);
+      conversationsPromise.then(
+        function(conversations) {
+          conversations.sort(function(a, b) {
+            return a.datetime_last_message < b.datetime_last_message;});
+          $scope.conversations = conversations;
+        },
+        function(errorMessage) {
+        });
+      $scope.showConversation = function(conversationId) {
+        $location.path('/conversation/' + conversationId);
+      };
+    });
+
+  module.controller(
     'ConversationController',
     function($scope, $q, $location, $timeout, $modal, Session,
              Conversation, Message, User, Share, makeDialog, conversation) {
@@ -65,21 +84,28 @@
       $scope.messageHighlightClasses[$scope.otherUser.id] = 'highlight2';
       $scope.newMessage = makeNewMessage();
       $timeout(refreshConversation, 5000);
+      $scope.createNewShare = function() {
+        var share = conversation.makeShare();
+        $scope.editShare(share);
+      };
+      $scope.editShare = function(share) {
+        var opts = {
+          templateUrl: './static/templates/share_edit.html',
+          controller: 'EditShareController',
+          resolve: {
+            share: function() {return share;}
+          }
+        };
+        $modal.open(opts);
+      };
+      var sortShares = function(shares) {
+        var sortedShares = Share.sortShares(shares);
+        $scope.futureShares = sortedShares.future;
+        $scope.pastShares = sortedShares.past;
+      };
       sharesPromise.then(
         function(shares) {
-          shares.sort(function(a, b) { return a.id - b.id; });
-          if (conversation.otherUser) {
-            if ((shares.length === 0)) {
-              $scope.share = conversation.makeShare();
-              $scope.events = $scope.share.events;
-            } else {
-              $scope.share = shares[0];
-              if ($scope.share.events.length === 0) {
-                $scope.share.addNewEvent();
-              }
-              $scope.events = $scope.share.events;
-            }
-          }
+          sortShares(shares);
         },
         showErrorMessage
       );
@@ -93,26 +119,16 @@
           },
           showErrorMessage
         );
-      }
-      $scope.editShare = function() {
-        var opts = {
-          templateUrl: './static/templates/share_edit.html',
-          controller: 'EditShareController',
-          resolve: {
-            share: function() {return $scope.share;},
-          }
-        };
-        var m = $modal.open(opts);
       };
-      $scope.now = new Date()
+      $scope.now = new Date();
       $scope.reviewEvent = function(event) {
         $location.path('/event/' + event.id);
       };
-      $scope.confirmShare = function() {
+      $scope.confirmShare = function(share) {
         // Saving with no changes acts as an approve.
-        $scope.share.save();
+        share.save();
       };
-      $scope.cancelShare = function() {
+      $scope.cancelShare = function(share) {
         var title = 'Cancel Share';
         var msg = 'Do you really want to cancel this share with ' +
           $scope.otherUser.name;
@@ -123,11 +139,9 @@
           function(result) {
             if (result === 'yes') {
               // FIXME: Send email to otherUser saying they want to cancel it.
-              var deletePromise = $scope.share.destroy();
+              var deletePromise = share.destroy();
               deletePromise.then(
                 function() {
-                  $scope.share = conversation.makeShare();
-                  $scope.events = $scope.share.events;
                 },
                 function(message) {
                   var baseMessage = 'Failed to cancel share';
@@ -144,7 +158,7 @@
     function (Session, $scope, $modalInstance, userId, searchId, User,
               Conversation, Message, Authenticator, Messages) {
       var userPromise = User.get(userId);
-      $scope.Session = Session
+      $scope.Session = Session;
       $scope.errorMessage = '';
       if (!Session.activeUser.email_confirmed) {
         // Refresh active User to make sure email is still unconfirmed.
@@ -186,7 +200,7 @@
             $scope.message.conversation_id = conversation.id;
             var messagePromise = $scope.message.save();
             messagePromise.then(
-              function(message) {
+              function() {
                 $modalInstance.close(conversation);
               },
               function(message) {

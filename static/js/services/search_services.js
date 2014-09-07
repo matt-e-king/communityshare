@@ -6,7 +6,7 @@
     [
       'communityshare.services.item',
       'communityshare.services.user'
-    ])
+    ]);
 
   module.factory(
     'getAllLabels',
@@ -33,15 +33,9 @@
     });
 
   module.factory(
-    'Search',
-    function(ItemFactory, $q, $http, makeBaseLabels, sortLabels, UserBase) {
-      var baseLabels = makeBaseLabels();
-      var labellists = {
-        gradeLevels: baseLabels.all.gradeLevels,
-        subjectAreas: baseLabels.all.subjectAreas.STEM.concat(
-          baseLabels.all.subjectAreas.Arts, baseLabels.all.subjectAreas.Custom),
-        engagementLevels: baseLabels.all.engagementLevels
-      };
+    'LabelMapping',
+    function(makeBaseLabels) {
+      var labellists = makeBaseLabels().all;
       var labelMapping = {};
       for (var key in labellists) {
         for (var i=0; i<labellists[key].length; i++) {
@@ -49,6 +43,12 @@
           labelMapping[label] = key;
         }
       }
+      return labelMapping;
+    });
+
+  module.factory(
+    'Search',
+    function(itemFactory, $q, $http, labelMapping, UserBase) {
 
       var compareLabels = function(targetLabels, retrievedLabels) {
         var matchingLabels = {};
@@ -58,16 +58,16 @@
           lcTargetLabels.push(targetLabels[i].toLowerCase());
         }
         var lcRetrievedLabels = [];
-        for (var i=0; i<retrievedLabels.length; i++) {
-          lcRetrievedLabels.push(retrievedLabels[i].toLowerCase());
+        for (var j=0; j<retrievedLabels.length; j++) {
+          lcRetrievedLabels.push(retrievedLabels[j].toLowerCase());
         }
-        for (var i=0; i<lcTargetLabels.length; i++) {
-          var lcTargetLabel = lcTargetLabels[i];
+        for (var k=0; k<lcTargetLabels.length; k++) {
+          var lcTargetLabel = lcTargetLabels[k];
           var index = lcRetrievedLabels.indexOf(lcTargetLabel);
           if (index === -1) {
-            missingLabels.push(targetLabels[i]);
+            missingLabels.push(targetLabels[k]);
           }
-          matchingLabels[targetLabels[i]] = (index >= 0);
+          matchingLabels[targetLabels[k]] = (index >= 0);
           if (index !== -1) {
             matchingLabels[retrievedLabels[index]] = true;
           }
@@ -77,16 +77,27 @@
           'missing': missingLabels
         };
         return comparison;
-      }
+      };
 
-      var Search = ItemFactory('search');
+      var Search = itemFactory('search');
       Search.prototype.initialize = function() {
-        if (this.labels) {
-          sortLabels(this.labels);
-        }
         if(this.searcher_user) {
           this.searcher_user = UserBase.make(this.searcher_user);
         }
+      };
+      Search.prototype.updateFromData = function(data) {
+        for (var key in data) {
+          this[key] = data[key];
+        }
+        if (this.created) {
+          this.created = new Date(this.created);
+        }
+      };
+      Search.prototype.isProfile = function(user) {
+        var isProfile = (
+          (user.community_partner_profile_search.id === this.id) ||
+            (user.educator_profile_search.id === this.id));
+        return isProfile;
       };
       Search.getResults = function(searchId) {
         var deferred = $q.defer();
@@ -101,7 +112,7 @@
           function(responses) {
             var baseSearch = responses[0];
             var resultsResponse = responses[1];
-            var searches = []
+            var searches = [];
             for (var i=0; i<resultsResponse.data.data.length; i++) {
               var search = new Search(resultsResponse.data.data[i]);
               var comparison = compareLabels(baseSearch.labels, search.labels);
@@ -121,141 +132,8 @@
           });
         return deferred.promise;
       };
-      Search.prototype.makeLabelDisplay = function() {
-        this.displayLabelsAll = makeBaseLabels()['suggested'];
-        this.displayLabelsActive = {
-          gradeLevels: [],
-          subjectAreas: [],
-          engagementLevels: []
-        };
-        this.activeLabels = {};
-        if (this.labels) {
-          for (var i=0; i<this.labels.length; i++) {
-            var label = this.labels[i];
-            this.activeLabels[label] = true;
-            var key = labelMapping[label];
-            if (key === undefined) {
-              this.displayLabelsAll.subjectAreas.Custom.push(label);
-              key = 'subjectAreas'
-            }
-            this.displayLabelsActive[key].push(label);
-          }
-        }
-        this.updateNActiveLabels();
-      };
-      Search.prototype.updateNActiveLabels = function() {
-        this.nActiveLabels = 0;
-        if (this.labels) {
-          for (label in this.activeLabels) {
-            if (this.activeLabels[label]) {
-              this.nActiveLabels += 1;
-            }
-          }
-        }
-      };
-      Search.prototype.processLabelDisplay = function() {
-        this.labels = [];
-        for (var key in this.activeLabels) {
-          if (this.activeLabels[key]) {
-            this.labels.push(key);
-          }
-        }
-      }
       return Search;
     });
 
-  module.factory(
-    'sortLabels',
-    function(makeBaseLabels) {
-      var baseLabels = makeBaseLabels()['all'];
-      var sortLabels = function(labels) {
-        var orderedLabels = baseLabels.gradeLevels.concat(
-          baseLabels.subjectAreas.STEM, baseLabels.subjectAreas.Arts,
-          baseLabels.subjectAreas.Custom, baseLabels.engagementLevels);
-        var labelPositions = {};
-        for (var i=0; i<orderedLabels.length; i++) {
-          labelPositions[orderedLabels[i]] = i;
-        }
-        var getPosition = function(label) {
-          var position = labelPositions[label];
-          if (position === undefined) {
-            position = orderedLabels.length;
-          }
-          return position;
-        }
-        var sortFn = function(labelA, labelB) {
-          var result = getPosition(labelA) - getPosition(labelB);
-          return result;
-        }
-        labels.sort(sortFn);
-      }
-      return sortLabels;
-    });
-
-  module.factory(
-    'makeBaseLabels',
-    function() {
-      var makeBaseLabels = function() {
-        var labels = {
-          // Grade levels
-          gradeLevels: {
-            suggested: ['K-5', '6-8', '9-12', 'College', 'Adult'] ,
-            other: ['K-3', '4-5', '6-8', '9-12', 'Preschool']
-          },
-          // Subject area
-          subjectAreas: {
-            STEM: {
-              suggested: ['Science', 'Technology', 'Engineering', 'Math'],
-              other: []
-            },
-            Arts: {
-              suggested: ['Visual Arts', 'Digital Media', 'Film & Photography', 'Literature',
-                          'Performing Arts'],
-              other: []
-            },
-            Custom: {
-              suggested: [],
-              other: []
-            }
-          },
-          // Level of Engagement
-          engagementLevels: {
-            suggested: [
-              'Guest Speaker', 'Field Trip Host', 'Student Competition Judget',
-              'Individual Mentor', 'Small Group Mentor', 'Curriculuum Development',
-              'Career Day Participant', 'Classroom Materials Provider',
-              'Short-term', 'Long-term'],
-            other: []
-          }
-        };
-
-        var suggestedLabels = {};
-        suggestedLabels.gradeLevels = labels.gradeLevels.suggested;
-        suggestedLabels.subjectAreas = {};
-        suggestedLabels.subjectAreas.STEM = labels.subjectAreas.STEM.suggested;
-        suggestedLabels.subjectAreas.Arts = labels.subjectAreas.Arts.suggested;
-        suggestedLabels.subjectAreas.Custom = labels.subjectAreas.Custom.suggested;
-        suggestedLabels.engagementLevels = labels.engagementLevels.suggested;
-
-        var allLabels = {};
-        allLabels.gradeLevels = labels.gradeLevels.suggested.concat(labels.gradeLevels.other);
-        allLabels.subjectAreas = {};
-        allLabels.subjectAreas.STEM = labels.subjectAreas.STEM.suggested.concat(
-          labels.subjectAreas.STEM.other);
-        allLabels.subjectAreas.Arts = labels.subjectAreas.Arts.suggested.concat(
-          labels.subjectAreas.Arts.other);
-        allLabels.subjectAreas.Custom = labels.subjectAreas.Custom.suggested.concat(
-          labels.subjectAreas.Custom.other);
-        allLabels.engagementLevels = labels.engagementLevels.suggested.concat(
-          labels.engagementLevels.other);
-        
-        return {'suggested': suggestedLabels,
-                'all': allLabels}
-      };
-
-
-      
-      return makeBaseLabels;
-    });
 
 })();

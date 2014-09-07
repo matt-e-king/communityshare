@@ -9,11 +9,33 @@
     ]);
 
   module.controller(
+    'SharesController',
+    function(Session, $scope, Share) {
+      $scope.Session = Session;
+      if ($scope.Session.activeUser) {
+        var sharesPromise = Share.get_many({'user_id': Session.activeUser.id}, true);
+        $scope.errorMessage = '';
+        $scope.infoMessage = 'Loading shares...';
+        sharesPromise.then(
+          function(shares) {
+            $scope.errorMessage = '';
+            $scope.infoMessage = '';
+            $scope.shares = shares;
+            var sortedShares = Share.sortShares(shares);
+            $scope.futureShares = sortedShares.future;
+            $scope.pastShares = sortedShares.past;
+          },
+          function(errorMessage) {
+            $scope.errorMessage = errorMessage;
+          });
+      }
+    });
+
+  module.controller(
     'ShareController',
     function(Session, $scope, $routeParams, Share) {
       $scope.Session = Session;
       var shareId = $routeParams.shareId;
-      var errorMessage = '';
       if (shareId !== undefined) {
         var sharePromise = Share.get(shareId);
         sharePromise.then(
@@ -33,7 +55,7 @@
 
   module.controller(
     'EditShareController',
-    function($scope, share, $modalInstance, $q) {
+    function($scope, share, $modalInstance) {
       $scope.share = share;
       $scope.events = share.events;
       $scope.cancel = $modalInstance.close;
@@ -43,7 +65,7 @@
           msg += ': ' + message;
         }
         $scope.errorMessage = msg;
-      }
+      };
       var close = function() {
         $modalInstance.close($scope.share);
       };
@@ -58,16 +80,9 @@
       };
     });
 
-  var parseyyyyMMdd = function(yyyyMMdd) {
-    var date = new Date(yyyyMMdd.substring(0, 4), yyyyMMdd.substring(4, 6),
-                        yyyyMMdd.substring(6, 8));
-    date.setMonth(date.getMonth()-1);
-    return date;
-  };
-
   module.controller(
     'EventsController',
-    function($scope, $routeParams, Session, Evnt) {
+    function($scope, $routeParams, Session, Evnt, parseyyyyMMdd) {
       $scope.Session = Session;
       var searchParams = {};
       var start = $routeParams.start;
@@ -104,7 +119,7 @@
 
   module.controller(
     'EventController',
-    function($scope, Session, evnt, Question, Answer) {
+    function($scope, Session, evnt, Question) {
       $scope.Session = Session;
       $scope.evnt = evnt;
       $scope.questions = [];
@@ -126,6 +141,14 @@
           }
         });
       $scope.questions = [];
+      var makeQuestionRemover = function(question) {
+        return function() {
+          var index = $scope.questions.indexOf(question);
+          if (index >= 0) {
+            $scope.questions.splice(index, 1);
+          }
+        };
+      };
       $scope.save = function() {
         var allPromises = [];
         var saveAnswerPromises = [];
@@ -135,10 +158,8 @@
           if (answer.text) {
             var saveAnswerPromise = answer.save();
             saveAnswerPromise.then(
-              function() {
-                var index = $scope.questions.indexOf(question);
-                $scope.questions.splice(index, 1);
-              }
+              // Wrapping function since it is in a loop.
+              makeQuestionRemover(question)
             );
             saveAnswerPromises.push(saveAnswerPromise);
             allPromises.push(saveAnswerPromise);
