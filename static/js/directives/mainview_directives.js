@@ -69,9 +69,15 @@
 
   module.directive(
     'csForbidden',
-    function() {
+    function(Session) {
       return {
-        templateUrl: '/static/templates/forbidden.html'
+        templateUrl: '/static/templates/forbidden.html',
+        controller: function($scope, $location) {
+          $scope.thisLocation = $location.path();
+          if (!(Session.activeUser)) {
+            $location.path('/login').search('goto', $scope.thisLocation);
+          }
+        }
       };
     });
 

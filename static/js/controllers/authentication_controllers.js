@@ -146,6 +146,7 @@
           $scope.email.value, $scope.password.value);
         userPromise.then(
           function() {
+            $location.search('goto', null);
             if (nextLocation) {
               $location.path(nextLocation);
             } else {
