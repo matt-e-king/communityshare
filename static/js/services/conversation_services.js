@@ -147,6 +147,15 @@
     'Message',
     function(itemFactory) {
       var Message = itemFactory('message');
+      Message.prototype.toData = function() {
+        var fields = ['id', 'conversation_id', 'sender_user_id', 'content', 'date_created', 'user'];
+        var d = {};
+        for (var i=0; i<fields.length; i++) {
+          var field = fields[i];
+          d[field] = this[field];
+        }
+        return d;
+      };
       Message.prototype.updateFromData = function(data) {
         for (var key in data) {
           this[key] = data[key];

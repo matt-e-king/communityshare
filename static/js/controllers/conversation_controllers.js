@@ -23,15 +23,17 @@
     function($scope, Session, Conversation, $location) {
       $scope.Session = Session;
       var user = Session.activeUser;
-      var conversationsPromise = Conversation.get_many({'user_id': user.id}, true);
-      conversationsPromise.then(
-        function(conversations) {
-          conversations.sort(function(a, b) {
-            return a.datetime_last_message < b.datetime_last_message;});
-          $scope.conversations = conversations;
-        },
-        function(errorMessage) {
-        });
+      if (user) {
+        var conversationsPromise = Conversation.get_many({'user_id': user.id}, true);
+        conversationsPromise.then(
+          function(conversations) {
+            conversations.sort(function(a, b) {
+              return a.datetime_last_message < b.datetime_last_message;});
+            $scope.conversations = conversations;
+          },
+          function(errorMessage) {
+          });
+      }
       $scope.showConversation = function(conversationId) {
         $location.path('/conversation/' + conversationId);
       };
@@ -45,6 +47,7 @@
       if ((conversation === undefined) || (Session.activeUser === undefined)) {
         return;
       }
+      
       var sharesPromise = Share.get_many({conversation_id: conversation.id});
       $scope.otherUser = undefined;
       $scope.conversation = conversation;
@@ -63,7 +66,7 @@
         $scope.errorMessage = msg;
       };
       var refreshConversation = function() {
-        var refreshedConversationPromise = Conversation.get(conversation.id);
+        var refreshedConversationPromise = Conversation.get(conversation.id, true);
         refreshedConversationPromise.then(
           function(conversation) {
             $scope.conversation = conversation;
