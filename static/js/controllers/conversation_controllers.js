@@ -71,10 +71,30 @@
           function(conversation) {
             $scope.conversation = conversation;
             $timeout(refreshConversation, 5000);
-            $scope.errorMessage = '';
+            $scope.conversationErrorMessage = '';
           },
-          showErrorMessage
+          function(message) {
+            var baseMessage = 'Failed to load conversation';
+            var msg = combineMessages(baseMessage, message);
+            $scope.conversationErrorMessage = msg;
+          }
         );
+      };
+      var refreshShares = function() {
+        var refreshedSharesPromise = Share.get_many({conversation_id: conversation.id}, true);
+        refreshedSharesPromise.then(
+          function(shares) {
+            sortShares(shares);
+            $scope.shares = shares;
+            $timeout(refreshShares, 5000);
+            $scope.sharesErrorMessage = '';
+          },
+          function(message) {
+            var baseMessage = 'Failed to load shares';
+            var msg = combineMessages(baseMessage, message);
+            $scope.sharesErrorMessage = msg;
+          }
+        );      
       };
       conversation.markMessagesAsViewed();
       if (conversation.userA.id === Session.activeUser.id) {
@@ -86,6 +106,7 @@
       $scope.messageHighlightClasses[Session.activeUser.id] = 'highlight1';
       $scope.messageHighlightClasses[$scope.otherUser.id] = 'highlight2';
       $scope.newMessage = makeNewMessage();
+      refreshShares();
       $timeout(refreshConversation, 5000);
       $scope.createNewShare = function() {
         var share = conversation.makeShare();
@@ -106,12 +127,6 @@
         $scope.futureShares = sortedShares.future;
         $scope.pastShares = sortedShares.past;
       };
-      sharesPromise.then(
-        function(shares) {
-          sortShares(shares);
-        },
-        showErrorMessage
-      );
       $scope.sendMessage = function() {
         var messagePromise = $scope.newMessage.save();
         messagePromise.then(

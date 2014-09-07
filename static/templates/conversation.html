@@ -79,6 +79,9 @@
       <div class="alert alert-danger" ng-show="errorMessage">
         {{errorMessage}}
       </div>
+      <div class="alert alert-danger" ng-show="conversationErrorMessage">
+        {{conversationErrorMessage}}
+      </div>
     </div>
   </div>
 
@@ -115,6 +118,10 @@
                 ng-show="share.approved">
           Confirmed
         </button>
+      </div>
+
+      <div class="alert alert-danger" ng-show="sharesErrorMessage">
+        {{sharesErrorMessage}}
       </div>
       
     </div>
