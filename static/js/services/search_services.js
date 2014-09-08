@@ -48,7 +48,7 @@
 
   module.factory(
     'Search',
-    function(itemFactory, $q, $http, labelMapping, UserBase) {
+    function(itemFactory, $q, $http, labelMapping, UserBase, orderLabels) {
 
       var compareLabels = function(targetLabels, retrievedLabels) {
         var matchingLabels = {};
@@ -91,6 +91,9 @@
         }
         if (this.created) {
           this.created = new Date(this.created);
+        }
+        if (this.labels) {
+          this.labels = orderLabels(this.labels);
         }
       };
       Search.prototype.isProfile = function(user) {

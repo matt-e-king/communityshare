@@ -89,6 +89,29 @@
     });
 
   module.factory(
+    'orderLabels',
+    function(labelMapping) {
+      var orderLabels = function(labels) {
+        var gradeLevels = [];
+        var subjectAreas = [];
+        var engagementLevels = [];
+        for (var i=0; i<labels.length; i++) {
+          var label = labels[i];
+          if (labelMapping[label] === 'gradeLevels') {
+            gradeLevels.push(label);
+          } else if (labelMapping[label] == 'engagementLevels') {
+            engagementLevels.push(label);
+          } else {
+            subjectAreas.push(label);
+          }
+        }
+        var combinedLabels = gradeLevels.concat(subjectAreas).concat(engagementLevels);
+        return combinedLabels;
+      };
+      return orderLabels;
+    });
+
+  module.factory(
     'LabelDisplay',
     function(makeBaseLabels, labelMapping) {
       var LabelDisplay = function(search, type) {
