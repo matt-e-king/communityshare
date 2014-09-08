@@ -93,7 +93,8 @@
 
     <div class="panel-body">
       <div ng-repeat="share in futureShares">
-        <p>{{share.description}}</p>
+        <hr/>
+        <h4>{{share.description}}</h4>
         <div ng-repeat="evnt in share.events">
           <div>Location: {{evnt.location}}</div>
           <div>Starting: {{evnt.datetime_start | date : 'EEEE d MMMM yyyy, h:mm a'}}</div>
@@ -135,7 +136,8 @@
 
     <div class="panel-body">
       <div ng-repeat="share in pastShares">
-        <p>{{share.description}}</p>
+        <hr/>
+        <h4>{{share.description}}</h4>
         <div ng-repeat="evnt in share.events">
           <div>Location: {{evnt.location}}</div>
           <div>Starting: {{evnt.datetime_start | date : 'EEEE d MMMM yyyy, h:mm a'}}</div>

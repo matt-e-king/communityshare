@@ -10,8 +10,9 @@
 
   module.controller(
     'SharesController',
-    function(Session, $scope, Share) {
+    function(Session, $scope, Share, startConversation) {
       $scope.Session = Session;
+      $scope.startConversation = startConversation;
       if ($scope.Session.activeUser) {
         var sharesPromise = Share.get_many({'user_id': Session.activeUser.id}, true);
         $scope.errorMessage = '';

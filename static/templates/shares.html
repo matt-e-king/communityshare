@@ -18,25 +18,37 @@
         You have no upcoming shares.
       </div>
       
-      <div ng-repeat="share in futureShares">
-
-        <h4>Share: {{share.title}}</h4>
+      <div ng-repeat="share in futureShares" class="row">
+        <hr/>
+        <div class="col-sm-3 col-xs-5 ">
+          <img ng-src="{{share.otherUser.picture_url}}"
+               class="img-responsive img-circle profile-img centered" />
+          <img ng-show="!share.otherUser.picture_url"
+               src="http://communityshare_assets.s3.amazonaws.com/default_avatar.png" 
+               class="img-responsive img-circle profile-img centered" />                   
+          <div class="text-center">
+            <button class="btn primary-btn match-message-btn btn-lg"
+                    ng-click="startConversation(Session.activeUser, share.otherUser, match, false)">
+              Message
+            </button>
+          </div>
+        </div>
+        <div class="col-sm-9 col-xs-7">
         
-        <div class="alert alert-danger" ng-show="errorMessage">{{errorMessage}}</div>
+          <h4>{{share.description}}</h4>
         
-        <div>{{share.description}}</div>
+          <div>Educator: <a href="#/user/{{share.educator.id}}">
+              {{share.educator.name}}
+          </a></div>
+          <div>Community Partner: <a href="#/user/{{share.community_partner.id}}">
+              {{share.community_partner.name}}
+          </a></div>
         
-        <div>Educator: <a href="#/user/{{share.educator.id}}">
-            {{share.educator.name}}
-        </a></div>
-        <div>Community Partner: <a href="#/user/{{share.community_partner.id}}">
-            {{share.community_partner.name}}
-        </a></div>
-        
-        <div ng-repeat="evnt in share.events">
-          <div>Location: {{evnt.location}}</div>
-          <div>Starting: {{evnt.datetime_start | date : 'EEEE d MMMM yyyy, h:mm a'}}</div>
-          <div>Stopping: {{evnt.datetime_stop | date : 'EEEE d MMMM yyyy, h:mm a'}}</div>
+          <div ng-repeat="evnt in share.events">
+            <div>Location: {{evnt.location}}</div>
+            <div>Starting: {{evnt.datetime_start | date : 'EEEE d MMMM yyyy, h:mm a'}}</div>
+            <div>Stopping: {{evnt.datetime_stop | date : 'EEEE d MMMM yyyy, h:mm a'}}</div>
+          </div>
         </div>
       </div>
     </div>
