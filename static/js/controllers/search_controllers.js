@@ -14,10 +14,10 @@
       $scope.Session = Session;
       $scope.labelMapping = labelMapping;
       $scope.labelClasses = {
-        gradeLevels: 'light-yellow-button',
-        engagementLevels: 'light-blue-button',
-        subjectAreas: 'light-green-button',
-        undefined: 'light-green-button'
+        gradeLevels: 'grade-level-button',
+        engagementLevels: 'engagement-button',
+        subjectAreas: 'subject-area-button',
+        undefined: 'subject-area-button'
       };
       var user = Session.activeUser;
       $scope.infoMessage = 'Loading searches...';

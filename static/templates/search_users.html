@@ -70,7 +70,7 @@
             <p class="show-linebreaks">{{user.bio}}</p>
             <div class="match-labels">
               <button ng-repeat="label in match.labels"
-                      ng-class="labelClasses[labelMapping[label]] + ' ' + {true: 'labelbox-selected', false: 'labelbox btn-xs'}[match.matchingLabels[label]]"
+                      ng-class="labelClasses[labelMapping[label]] + ' ' + {true: 'label-selected', false: 'labelbox btn-xs'}[match.matchingLabels[label]]"
                       class="btn btn-sm">
                 {{label}}
               </button>

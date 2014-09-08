@@ -38,7 +38,7 @@
         <p>Search results based on these filters:</p>
         <button ng-repeat="label in search.labels"
                 ng-class="labelClasses[labelMapping[label]]"
-                class="btn btn-small">
+                class="btn btn-small label-button label-in-match">
           {{label}}
         </button>
 
@@ -77,8 +77,8 @@
               <p class="show-linebreaks">{{match.searcher_user.bio}}</p>
               <div class="match-labels">
                 <button ng-repeat="label in match.labels"
-                        ng-class="labelClasses[labelMapping[label]] + ' ' + {true: 'labelbox-selected', false: 'labelbox btn-xs'}[match.matchingLabels[label]]"
-                        class="btn btn-sm">
+                        ng-class="labelClasses[labelMapping[label]] + ' ' + {true: 'label-selected', false: ''}[match.matchingLabels[label]]"
+                        class="btn btn-sm label-button label-in-match">
                   {{label}}
                 </button>
               </div>

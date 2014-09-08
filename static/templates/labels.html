@@ -3,8 +3,8 @@
   <div class="btn-group">
     <button ng-repeat="label in display.all.gradeLevels" ng-click="toggleLabel(label)"
             ng-show="display.active[label] || !onlyShowActive"
-            ng-class="{true: 'labelbox-selected', false: ''}[display.active[label]]"
-            class="btn btn-sm search-btn light-yellow-button"
+            ng-class="{true: 'label-selected', false: ''}[display.active[label]]"
+            class="btn btn-sm label-button search-label grade-level-button"
             >
       {{label}}
     </button>
@@ -16,8 +16,8 @@
   <div class="btn-group">
     <button ng-repeat="label in display.all.subjectAreas" ng-click="toggleLabel(label)"
             ng-show="display.active[label] || !onlyShowActive"
-            ng-class="{true: 'labelbox-selected', false: ''}[display.active[label]]"
-            class="btn btn-sm search-btn light-green-button"
+            ng-class="{true: 'label-selected', false: ''}[display.active[label]]"
+            class="btn btn-sm label-button search-label subject-area-button"
             >
       {{label}}
     </button>
@@ -46,8 +46,8 @@
   <div class="btn-group">
     <button ng-repeat="label in display.all.engagementLevels" ng-click="toggleLabel(label)"
             ng-show="display.active[label] || !onlyShowActive"
-            ng-class="{true: 'labelbox-selected', false: ''}[display.active[label]]"
-            class="btn btn-sm search-btn light-blue-button"
+            ng-class="{true: 'label-selected', false: ''}[display.active[label]]"
+            class="btn btn-sm label-button search-label engagement-button"
             >
       {{label}}
     </button>
