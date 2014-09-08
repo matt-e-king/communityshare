@@ -27,34 +27,36 @@
         $location.path('/conversation/' + conversation.id);
       };
 
-      var searchesPromise = Search.get_many({'searcher_user_id': user.id}, true);
-      searchesPromise.then(
-        function(searches) {
-          $scope.infoMessage = '';
-          $scope.errorMessage = '';
-          $scope.searches = searches;
-          var compareSearchDate = function(search1, search2) {
-            var output = -1;
-            if (search1.created === search2.created) {
-              output = 0;
-            } else if (search1.created < search2.created) {
-              output = 1;
+      if (user) {
+        var searchesPromise = Search.get_many({'searcher_user_id': user.id}, true);
+        searchesPromise.then(
+          function(searches) {
+            $scope.infoMessage = '';
+            $scope.errorMessage = '';
+            $scope.searches = searches;
+            var compareSearchDate = function(search1, search2) {
+              var output = -1;
+              if (search1.created === search2.created) {
+                output = 0;
+              } else if (search1.created < search2.created) {
+                output = 1;
+              }
+              return output;
+            };
+            $scope.searches.sort(compareSearchDate);
+            var gotSomeMatches = false;
+            for (var i=0; i<$scope.searches.length; i++) {
+              var search = $scope.searches[i];
+              if ((!gotSomeMatches) && (search.labels.length > 0)) {
+                $scope.getMatches(search);
+                gotSomeMatches = true;
+              }
             }
-            return output;
-          };
-          $scope.searches.sort(compareSearchDate);
-          var gotSomeMatches = false;
-          for (var i=0; i<$scope.searches.length; i++) {
-            var search = $scope.searches[i];
-            if ((!gotSomeMatches) && (search.labels.length > 0)) {
-              $scope.getMatches(search);
-              gotSomeMatches = true;
-            }
-          }
-        },
-        function() {
-          console.log('failed to get searches');
-        });
+          },
+          function() {
+            console.log('failed to get searches');
+          });
+      }
       $scope.getMatches = function(search) {
         var matchesPromise = Search.getResults(search.id);
         search.show = true;
