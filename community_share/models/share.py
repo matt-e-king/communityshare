@@ -11,6 +11,7 @@ from sqlalchemy import or_, and_
 from community_share import time_format, mail_actions
 from community_share import store, Base, config
 from community_share.models.base import Serializable, ValidationException
+from community_share.models import survey
 
 logger = logging.getLogger(__name__)
 
