@@ -187,9 +187,10 @@ def register_user_routes(app):
             processed = None
         return processed
 
-    @app.route('/api/usersearch/<string:search_text>', methods=['GET'])
-    def search(search_text):
+    @app.route('/api/usersearch', methods=['GET'])
+    def search():
         requester = get_requesting_user()
+        search_text = request.args.get('search_text', None)
         date_created_greaterthan = request.args.get('date_created.greaterthan', None)
         date_created_lessthan = request.args.get('date_created.lessthan', None)
         users = User.search(search_text, date_created_greaterthan, date_created_lessthan)

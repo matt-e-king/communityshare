@@ -142,6 +142,16 @@
       }
     });
 
+    $routeProvider.when('/searchusers', {
+      templateUrl: './static/templates/search_users.html',
+      controller: 'SearchUsersController',
+      resolve: {
+        activeUser: function(activeUserLoader) {
+          return activeUserLoader();
+        }
+      }
+    });
+
     $routeProvider.when('/matches', {
       templateUrl: './static/templates/matches.html',
       controller: 'MatchesController',

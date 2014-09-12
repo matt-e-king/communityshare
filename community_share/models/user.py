@@ -287,15 +287,16 @@ class User(Base, Serializable):
                 other_user, self, share.conversation)
 
     @classmethod
-    def search(cls, searchText, date_created_greaterthan, date_created_lessthan):
+    def search(cls, search_text, date_created_greaterthan, date_created_lessthan):
         '''
         searchText can match name, email, institution name
         '''
         query = store.session.query(User).outerjoin(InstitutionAssociation).outerjoin(Institution)
-        name_condition = User.name.ilike('%'+searchText+'%')
-        email_condition = User.email.ilike('%'+searchText+'%')
-        institution_condition = Institution.name.ilike('%'+searchText+'%')
-        query = query.filter(or_(name_condition, email_condition, institution_condition))
+        if search_text:
+            name_condition = User.name.ilike('%'+search_text+'%')
+            email_condition = User.email.ilike('%'+search_text+'%')
+            institution_condition = Institution.name.ilike('%'+search_text+'%')
+            query = query.filter(or_(name_condition, email_condition, institution_condition))
         if date_created_greaterthan:
             query = query.filter(User.date_created > date_created_greaterthan)
         if date_created_lessthan:

@@ -183,9 +183,10 @@
       var searchForUsers = function() {
         var searchParams = {
           'date_created.greaterthan': start,
-          'date_created.lessthan': stop
+          'date_created.lessthan': stop,
+          'search_text': $routeParams.searchText
         };
-        var searchPromise = User.search($scope.searchText.value, searchParams);
+        var searchPromise = User.search(searchParams);
         searchPromise.then(
           function(results) {
             var addedIds = {};

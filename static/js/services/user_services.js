@@ -84,11 +84,11 @@
     'User',
     function(UserBase, $q, $http, Search, Conversation, SessionBase, Evnt, Messages) {
 
-      UserBase.search = function(searchText, searchParams) {
+      UserBase.search = function(searchParams) {
         var deferred = $q.defer();
         var dataPromise = $http({
           method: 'GET',
-          url: '/api/usersearch/' + searchText,
+          url: '/api/usersearch',
           data: searchParams
         });
         dataPromise.then(
