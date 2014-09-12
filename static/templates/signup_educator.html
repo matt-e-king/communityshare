@@ -40,15 +40,27 @@
           </div>
         </div>
 
-        <div ng-show="!enoughLabelsSelected()" alert type="danger">
-          No labels selected
+        <div class="row">
+          <div class="col-md-9 centered">
+            <div ng-show="!enoughLabelsSelected()" alert type="danger">
+              No labels selected
+            </div>
+          </div>
         </div>
-        
 
+        <div class="row">
+          <div class="checkbox col-md-9 centered">
+            <label>
+              <input type="checkbox" ng-model="agreeToFollowHomePolicies">
+              I agree to follow the policies and procedures of my home institution when working with third-party individuals (e.g. community partners) and organizations.
+           </label>
+          </div>
+        </div>
         <div class="row">
           <div class="signup-bottom">
             <div class="pull-right">
               <button class="btn btn-primary"
+                      ng-disabled="(!agreeToFollowHomePolicies) || (!enoughLabelsSelected())"
                       ng-click="submit()">
                 Next</button>
             </div>
