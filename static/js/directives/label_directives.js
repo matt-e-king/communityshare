@@ -18,7 +18,7 @@
           subjectAreas: {
             communityPartnerSuggested: [
               'Science', 'Technology', 'Engineering', 'Math',
-              'Visual Arts', 'Digital Media', 'Film & Photography', 'Literature',
+              'Visual Arts', 'Digital Media', 'Wildlife Biology', 'Literature',
               'Performing Arts'
             ],
             educatorSuggested: [
@@ -30,11 +30,13 @@
           // Level of Engagement
           engagementLevels: {
             suggested: [
-              'Guest Speaker', 'Field Trip Host', 'Student Competition Judget',
-              'Individual Mentor', 'Small Group Mentor', 'Curriculuum Development',
-              'Career Day Participant', 'Classroom Materials Provider',
-              'Short-term', 'Long-term'],
-            other: []
+              'Guest Speaker', 'Host Field Trip', 'Judge Student Competition',
+              'Participate in Career Day', 'Collaborate on a Class Project',
+              'Mentor Students', 'Brainstorm Curriculum Ideas with Educator',
+              'Hands-On Demonstration'
+            ],
+            other: [
+            ]
           }
         };
 

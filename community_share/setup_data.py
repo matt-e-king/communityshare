@@ -16,6 +16,8 @@ def get_questions(creator):
                 SuggestedAnswer(creator=creator,
                                 text='Nonprofits'),
                 SuggestedAnswer(creator=creator,
+                                text='Schools and Nonprofits'),
+                SuggestedAnswer(creator=creator,
                                 text='I have no previous volunteer experience'),
             ]
         ),
@@ -42,7 +44,7 @@ def get_questions(creator):
         ),
 
         Question(
-            text='To what extent have you worked with community experts before?',
+            text='How often do you bring in community partners each year?',
             creator=creator,
             question_type='signup_educator',
             public=True,
