@@ -99,6 +99,9 @@
           $location.path('matches');
         }
       }
+      
+      var showModal = $location.search()['showModal'];
+
       $scope.newUser = new User();
       $scope.passwordMethods = {};
       $scope.pg = 'default';
@@ -132,6 +135,18 @@
           controller: 'TermsController'
         });
       };
+      $scope.showPrivacy = function() {
+        $modal.open({
+          templateUrl: './static/templates/privacy.html',
+          controller: 'TermsController'
+        });
+      };
+      if (showModal == 'terms') {
+        $scope.showTerms();
+      }
+      if (showModal == 'privacy') {
+        $scope.showPrivacy();
+      }
     });
 
   module.controller(
