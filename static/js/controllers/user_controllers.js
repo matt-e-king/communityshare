@@ -119,7 +119,7 @@
   module.controller(
     'SignupCommunityPartnerController',
     function($scope, Session, Messages, $location, $q, Search,
-             Question, Answer) {
+             Question, Answer, $modal) {
       $scope.Session = Session;
       var user = Session.activeUser;
       var search;
@@ -130,6 +130,13 @@
       // Signup logic common to Community Partners and Educators
       commonSignupLogic($scope, user, search, Messages, $location, $q,
                        Question, Answer);
+      $scope.showTutorial = function() {
+        $modal.open({
+          templateUrl: './static/templates/community_partner_tutorial.html',
+          controller: 'ModalController'
+        });
+      };
+      $scope.showTutorial();
     });
   
   module.controller(
@@ -181,7 +188,7 @@
   module.controller(
     'SignupEducatorController',
     function($scope, Session, Messages, $location, $q, Search,
-            Question, Answer) {
+            Question, Answer, $modal) {
       $scope.Session = Session;
       var user = Session.activeUser;
       var search;
@@ -193,6 +200,13 @@
       // Signup logic common to Community Partners and Educators
       commonSignupLogic($scope, user, search, Messages, $location, $q,
                        Question, Answer);
+      $scope.showTutorial = function() {
+        $modal.open({
+          templateUrl: './static/templates/educator_tutorial.html',
+          controller: 'ModalController'
+        });
+      };
+      $scope.showTutorial();
     });
 
   // Settings Controller

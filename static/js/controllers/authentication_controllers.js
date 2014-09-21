@@ -80,9 +80,9 @@
     });
 
   module.controller(
-    'TermsController',
+    'ModalController',
     function($scope, $modalInstance) {
-      $scope.closeTerms = function() {
+      $scope.closeModal = function() {
         $modalInstance.close();        
       };
     });
@@ -132,13 +132,13 @@
       $scope.showTerms = function() {
         $modal.open({
           templateUrl: './static/templates/terms.html',
-          controller: 'TermsController'
+          controller: 'ModalController'
         });
       };
       $scope.showPrivacy = function() {
         $modal.open({
           templateUrl: './static/templates/privacy.html',
-          controller: 'TermsController'
+          controller: 'ModalController'
         });
       };
       if (showModal == 'terms') {
