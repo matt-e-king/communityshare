@@ -95,8 +95,11 @@
           $location.path('signup/choice');
         } else if (user.accountCreationStatus === 'personal') {
           $location.path('signup/personal');
-        } else {
+        } else if (user.is_educator) {
           $location.path('matches');
+        } else {
+          
+          $location.path('messages');
         }
       }
       

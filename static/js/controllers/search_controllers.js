@@ -10,7 +10,7 @@
   module.controller(
     'MatchesController',
     function($scope, Session, Search, $location, labelMapping, makeDialog,
-             startConversation, Messages) {
+             startConversation, Messages, $modal) {
       $scope.Session = Session;
       $scope.labelMapping = labelMapping;
       $scope.labelClasses = {
@@ -26,6 +26,18 @@
       $scope.goToConversation = function(conversation) {
         $location.path('/conversation/' + conversation.id);
       };
+
+      $scope.showThankYou = function() {
+        $modal.open({
+          templateUrl: './static/templates/educator_thankyou.html',
+          controller: 'ModalController'
+        });
+      };
+
+      var showModal = $location.search()['first'];
+      if (showModal) {
+        $scope.showThankYou();
+      }
 
       if (user) {
         var searchesPromise = Search.get_many({'searcher_user_id': user.id}, true);

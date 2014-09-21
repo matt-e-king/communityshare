@@ -154,7 +154,8 @@
             var userPromise = $scope.user.save();
             userPromise.then(
               function() {
-                $location.path('matches');
+                $location.path('/');
+                $location.search('first');
               },
               function(errorMessage) {
                 $scope.errorMessage = errorMessage;

@@ -20,7 +20,7 @@
 
   module.controller(
     'MessagesController',
-    function($scope, Session, Conversation, $location) {
+    function($scope, Session, Conversation, $location, $modal) {
       $scope.Session = Session;
       var user = Session.activeUser;
       if (user) {
@@ -37,6 +37,18 @@
       $scope.showConversation = function(conversationId) {
         $location.path('/conversation/' + conversationId);
       };
+
+      $scope.showThankYou = function() {
+        $modal.open({
+          templateUrl: './static/templates/community_partner_thankyou.html',
+          controller: 'ModalController'
+        });
+      };
+
+      var showModal = $location.search()['first'];
+      if (showModal) {
+        $scope.showThankYou();
+      }
     });
 
   module.controller(
