@@ -206,13 +206,16 @@
     };
     $scope.newLabelMethods = {
       onUpdate: function() {
-        var newLabelName = $scope.newLabel.name;
-        if (newLabelName) {
-          var index = $scope.display.all.subjectAreas.indexOf(newLabelName);
-          if (index === -1) {
-            $scope.display.all.subjectAreas.push(newLabelName);
+        var splitNames = $scope.newLabel.name.split(',');
+        for (var i=0; i<splitNames.length; i++) {
+          var newLabelName = splitNames[i].trim().toLowerCase();
+          if (newLabelName) {
+            var index = $scope.display.all.subjectAreas.indexOf(newLabelName);
+            if (index === -1) {
+              $scope.display.all.subjectAreas.push(newLabelName);
+            }
+            $scope.display.setSelected(newLabelName);
           }
-          $scope.display.setSelected(newLabelName);
         }
         $scope.newLabel.name = '';
       }
