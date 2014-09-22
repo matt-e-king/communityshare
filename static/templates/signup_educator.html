@@ -49,18 +49,23 @@
         </div>
 
         <div class="row">
-          <div class="checkbox col-md-9 centered">
-            <label>
-              <input type="checkbox" ng-model="agreeToFollowHomePolicies">
-              I agree to follow the policies and procedures of my home institution when working with third-party individuals (e.g. community partners) and organizations.
-           </label>
+          <div class="control-group">
+            <div class="checkbox col-md-9 centered">
+              <label>
+                <input type="checkbox" ng-model="agreeToFollowHomePolicies">
+                I agree to follow the policies and procedures of my home institution when working with third-party individuals (e.g. community partners) and organizations.
+              </label>
+              <div ng-show="!agreeToFollowHomePolicies && submitted" alert type="danger">
+                You must agree to the above to continue.
+              </div>
+            </div>
           </div>
         </div>
         <div class="row">
           <div class="signup-bottom">
             <div class="pull-right">
               <button class="btn btn-primary"
-                      ng-disabled="(!agreeToFollowHomePolicies) || (!enoughLabelsSelected())"
+                      ng-disabled="!enoughLabelsSelected()"
                       ng-click="submit()">
                 Next</button>
             </div>
