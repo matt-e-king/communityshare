@@ -40,12 +40,29 @@
         </li>
         <li ng-show="Session.activeUser">
           <a href="#/user/{{Session.activeUser.id}}">
-            <span class="hidden-md hidden-sm hidden-lg">My Profile</span>
+            <span class="hidden-md hidden-sm hidden-lg">View My Profile</span>
             <span class="hidden-xs">{{Session.activeUser.name}}</span>
           </a>
         </li>
-        <li ng-show="Session.activeUser">
-          <a href="#/settings">Settings</a></li>
+        <li ng-show="Session.activeUser" class="hidden-md hidden-sm hidden-lg">
+          <a href="#/settings">
+            Edit My Profile
+          </a>
+        </li>
+        <li ng-show="Session.activeUser" class="hidden-md hidden-sm hidden-lg">
+          <a ng-click="deleteAccount()">
+            Delete My Account
+          </a>
+        </li>
+        <li class="dropdown" ng-show="Session.activeUser" class="hidden-xs">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Settings <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+            <li><a href="#/user/{{Session.activeUser.id}}">View My Profile</a></li>
+            <li><a href="#/settings">Edit My Profile</a></li>
+            <li class="divider"></li>
+            <li><a ng-click="deleteAccount()">Delete My Account</a></li>
+          </ul>
+        </li>
         <li ng-show="Session.activeUser">
           <a ng-click="logout()" class="clickable">Logout</a></li>
         <li ng-show="Session.activeUser == undefined">

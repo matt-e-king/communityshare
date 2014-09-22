@@ -46,6 +46,7 @@
     function() {
       return {
         templateUrl: '/static/templates/navbar.html',
+        controller: 'NavbarController',
         replace: true
       };
     });
