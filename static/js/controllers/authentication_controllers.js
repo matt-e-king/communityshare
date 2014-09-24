@@ -144,6 +144,12 @@
           controller: 'ModalController'
         });
       };
+      $scope.showChoiceText = function() {
+        $modal.open({
+          templateUrl: './static/templates/choice_modal.html',
+          controller: 'ModalController'
+        });
+      };
       if (showModal == 'terms') {
         $scope.showTerms();
       }
