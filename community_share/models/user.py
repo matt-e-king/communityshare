@@ -301,6 +301,7 @@ class User(Base, Serializable):
             query = query.filter(User.date_created > date_created_greaterthan)
         if date_created_lessthan:
             query = query.filter(User.date_created < date_created_lessthan)
+        query = query.filter_by(active=True)
         users = query.all()
         return users
 

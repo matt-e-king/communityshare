@@ -129,7 +129,7 @@ def make_blueprint(Item, resourceName):
         elif not is_integer(id):
             response = make_bad_request_user()
         else:
-            item = store.session.query(Item).filter_by(id=id).first()
+            item = store.session.query(Item).filter_by(id=id, active=True).first()
             if item is None:
                 response = make_not_found_response()
             else:
