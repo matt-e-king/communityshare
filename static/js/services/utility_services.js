@@ -3,6 +3,15 @@
 
   var module = angular.module('communityshare.services.utility', []);
 
+  module.factory('support', function() {
+    return {
+      nativePlaceholderSupport: (function() {
+        var i = document.createElement('input');
+        return i.placeholder !== undefined;
+      })()
+    };
+  });
+
   module.filter('truncate', function () {
     return function (text, length, end) {
       if (end === undefined) {

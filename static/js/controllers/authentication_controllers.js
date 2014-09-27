@@ -89,7 +89,8 @@
 
   module.controller(
     'DefaultController',
-    function($scope, user, $location, User, signUp, Messages, $modal) {
+    function($scope, user, $location, User, signUp, Messages, $modal, support) {
+      $scope.support = support;
       if (user) {
         if (user.accountCreationStatus === 'choice') {
           $location.path('signup/choice');
