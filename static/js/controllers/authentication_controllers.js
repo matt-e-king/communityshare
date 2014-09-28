@@ -21,8 +21,6 @@
       // password_repeat directives.
       $scope.passwordMethods = {};
       $scope.resetPassword = function() {
-        console.log('password is ');
-        console.log($scope.password);
         var promise = Authenticator.resetPassword(key, $scope.password.password);
         promise.then(
           function() {

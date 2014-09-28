@@ -66,7 +66,6 @@
             }
           },
           function() {
-            console.log('failed to get searches');
           });
       }
       $scope.getMatches = function(search) {
