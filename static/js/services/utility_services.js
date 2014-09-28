@@ -4,13 +4,31 @@
   var module = angular.module('communityshare.services.utility', []);
 
   module.factory('support', function() {
+    var isIE =  function(version, comparison) {
+      var cc = 'IE';
+      var b = document.createElement('B');
+      var docElem = document.documentElement;
+      var isIE;
+      if(version){
+        cc += ' ' + version;
+        if(comparison){ cc = comparison + ' ' + cc; }
+      }
+      b.innerHTML = '<!--[if '+ cc +']><b id="iecctest"></b><![endif]-->';
+      docElem.appendChild(b);
+      isIE = !!document.getElementById('iecctest');
+      docElem.removeChild(b);
+      return isIE;
+    };
     return {
       nativePlaceholderSupport: (function() {
         var i = document.createElement('input');
         return i.placeholder !== undefined;
-      })()
-    };
+      })(),
+      isIE: isIE,
+      fileUploader: !isIE(8, 'lte')
+    }; 
   });
+
 
   module.filter('truncate', function () {
     return function (text, length, end) {

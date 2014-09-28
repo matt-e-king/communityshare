@@ -68,8 +68,9 @@
   // User Signups
 
   var commonSignupLogic = function($scope, user, search, Messages, $location,
-                                   $q, Question, Answer) {
+                                   $q, Question, Answer, support) {
     $scope.user = user;
+    $scope.support = support;
     $scope.search = search;
     $scope.institutionMethods = {};
 
@@ -143,7 +144,8 @@
   
   module.controller(
     'SignupPersonalController',
-    function($scope, Session, $fileUploader, $http, $location) {
+    function($scope, Session, $fileUploader, $http, $location, support) {
+      $scope.support = support;
       $scope.Session = Session;
       $scope.user = Session.activeUser;
       $scope.submitAttempted = false;
@@ -152,7 +154,9 @@
         $scope.submit = function(personalSettingsForm) {
           $scope.submitAttempted = true;
           if (personalSettingsForm.$valid) {
-            uploader.uploadAll();
+            if (uploader) {
+              uploader.uploadAll();
+            }
             var userPromise = $scope.user.save();
             userPromise.then(
               function() {
@@ -165,26 +169,30 @@
           }
         };
         $scope.validImage = true;
-        var uploader = $scope.uploader = $fileUploader.create({
-          scope: $scope,
-          url: '/api/user/'+$scope.user.id+'/picture',
-          headers: $http.defaults.headers.common,
-          filters: [
-            function (item) {
-              var is_image = (item.type.substring(0, 5) === 'image');
-              $scope.validImage = is_image;
-              uploader.queue.splice(0, uploader.queue.length);
-              return is_image;
-            }
-          ]
-        });
         
-        // Make sure we only have one file in the uploader queue
-        uploader.bind('afteraddingfile', function () {
-          if (uploader.queue.length > 1) {
-            uploader.queue.splice(0, uploader.queue.length-1);
-          }
-        });
+        if (support.fileUploader) {
+          var uploader = $scope.uploader = $fileUploader.create({
+            scope: $scope,
+            url: '/api/user/'+$scope.user.id+'/picture',
+            headers: $http.defaults.headers.common,
+            filters: [
+              function (item) {
+                var is_image = (item.type.substring(0, 5) === 'image');
+                $scope.validImage = is_image;
+                uploader.queue.splice(0, uploader.queue.length);
+                return is_image;
+              }
+            ]
+          });
+          
+          // Make sure we only have one file in the uploader queue
+          uploader.bind('afteraddingfile', function () {
+            if (uploader.queue.length > 1) {
+              uploader.queue.splice(0, uploader.queue.length-1);
+            }
+          });
+        }
+
       }
     });
 

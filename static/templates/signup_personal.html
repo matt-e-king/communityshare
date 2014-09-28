@@ -36,10 +36,12 @@
 
                 <div class="col-sm-9">
                   <h3>About Me</h3>
-                  <p class="text-muted">
-                    Choose a profile image.
-                  </p>
-                  <input ng-file-select type="file" class="org-input" name="picture" id="picture" value="Select File"/>
+                  <div ng-show="support.fileUploader">
+                    <p class="text-muted">
+                      Choose a profile image.
+                    </p>
+                    <input ng-file-select type="file" class="org-input" name="picture" id="picture" value="Select File"/>
+                  </div>
                   <div class="form-group" data-input-error-helper data-input-tag="textarea">
                     <label ng-show="!support.nativePlaceholderSupport">Tell us about yourself! Your favorite quotes, movies, books, hobbies, languages, travel adventures, philosophy on life, heroes, etc.</label>
                     <textarea ng-model="user.bio"
