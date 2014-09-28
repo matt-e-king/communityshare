@@ -89,7 +89,7 @@
         var dataPromise = $http({
           method: 'GET',
           url: '/api/usersearch',
-          data: searchParams
+          params: searchParams
         });
         dataPromise.then(
           function(response) {
@@ -344,7 +344,6 @@
             }
           },
           function(errorMessage) {
-            console.log('got an errorMessage: ' + errorMessage);
             Messages.info(errorMessage);
           }
         );
