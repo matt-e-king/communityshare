@@ -25,7 +25,7 @@ def get_requesting_user():
             if email == 'api':
                 authorized_user = User.from_api_key(password)
             else:
-                user = store.session.query(User).filter_by(email=email).first()
+                user = store.session.query(User).filter_by(email=email, active=True).first()
                 if user is not None:
                     if user.is_password_correct(password):
                         authorized_user = user
