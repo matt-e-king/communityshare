@@ -118,6 +118,8 @@
               $location.path('/signup/communitypartner');
             } else if ($scope.user_type.value === 'educator') {
               $location.path('/signup/educator');
+            } else {
+              $location.path('signup/choice');
             }
           },
           function(message) {
