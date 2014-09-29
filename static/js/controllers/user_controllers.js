@@ -225,7 +225,9 @@
   module.controller(
     'SettingsController',
     function($scope, $location, Session, Messages, $q,
-             Question, Answer, $fileUploader, $http, makeDialog, Authenticator, $rootScope) {
+             Question, Answer, $fileUploader, $http, makeDialog, Authenticator, $rootScope,
+             support) {
+      $scope.support = support;
 
       var justSaved = false;
       var turnOffLocationChangeHandler;
@@ -297,27 +299,29 @@
         $scope.successMessage = '';
       };
 
-      $scope.validImage = true;
-      var uploader = $scope.uploader = $fileUploader.create({
-        scope: $scope,
-        url: '/api/user/'+$scope.user.id+'/picture',
-        headers: $http.defaults.headers.common,
-        filters: [
-          function (item) {
-            var is_image = (item.type.substring(0, 5) === 'image');
-            $scope.validImage = is_image;
-            uploader.queue.splice(0, uploader.queue.length);
-            return is_image;
-          }
-        ]
-      });
+      if (support.fileUploader) {
+        $scope.validImage = true;
+        var uploader = $scope.uploader = $fileUploader.create({
+          scope: $scope,
+          url: '/api/user/'+$scope.user.id+'/picture',
+          headers: $http.defaults.headers.common,
+          filters: [
+            function (item) {
+              var is_image = (item.type.substring(0, 5) === 'image');
+              $scope.validImage = is_image;
+              uploader.queue.splice(0, uploader.queue.length);
+              return is_image;
+            }
+          ]
+        });
 
-      // Make sure we only have one file in the uploader queue
-      uploader.bind('afteraddingfile', function () {
-        if (uploader.queue.length > 1) {
-          uploader.queue.splice(0, uploader.queue.length-1);
-        }
-      });
+        // Make sure we only have one file in the uploader queue
+        uploader.bind('afteraddingfile', function () {
+          if (uploader.queue.length > 1) {
+            uploader.queue.splice(0, uploader.queue.length-1);
+          }
+        });
+      }
 
       $scope.resendEmailConfirmation = function() {
         var emailConfirmPromise = Authenticator.requestConfirmEmail();
@@ -332,7 +336,9 @@
 
       $scope.save = function() {
         var saveUserPromise = $scope.user.save();
-        uploader.uploadAll();
+        if (uploader) {
+          uploader.uploadAll();
+        }
         var allPromises = [saveUserPromise];
         if ($scope.questions) {
           var saveAnswerPromises = [];
