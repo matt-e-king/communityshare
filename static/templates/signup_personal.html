@@ -49,12 +49,17 @@
                               required
                               placeholder="Tell us about yourself! Your favorite quotes, movies, books, hobbies, languages, travel adventures, philosophy on life, heroes, etc."
                               rows="5"
+                              ng-maxlength="1000"
                               class="form-control org-input">
                     </textarea>
                     <p class="text-muted">
-                      100 Words or less
+                      Please try to limit your bio to 100 words.
                     </p>
-                    <p ng-show="personalSettingsForm.bio.$invalid && !personalSettingsForm.bio.$pristine"
+                    <p ng-show="personalSettingsForm.bio.$error.maxlength"
+                       class="help-block">
+                      The bio may not exceed 1000 characters.
+                    </p>
+                    <p ng-show="personalSettingsForm.bio.$error.required && !personalSettingsForm.bio.$pristine"
                        class="help-block">
                       This field is required.
                     </p>
@@ -137,7 +142,7 @@
                     <button class="btn btn-primary"
                             type="submit"
                             ng-click="submit(personalSettingsForm)"
-                            >Next</button>
+                            >Submit</button>
                   </div>
                   <div class="pull-left">
                     <a ng-if="user.is_community_partner" ng-href="#/signup/communitypartner">Previous</a>

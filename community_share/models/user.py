@@ -203,6 +203,12 @@ class User(Base, Serializable):
         'community_partner_profile_search': serialize_community_partner_profile_search,
     }
          
+    def deserialize_bio(self, bio):
+        BIO_LIMIT = 1000
+        if len(bio) > BIO_LIMIT:
+            bio = bio[:BIO_LIMIT]
+        self.bio = bio
+
     def deserialize_institution_associations(self, data_list):
         if data_list is None:
             data_list = []
@@ -236,6 +242,7 @@ class User(Base, Serializable):
         'institution_associations': deserialize_institution_associations,
         'educator_profile_search': deserialize_educator_profile_search,
         'community_partner_profile_search': deserialize_community_partner_profile_search,
+        'bio': deserialize_bio,
         }
 
     def make_api_key(self):
