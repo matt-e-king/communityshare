@@ -11,7 +11,7 @@ def register_search_routes(app):
     search_blueprint = base_routes.make_blueprint(Search, 'search')
     app.register_blueprint(search_blueprint)
 
-    @app.route('/api/labels/')
+    @app.route('/api/labels')
     def get_labels():
         labels = store.session.query(Label).filter(Label.active==True).all()
         labelnames = [label.name for label in labels]
