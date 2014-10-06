@@ -103,6 +103,26 @@
           <button class="btn btn-default" type="submit" ng-click="cancel()">
             Cancel
           </button>
+          {{shareForm.description.$error}}
+          {{shareForm.location.$error}}
+          {{shareForm.date.$error}}
+          {{shareForm.time_start.$error}}
+          {{shareForm.time_stop.$error}}
+          {{shareForm.$invalid}}
+          blah
+          <br/>
+          {{shareForm.$error.maxlength[0]}}
+          <br/>
+          <br/>
+          {{shareForm.$error.maxlength[1]}}
+          <br/>
+          <br/>
+          {{shareForm.$error.maxlength[2]}}
+          <br/>
+          <br/>
+          {{shareForm.$error.maxlength[3]}}
+          <br/>
+          <br/>
           <button class="btn btn-default" type="submit" ng-click="save()"
                   ng-disabled="shareForm.$invalid">
             Save
