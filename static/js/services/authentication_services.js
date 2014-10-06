@@ -92,7 +92,7 @@
         function(email, password) {
           $http.defaults.headers.common.Authorization = 
             'Basic:' + email + ':' + password; 
-          var url = 'api/requestapikey';
+          var url = '/api/requestapikey';
           var promiseApiKey = $http({
             url: url,
             method: 'GET'
