@@ -2,10 +2,13 @@
 
 # https://raw.githubusercontent.com/kennethreitz/flask-sslify/master/flask_sslify.py
 
+import logging
+
 from flask import request, redirect, current_app
 
 YEAR_IN_SECS = 31536000
 
+logger = logging.getLogger(__name__)
 
 class SSLify(object):
     """Secures your Flask App."""
