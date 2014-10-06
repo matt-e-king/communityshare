@@ -100,7 +100,7 @@ def register_user_routes(app):
                 response = base_routes.make_OK_response()
         return response
 
-    @app.route('/api/requestapikey/', methods=['GET'])
+    @app.route('/api/requestapikey', methods=['GET'])
     def request_api_key():
         requester = get_requesting_user()
         if requester is None:
