@@ -2,6 +2,7 @@ import logging
 import os
 
 from flask import Flask, send_from_directory, render_template
+from flask_sslify import SSLify
 
 from community_share import config, store
 from community_share.routes.user_routes import register_user_routes
@@ -18,6 +19,7 @@ def make_app():
     logger.debug('COMMIT_HASH is {0}'.format(config.COMMIT_HASH))
     app = Flask(__name__, template_folder='../static/')
     app.config['SQLALCHEMY_DATABASE_URI'] = config.DB_CONNECTION
+    sslify = SSLify(app)
 
     register_user_routes(app)
     register_search_routes(app)
@@ -65,6 +67,6 @@ if __name__ == '__main__':
     config.load_from_environment()
     logger.info('Making application')
     app = make_app()
-    app.debug = True
+    app.debug = False
     logger.info('Running application - debug={0}'.format(app.debug))
     app.run()
