@@ -40,8 +40,10 @@ class SSLify(object):
         criteria = [
             request.is_secure,
             current_app.debug,
-            request.headers.get('X-Forwarded-Proto', 'http') == 'https'
+            request.headers.get('X-Forwarded-Proto', 'http') == 'https',
+            request.headers.get('x-forwarded-proto', 'http') == 'https',
         ]
+        logger.info('criteria is {}'.format(criteria))
 
         if not any(criteria):
             if request.url.startswith('http://'):
