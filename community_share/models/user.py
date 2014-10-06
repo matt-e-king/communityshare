@@ -205,8 +205,9 @@ class User(Base, Serializable):
          
     def deserialize_bio(self, bio):
         BIO_LIMIT = 1000
-        if len(bio) > BIO_LIMIT:
-            bio = bio[:BIO_LIMIT]
+        if bio != None:
+            if len(bio) > BIO_LIMIT:
+                bio = bio[:BIO_LIMIT]
         self.bio = bio
 
     def deserialize_institution_associations(self, data_list):
