@@ -18,7 +18,8 @@ def make_app():
     logger.debug('COMMIT_HASH is {0}'.format(config.COMMIT_HASH))
     app = Flask(__name__, template_folder='../static/')
     app.config['SQLALCHEMY_DATABASE_URI'] = config.DB_CONNECTION
-    flask_sslify.SSLify(app)
+    if config.SSL != 'NO_SSL':
+        flask_sslify.SSLify(app)
     register_user_routes(app)
     register_search_routes(app)
     register_conversation_routes(app)
