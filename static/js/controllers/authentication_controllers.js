@@ -102,7 +102,7 @@
         }
       }
       
-      var showModal = $location.search()['showModal'];
+      var showModal = $location.search().showModal;
 
       $scope.newUser = new User();
       $scope.passwordMethods = {};
@@ -162,7 +162,7 @@
   module.controller(
     'LoginController',
     function($scope, $location, Authenticator) {
-      var nextLocation = $location.search()['goto'];
+      var nextLocation = $location.search().goto;
       $scope.email = {value: undefined};
       $scope.password = {value: undefined};
       $scope.errorMessage = '';

@@ -34,7 +34,7 @@
         });
       };
 
-      var showModal = $location.search()['first'];
+      var showModal = $location.search().first;
       if (showModal) {
         $scope.showThankYou();
       }
