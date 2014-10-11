@@ -208,4 +208,80 @@
       };
     });
 
+  module.controller(
+    'SearchUsersController',
+    function($scope, $location, $q, User, Session, $routeParams, parseyyyyMMdd,
+             startConversation) {
+      $scope.Session = Session;
+      $scope.startConversation = startConversation;
+      $scope.infoMessage = 'Searching for matching users...';
+      $scope.users = undefined;
+      $scope.prevSearchText = $routeParams.searchText;
+      $scope.searchText = {value: $routeParams.searchText};
+      var start = $routeParams.created_start;
+      if (start) {
+        start = parseyyyyMMdd(start);
+      }
+      var stop = $routeParams.created_stop;
+      if (stop) {
+        stop = parseyyyyMMdd(stop);
+      }
+      $scope.start = start;
+      $scope.stop = stop;
+      var searchForUsers = function() {
+        var searchParams = {
+          'date_created.greaterthan': start,
+          'date_created.lessthan': stop,
+          'search_text': $routeParams.searchText
+        };
+        var searchPromise = User.search(searchParams);
+        searchPromise.then(
+          function(results) {
+            var addedIds = {};
+            var uniqueUsers = [];
+            var users;
+            if (results.byName === undefined) {
+              users = results;
+            } else {
+              users = results.byName.concat(results.byEmail);
+            }
+            for (var i=0; i<users.length; i++) {
+              var user = users[i];
+              if (!(user.id in addedIds)) {
+                uniqueUsers.push(user);
+                addedIds[user.id] = true;
+              }
+            }
+            var compare = function(a, b) {
+              var aUC = a.name.toUpperCase();
+              var bUC = b.name.toUpperCase();
+              if (aUC > bUC) {
+                return 1;
+              } else if (aUC < bUC) {
+                return -1;
+              } else {
+                return 0;
+              }
+            };
+            uniqueUsers.sort(compare);
+            $scope.users = uniqueUsers;
+            $scope.infoMessage = '';
+            $scope.errorMessage = '';
+          },
+          function(message) {
+            var msg = '';
+            if (message) {
+              msg = ': ' + message;
+            }
+            $scope.errorMessage = 'Failed to load users' + msg;
+            $scope.infoMessage = '';
+          });
+      };
+      searchForUsers();
+      $scope.newSearch = function() {
+        $location.path('/searchusers/' + $scope.searchText.value);
+      };
+    });
+
+
 })();

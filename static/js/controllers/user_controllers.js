@@ -366,32 +366,4 @@
       
     });
 
-  module.controller(
-    'NavbarController',
-    function($scope, Messages, Session, $modal, Authenticator, $location,
-             makeDialog) {
-      $scope.deleteAccount = function() {
-        var title = 'Delete Account';
-          var msg = 'Do you really want to delete your Community Share account?';
-        var btns = [{result:'yes', label: 'Yes'},
-                    {result:'no', label: 'No', cssClass: 'btn-primary'}];
-        var d = makeDialog(title, msg, btns);
-        d.result.then(
-          function(result) {
-            if (result === 'yes') {
-              var deletePromise = Session.activeUser.destroy();
-              deletePromise.then(
-                function() {
-                  Authenticator.clean();
-                  $location.path('/');
-                },
-                function(message) {
-                    Messages.error(message);
-                });
-            }
-          });
-      };
-    });
-
-
 })();
