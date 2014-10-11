@@ -70,6 +70,8 @@ class Config(object):
         'COMMIT_HASH',
         # Cryptography
         'ENCRYPTION_KEY',
+        # SSL
+        'SSL',
     )
     def load_from_dict(self, d):
         if set(d.keys()) != set(self.NAMES):
@@ -104,6 +106,7 @@ class Config(object):
             'UPLOAD_LOCATION': os.environ['COMMUNITYSHARE_UPLOAD_LOCATION'],
             'COMMIT_HASH': os.environ['COMMIT_HASH'],
             'ENCRYPTION_KEY': os.environ['COMMUNITYSHARE_ENCRYPTION_KEY'],
+            'SSL': os.environ.get('COMMUNITYSHARE_SSL', 'FORCE_SSL'),
         }
         self.load_from_dict(data)
 
