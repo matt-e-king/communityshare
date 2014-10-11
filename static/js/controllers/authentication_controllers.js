@@ -78,14 +78,6 @@
     });
 
   module.controller(
-    'ModalController',
-    function($scope, $modalInstance) {
-      $scope.closeModal = function() {
-        $modalInstance.close();        
-      };
-    });
-
-  module.controller(
     'DefaultController',
     function($scope, user, $location, User, signUp, Messages, $modal, support) {
       $scope.support = support;
@@ -187,26 +179,6 @@
           }
         );
       };
-    });
-
-  module.controller(
-    'NavigationController',
-    function($scope, Session, Authenticator, $location) {
-      $scope.Session = Session;
-      $scope.logout = function() {
-        Authenticator.clean();
-        $location.path('');
-      };
-    });
-  
-  module.controller(
-    'DropdownCtrl',
-    function($scope) {
-      $scope.items = [
-        "Find Project",
-        "Create Project",
-        "Update Project"
-      ];
     });
 
 })();

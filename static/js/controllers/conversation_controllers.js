@@ -245,26 +245,4 @@
       };
     });
 
-  module.controller(
-    'UnviewedConversationController',
-    function($scope, $location, Session, Conversation) {
-      var conversationsPromise = Conversation.getUnviewedForUser(
-        Session.activeUser.id);
-      $scope.infoMessage = 'Loading conversations...';
-      conversationsPromise.then(
-        function(conversations) {
-          $scope.conversations = conversations;
-          
-          $scope.infoMessage = '';
-        },
-        function(message) {
-          var baseMessage = 'Failed to load conversations';
-          $scope.errorMessage = combineMessages(baseMessage, message);
-          $scope.infoMessage = '';
-        });
-      $scope.viewConversation = function(conversation_id) {
-        $location.path('/conversation/' + conversation_id);
-      };
-    });
-
 }());
