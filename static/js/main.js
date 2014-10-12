@@ -7,7 +7,7 @@
       'ui.bootstrap',
       'communityshare.directives.mainview',
       'communityshare.controllers.authentication',
-      'communityshare.controllers.home',
+      'communityshare.controllers.misc',
       'communityshare.controllers.user',
       'communityshare.controllers.search',
       'communityshare.controllers.message',

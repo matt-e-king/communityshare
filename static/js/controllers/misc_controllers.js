@@ -4,6 +4,10 @@
   var module = angular.module(
     'communityshare.controllers.misc',
     [
+      'communityshare.services.authentication',
+      'communityshare.services.modal',
+      'communityshare.services.statistics',
+      'communityshare.services.message'
     ]);
 
   module.controller(
