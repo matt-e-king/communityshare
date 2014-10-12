@@ -60,12 +60,3 @@ def make_app():
         )
         
     return app
-
-if __name__ == '__main__':
-    logger.info('Loading settings from environment')
-    config.load_from_environment()
-    logger.info('Making application')
-    app = make_app()
-    app.debug = False
-    logger.info('Running application - debug={0}'.format(app.debug))
-    app.run()
