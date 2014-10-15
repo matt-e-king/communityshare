@@ -13,7 +13,8 @@
       'communityshare.controllers.message',
       'communityshare.controllers.share',
       'communityshare.directives.labels',
-      'communityshare.services.share'
+      'communityshare.services.share',
+      'ng.shims.placeholder'
     ]);
   
   app.config(function($routeProvider) {
@@ -294,5 +295,10 @@
       return -1;
     };
   }
-  Date.now = Date.now || function() { return +new Date; };  
+  Date.now = Date.now || function() { return +new Date; };
+
+  $(function() {
+    $('input, textarea').placeholder();
+  });
+
 })();

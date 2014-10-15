@@ -21,6 +21,13 @@
     <link rel="stylesheet"
           href="/static/css/base.css?q={{COMMIT_HASH}}"
           type="text/css" />
+
+    <!--[if lt IE 9]>
+        <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+        <script src="./static/js/lib/html5shiv.js"></script>
+        <script src="./static/js/lib/jquery.placeholder.js"></script>
+    <![endif]-->
+
   </head>
 
   <body>
@@ -66,7 +73,7 @@
     <script src="./static/js/directives/label_directives.js?q={{COMMIT_HASH}}"></script>
     <script src="./static/js/directives/institution_directives.js?q={{COMMIT_HASH}}"></script>
     <script src="./static/js/directives/survey_directives.js?q={{COMMIT_HASH}}"></script>
-
+    <script src="./static/js/lib/angular-shims-placeholder.min.js"></script>
   </body>
 
 </html>
