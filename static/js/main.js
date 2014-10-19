@@ -283,7 +283,7 @@
     $httpProvider.defaults.headers.get['If-Modified-Since'] = '0';
   }]);
 
-  // Patch indexOf for IE8
+  // Patch .indexOf() for IE8
   // http://stackoverflow.com/questions/3629183/why-doesnt-indexof-work-on-an-array-ie8
   if (!Array.prototype.indexOf) {
     Array.prototype.indexOf = function (elt) {
@@ -304,5 +304,14 @@
       return -1;
     };
   }
+
+  // Path .trim() for IE8
+  // https://stackoverflow.com/questions/2308134/trim-in-javascript-not-working-in-ie
+  if (typeof String.prototype.trim !== 'function') {
+    String.prototype.trim = function() {
+      return this.replace(/^\s+|\s+$/g, '');
+    }
+  }
+
   Date.now = Date.now || function() { return +new Date; };
 })();
