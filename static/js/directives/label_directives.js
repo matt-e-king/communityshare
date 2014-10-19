@@ -206,13 +206,20 @@
     };
     $scope.newLabelMethods = {
       onUpdate: function() {
-        var splitNames = $scope.newLabel.name.split(',');
-        for (var i=0; i<splitNames.length; i++) {
-          var newLabelName = splitNames[i].trim().toLowerCase();
+        var splitNames
+          , newLabelName
+          , i
+          , index
+          ;
+
+        splitNames = $scope.newLabel.name.split(',');
+        for (i = 0; i < splitNames.length; i++) {
+          newLabelName = splitNames[i].trim().toLowerCase();
           if (newLabelName) {
-            var index = $scope.display.all.subjectAreas.indexOf(newLabelName);
-            if (index === -1) {
+            index = $scope.display.all.subjectAreas.indexOf(newLabelName);
+            if (index < 0) {
               $scope.display.all.subjectAreas.push(newLabelName);
+              console.log(newLabelName);
             }
             $scope.display.setSelected(newLabelName);
           }
