@@ -219,7 +219,6 @@
             index = $scope.display.all.subjectAreas.indexOf(newLabelName);
             if (index < 0) {
               $scope.display.all.subjectAreas.push(newLabelName);
-              console.log(newLabelName);
             }
             $scope.display.setSelected(newLabelName);
           }
