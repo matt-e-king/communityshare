@@ -1,9 +1,9 @@
 <div class="modal-content">
   <div class="modal-header">
-    <h4 class="modal-title">Start Conversation with {{user.name}}</h4>
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
             ng-click="cancel()">
       &times;</button>
+    <h4 class="modal-title">Start Conversation with {{user.name}}</h4>
   </div>
 
   <div class="modal-body">
@@ -54,12 +54,16 @@
       <div class="alert alert-danger" ng-show="errorMessage">
         {{errorMessage}}
       </div>
-      
-      <button class="btn btn-default" type="submit" ng-click="startConversation()"
-              ng-disabled="newConversationForm.$invalid">
-        Send Message
-      </button>
+
 
     </form>
   </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-default" type="submit" ng-click="startConversation()"
+            ng-disabled="newConversationForm.$invalid">
+      Send Message
+    </button>
+  </div>
+
 </div>

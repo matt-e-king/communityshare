@@ -1,20 +1,29 @@
 (function() {
   'use strict';
-  var app = angular.module(
-    'communityshare',
-    [
-      'ngRoute',
-      'ui.bootstrap',
-      'communityshare.directives.mainview',
-      'communityshare.controllers.authentication',
-      'communityshare.controllers.misc',
-      'communityshare.controllers.user',
-      'communityshare.controllers.search',
-      'communityshare.controllers.message',
-      'communityshare.controllers.share',
-      'communityshare.directives.labels',
-      'communityshare.services.share'
-    ]);
+  var requirements
+    , app
+    ;
+
+  requirements = [
+    'ngRoute',
+    'ui.bootstrap',
+    'communityshare.directives.mainview',
+    'communityshare.controllers.authentication',
+    'communityshare.controllers.misc',
+    'communityshare.controllers.user',
+    'communityshare.controllers.search',
+    'communityshare.controllers.message',
+    'communityshare.controllers.share',
+    'communityshare.directives.labels',
+    'communityshare.services.share'
+  ];
+
+  // Use placeholder shim if browser doesn't support html5
+  if (!window.history.replaceState) {
+    requirements.push('ng.shims.placeholder');
+  }
+
+  app = angular.module('communityshare', requirements);
   
   app.config(function($routeProvider) {
 
@@ -274,25 +283,37 @@
     $httpProvider.defaults.headers.get['If-Modified-Since'] = '0';
   }]);
 
-  // Patch indexOf for IE8
+  // Patch .indexOf() for IE8
   // http://stackoverflow.com/questions/3629183/why-doesnt-indexof-work-on-an-array-ie8
-  if (!Array.prototype.indexOf)
-  {
-    Array.prototype.indexOf = function(elt /*, from*/)
-    {
-      var len = this.length >>> 0;
-      var from = Number(arguments[1]) || 0;
+  if (!Array.prototype.indexOf) {
+    Array.prototype.indexOf = function (elt) {
+      var len
+        , from
+        ;
+
+      len = this.length >>> 0;
+      from = Number(arguments[1]) || 0;
       from = (from < 0) ? Math.ceil(from) : Math.floor(from);
-      if (from < 0)
-        from += len;
-      for (; from < len; from++)
-      {
-        if (from in this &&
-            this[from] === elt)
-          return from;
+
+      if (from < 0) from += len;
+
+      for (; from < len; from++) {
+        if (from in this && this[from] === elt) return from;
       }
+
       return -1;
     };
   }
-  Date.now = Date.now || function() { return +new Date; };  
+
+  // Path .trim() for IE8
+  // https://stackoverflow.com/questions/2308134/trim-in-javascript-not-working-in-ie
+  if (typeof String.prototype.trim !== 'function') {
+    String.prototype.trim = function() {
+      return this.replace(/^\s+|\s+$/g, '');
+    }
+  }
+
+  window.console = window.console || {};
+
+  Date.now = Date.now || function() { return +new Date; };
 })();

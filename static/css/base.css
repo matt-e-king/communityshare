@@ -1,0 +1,28 @@
+.modal-body .form-horizontal .form-group {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.gradient-header {
+    background-color: #f9af4f;
+}
+
+.grade-level-button {
+    background-color: #f93119;
+    opacity: 0.5;
+}
+
+.subject-area-button {
+    background-color: #7cab43;
+    opacity: 0.5;
+}
+
+.add-search-btn {
+    background-image: linear-gradient(to bottom, #bbd697 57%, #aec98a 76%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#bbd697', endColorstr='#aec98a', GradientType=1)
+}
+
+.engagement-button {
+    background-color: #27969d;
+    opacity: 0.5;
+}
