@@ -6,6 +6,7 @@ SQLAlchemy==0.9.4
 Werkzeug==0.9.4
 aniso8601==0.82
 argparse==1.2.1
+docutils==0.12
 gunicorn==18.0
 itsdangerous==0.24
 mimerender==0.5.3

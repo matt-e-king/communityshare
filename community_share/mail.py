@@ -4,9 +4,30 @@ import hmac, hashlib
 
 import requests
 
+from docutils import core
+from docutils.writers.html4css1 import Writer, HTMLTranslator
+
 from community_share import config
 
 logger = logging.getLogger(__name__)
+
+# Docutils stuff taken from
+# https://wiki.python.org/moin/ReStructuredText
+class HTMLFragmentTranslator( HTMLTranslator ):
+     def __init__( self, document ):
+         HTMLTranslator.__init__( self, document )
+         self.head_prefix = ['','','','','']
+         self.body_prefix = []
+         self.body_suffix = []
+         self.stylesheet = []
+     def astext(self):
+         return ''.join(self.body)
+
+w = Writer()
+w.translator_class = HTMLFragmentTranslator
+
+def reST_to_html(s):
+    return core.publish_string(s, writer=w)
 
 dummy_template = '''
 ----------------------------
@@ -50,6 +71,7 @@ class Email(object):
             'recipient': self.to_address,
             'stripped-text': self.new_content,
             'body-plain': self.content,
+            'body-html': reST_to_html(self.content),
             'sender': self.from_address,
             'subject': self.subject,
         }
@@ -105,7 +127,8 @@ class MailgunMailer(object):
                 'from': email.from_address,
                 'to': email.to_address,
                 'subject': email.subject,
-                'text': email.content
+                'text': email.content,
+                'html': reST_to_html(email.content),
             }
             logger.info('Sending mail request to mailgun - {}'.format(payload))
             r = requests.post(
