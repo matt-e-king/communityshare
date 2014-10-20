@@ -313,5 +313,7 @@
     }
   }
 
+  window.console = window.console || {};
+
   Date.now = Date.now || function() { return +new Date; };
 })();
