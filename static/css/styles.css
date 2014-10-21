@@ -6415,13 +6415,13 @@ body {
   margin: 2px;
 }
 .grade-level-button {
-  background-color: rgba(249, 49, 25, 0.5);
+  background-color: #fc968c;
 }
 .subject-area-button {
-  background-color: rgba(124, 171, 67, 0.5);
+  background-color: #bed5a1;
 }
 .engagement-button {
-  background-color: rgba(39, 150, 157, 0.5);
+  background-color: #93cbce;
 }
 .label-selected {
   border: solid;
@@ -6430,7 +6430,7 @@ body {
   color: white;
 }
 .label-selected.grade-level-button {
-  background-color: #f93119;
+  background-color: #f92d19;
 }
 .label-selected.subject-area-button {
   background-color: #7cab43;
