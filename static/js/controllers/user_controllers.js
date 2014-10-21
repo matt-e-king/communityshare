@@ -97,7 +97,7 @@
       $scope.institutionMethods.form.submitted = true;
       $scope.submitted = true;
       if ($scope.enoughLabelsSelected() && ($scope.institutionMethods.isValid())
-         && (($scope.agreeToFollowHomePolicies) || (!user.is_educator))) {
+         && (($scope.agreeToFollowHomePolicies) || (!user.educator_profile_search.labels))) {
         // Save changes made to user.
         var userPromise = user.save();
         var allPromises = [userPromise];
