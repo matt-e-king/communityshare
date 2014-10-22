@@ -138,20 +138,23 @@ def send_partner_deletion_message(user, canceled_user, conversation):
     url = conversation.get_url()
     content = PARTNER_DELETION_TEMPLATE.render(
         canceled_user=canceled_user, url=url)
-    to_address = user.confirmed_email
-    from_address = config.DONOTREPLY_EMAIL_ADDRESS
-    if not to_address:
-        error_message = '{0} is not a confirmed email address'.format(
-            receiver.email)
+    if user is None:
+        error_message = '{0} other user in share does not exist'
     else:
-        email = mail.Email(
-            from_address=from_address,
-            to_address=to_address,
-            subject=subject,
-            content=content,
-            new_content=content
-        )
-        error_message = mail.get_mailer().send(email)
+        to_address = user.confirmed_email
+        from_address = config.DONOTREPLY_EMAIL_ADDRESS
+        if not to_address:
+            error_message = '{0} is not a confirmed email address'.format(
+                receiver.email)
+        else:
+            email = mail.Email(
+                from_address=from_address,
+                to_address=to_address,
+                subject=subject,
+                content=content,
+                new_content=content
+            )
+            error_message = mail.get_mailer().send(email)
     return error_message
 
 def send_account_deletion_message(user):
