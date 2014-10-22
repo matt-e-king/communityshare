@@ -2,6 +2,8 @@ import json
 import logging
 from datetime import datetime
 
+import jinja2
+
 from community_share.models.user import User
 from community_share.models.secret import Secret
 from community_share import mail, config, store, time_format
@@ -12,104 +14,104 @@ logger = logging.getLogger(__name__)
 def append_conversation_link(content, conversation):
     conversation_url = '{0}/#/conversation/{1}'.format(
         config.BASEURL, conversation.id)
-    content = '{content}\n\nThe email is part of a Community Share Conversation.  Simply reply to this email to continue the conversation.  If you are ready to schedule an event or to view the entire conversation go to {url}'.format(content=content, url=conversation_url)
+    content = '{content}<br/>\nThe email is part of a Community Share Conversation.  Simply reply to this email to continue the conversation.  If you are ready to schedule an event or to view the entire conversation go to <a href={{url}}>{url}</a>'.format(content=content, url=conversation_url)
     return content
 
-EVENT_REMINDER_TEMPLATE = '''You have a share soon with {other_user.name}.  The share details are:
+EVENT_REMINDER_TEMPLATE = jinja2.Template('''<p>You have a share soon with {{other_user.name | e}}.  The share details are:</p>
 
-Title: {share.title}
-Description: {share.description}
+Title: {{share.title | e}}<br/>
+Description: {{share.description | e}}<br/>
+<br/>
+Educator: {{share.educator.name | e}}<br/>
+Community Partner: {{share.community_partner.name | e}}<br/>
+<p>
+{{eventdetails}}
+</p>
+Go to <a href={{url}}>{{url}}</a> for more details.
+''')
 
-Educator: {share.educator.name}
-Community Partner: {share.community_partner.name}
-
-{eventdetails}
-
-Go to {url} for more details.
-'''
-
-ACCOUNT_DELETION_TEMPLATE = '''You have requested to delete your Community Share account.
+ACCOUNT_DELETION_TEMPLATE = jinja2.Template(''')You have requested to delete your Community Share account.
 If you did not make this request, or it was done accidentally please contact an administrator
-at {admin_email}.
-'''
+at <a href="mailto:{{admin_email}}>{{admin_email}}</a>.
+''')
 
-PARTNER_DELETION_TEMPLATE = '''{canceled_user.name} has just deleted their community share account.
-You have been notified because you have one upcoming event planned with them.
+PARTNER_DELETION_TEMPLATE = jinja2.Template('''<p>{{canceled_user.name | e}} has just deleted their community share account.
+You have been notified because you have one upcoming event planned with them.</p>
 
-To view your conversation with {canceled_user.name} go to {url}.
-'''
+<p>To view your conversation with {canceled_user.name | e} go to <a href={{url}}>{{url}}</a>.</p>
+''')
 
-SHARE_DELETION_TEMPLATE = '''{editer.name} has canceled the share '{share.title}'.
+SHARE_DELETION_TEMPLATE = jinja2.Template('''<p>{{editer.name | e}} has canceled the share '{{share.title | e}}'</p>.
 
-To view the conversation go to {url}.
-'''
+<p>To view the conversation go to <a href={{url}}>{{url}}</a></p>.
+''')
 
-SHARE_CONFIRMATION_TEMPLATE = '''{editer.name} has confirmed the details of a share.
+SHARE_CONFIRMATION_TEMPLATE = jinja2.Template('''<p>{{editer.name | e}} has confirmed the details of a share.</p>
 
-To view the share details go to {url}.
-'''
+<p>To view the share details go to <a href={{url}}>{{url}}</a>.</p>
+''')
 
-NOTIFY_SHARE_CREATION_TEMPLATE = '''A share has been created.
-Title: {share.title}
-Description: {share.description}
+NOTIFY_SHARE_CREATION_TEMPLATE = jinja2.Template('''<p>A share has been created.</p>
+Title: {{share.title | e}}<br/>
+Description: {{share.description | e}}<br/>
+<br/>
+Educator: {{share.educator.name | e}}<br/>
+Community Partner: {{share.community_partner.name | e}}<br/>
 
-Educator: {share.educator.name}
-Community Partner: {share.community_partner.name}
+<p>{{eventdetails}}</p>
 
-{eventdetails}
+View the details at <a href={url}>{url}</a>.
+''')
 
-View the details at {url}.
-'''
+SHARE_CREATION_TEMPLATE = jinja2.Template('''<p>{{editer.name | e}} has proposed a share with you.  The details are:</p>
 
-SHARE_CREATION_TEMPLATE = '''{editer.name} has proposed a share with you.  The details are:
+Title: {{share.title | e}}<br/>
+Description: {{share.description | e}}<br/>
+<br/>
+Educator: {{share.educator.name | e}}<br/>
+Community Partner: {{share.community_partner.name | e}}<br/>
 
-Title: {share.title}
-Description: {share.description}
+<p>{{eventdetails}}</p>
 
-Educator: {share.educator.name}
-Community Partner: {share.community_partner.name}
+To confirm this suggestion please go to <a href={{url}}>{{url}}</a> and click the confirm share button.
+''')
 
-{eventdetails}
+SHARE_EDIT_TEMPLATE = jinja2.Template('''<p>{{editer.name | e}} has edited the details of a share which you are involved in or have been invited to.  The new share details suggested are:</p>
 
-To confirm this suggestion please go to {url} and click the confirm share button.
-'''
+Title: {{share.title | e}}<br/>
+Description: {{share.description | e}}<br/>
 
-SHARE_EDIT_TEMPLATE = '''{editer.name} has edited the details of a share which you are involved in or have been invited to.  The new share details suggested are:
+Educator: {{share.educator.name | e}}<br/>
+Community Partner: {{share.community_partner.name | e}}<br/>
 
-Title: {share.title}
-Description: {share.description}
+<p>{{eventdetails}}</p>
 
-Educator: {share.educator.name}
-Community Partner: {share.community_partner.name}
+To confirm these changes please go to <a href={{url}}>{{url}}</a> and click the confirm share button.<br/>
+''')
 
-{eventdetails}
+EVENT_EDIT_TEMPLATE = jinja2.Template('''Location: {{event.location| e}}<br/>
+Starting: {{event.formatted_datetime_start}}<br/>
+Stopping: {{event.formatted_datetime_stop}}<br/>
+''')
 
-To confirm these changes please go to {url} and click the confirm share button.
-'''
+REVIEW_REMINDER_TEMPLATE = jinja2.Template('''<p>You recently participated in a Community Share.</p>
 
-EVENT_EDIT_TEMPLATE = '''Location: {event.location}
-Starting: {event.formatted_datetime_start}
-Stopping: {event.formatted_datetime_stop}
-'''
+<p>Please go to <a href={{url}}>{{url}}</a> to leave a review and feedback.</p>
 
-REVIEW_REMINDER_TEMPLATE = '''You recently participated in a Community Share.
+Title: {{share.title | e}}<br/>
+Description: {{share.description | e}}<br/>
+<br/>
+Educator: {{share.educator.name | e}}<br/>
+Community Partner: {{share.community_partner.name | e}}<br/>
 
-Please go to {url} to leave a review and feedback.
-
-Title: {share.title}
-Description: {share.description}
-
-Educator: {share.educator.name}
-Community Partner: {share.community_partner.name}
-
-{eventdetails}
-'''
+<p>{{eventdetails}}</p>
+''')
 
 def send_review_reminder_message(user, event):
     subject = 'Review Community Share Event'
     url = event.get_url()
-    event_details = EVENT_EDIT_TEMPLATE.format(event=event)
-    content = REVIEW_REMINDER_TEMPLATE.format(
+    event_details = EVENT_EDIT_TEMPLATE.render(event=event)
+    content = REVIEW_REMINDER_TEMPLATE.render(
         url=url,
         share=event.share,
         eventdetails=event_details,
@@ -134,7 +136,7 @@ def send_review_reminder_message(user, event):
 def send_partner_deletion_message(user, canceled_user, conversation):
     subject = 'Community Share Account Deletion'
     url = conversation.get_url()
-    content = PARTNER_DELETION_TEMPLATE.format(
+    content = PARTNER_DELETION_TEMPLATE.render(
         canceled_user=canceled_user, url=url)
     to_address = user.confirmed_email
     from_address = config.DONOTREPLY_EMAIL_ADDRESS
@@ -155,7 +157,7 @@ def send_partner_deletion_message(user, canceled_user, conversation):
 def send_account_deletion_message(user):
     admin_email = config.SUPPORT_EMAIL_ADDRESS
     subject = 'Community Share Account Deletion'
-    content = ACCOUNT_DELETION_TEMPLATE.format(admin_email=admin_email)
+    content = ACCOUNT_DELETION_TEMPLATE.render(admin_email=admin_email)
     to_address = user.confirmed_email
     from_address = config.SUPPORT_EMAIL_ADDRESS
     if not to_address:
@@ -177,13 +179,13 @@ def send_event_reminder_message(event):
     receivers = [share.educator, share.community_partner]
     other_users = [share.community_partner, share.educator]
     from_address = config.DONOTREPLY_EMAIL_ADDRESS
-    event_details = EVENT_EDIT_TEMPLATE.format(event=event)
+    event_details = EVENT_EDIT_TEMPLATE.render(event=event)
     url = share.conversation.get_url()
     subject = 'Reminder for Share on {}'.format(
         time_format.to_pretty(event.datetime_start))
     error_messages = []
     for receiver, other_user in zip(receivers, other_users):
-        content = EVENT_REMINDER_TEMPLATE.format(
+        content = EVENT_REMINDER_TEMPLATE.render(
             share=share, eventdetails=event_details, url=url,
             other_user=other_user)
         to_address = receiver.confirmed_email
@@ -208,11 +210,11 @@ def send_event_reminder_message(event):
 def send_notify_share_creation(share, requester):
     to_address = config.NOTIFY_EMAIL_ADDRESS
     from_address = config.DONOTREPLY_EMAIL_ADDRESS
-    event_details = ''.join([EVENT_EDIT_TEMPLATE.format(event=event)
+    event_details = ''.join([EVENT_EDIT_TEMPLATE.render(event=event)
                              for event in share.events])
     url = share.conversation.get_url()
     subject = 'Share Created: {0}'.format(share.title)
-    content = NOTIFY_SHARE_CREATION_TEMPLATE.format(
+    content = NOTIFY_SHARE_CREATION_TEMPLATE.render(
         share=share, eventdetails=event_details, url=url)
     if not to_address:
         error_message = 'Recipient has not confirmed their email address'
@@ -232,25 +234,25 @@ def send_share_message(share, editer, new_share=False, is_confirmation=False,
     receivers = [share.conversation.userA, share.conversation.userB]
     receivers = [r for r in receivers if (editer.id != r.id)]
     from_address = config.DONOTREPLY_EMAIL_ADDRESS
-    event_details = ''.join([EVENT_EDIT_TEMPLATE.format(event=event)
+    event_details = ''.join([EVENT_EDIT_TEMPLATE.render(event=event)
                              for event in share.events])
     url = share.conversation.get_url()
     if is_confirmation:
         subject = 'Share Details Confirmed: {0}'.format(share.title)
-        content = SHARE_CONFIRMATION_TEMPLATE.format(
+        content = SHARE_CONFIRMATION_TEMPLATE.render(
             share=share, eventdetails=event_details, url=url, editer=editer)
     elif is_delete:
         subject = 'Share Canceled: {0}'.format(share.title)
-        content = SHARE_DELETION_TEMPLATE.format(
+        content = SHARE_DELETION_TEMPLATE.render(
             share=share, eventdetails=event_details, url=url,
             editer=editer)
     elif new_share:
         subject = 'Share Details Suggested: {0}'.format(share.title)
-        content = SHARE_CREATION_TEMPLATE.format(
+        content = SHARE_CREATION_TEMPLATE.render(
             share=share, eventdetails=event_details, url=url, editer=editer)
     else:
         subject = 'Share Details Edited: {0}'.format(share.title)
-        content = SHARE_EDIT_TEMPLATE.format(
+        content = SHARE_EDIT_TEMPLATE.render(
             share=share, eventdetails=event_details, url=url, editer=editer)
     error_messages = []
     for receiver in receivers:
