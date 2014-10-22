@@ -30,9 +30,9 @@ Community Partner: {{share.community_partner.name | e}}<br/>
 Go to <a href={{url}}>{{url}}</a> for more details.
 ''')
 
-ACCOUNT_DELETION_TEMPLATE = jinja2.Template(''')You have requested to delete your Community Share account.
+ACCOUNT_DELETION_TEMPLATE = jinja2.Template('''You have requested to delete your Community Share account.
 If you did not make this request, or it was done accidentally please contact an administrator
-at <a href="mailto:{{admin_email}}>{{admin_email}}</a>.
+at <a href="mailto:{{admin_email}}">{{admin_email}}</a>.
 ''')
 
 PARTNER_DELETION_TEMPLATE = jinja2.Template('''<p>{{canceled_user.name | e}} has just deleted their community share account.
@@ -312,15 +312,17 @@ def request_signup_email_confirmation(user):
     }
     hours_duration = 48
     secret = Secret.create_secret(secret_info, hours_duration)
-    content = '''A community share account has been created and attached to this email address.
+    url = '{BASEURL}/#/confirmemail?key={secret_key}'.format(
+        BASEURL=config.BASEURL, secret_key=secret.key)
+    content = '''<p>A community share account has been created and attached to this email address.<p>
 
-To confirm that you created the account, please click on the following link.
+<p>To confirm that you created the account, please click on the following link.</p>
 
-{BASEURL}/#/confirmemail?key={secret_key}
+<p><a href={url}>{url}</a></p>
 
-If you did not create this account, simply ignore this email.
+<p>If you did not create this account, simply ignore this email.</p>
 '''
-    content = content.format(BASEURL=config.BASEURL, secret_key=secret.key)
+    content = content.format(url=url)
     email = mail.Email(
         from_address=config.DONOTREPLY_EMAIL_ADDRESS,
         to_address=user.email,
@@ -339,15 +341,17 @@ def request_password_reset(user):
     }
     hours_duration = 48
     secret = Secret.create_secret(secret_info, hours_duration)
-    content = '''We received a request to reset your password for CommunityShare.
+    url = '{BASEURL}/#/resetpassword?key={secret_key}'.format(
+        BASEURL=config.BASEURL, secret_key=secret.key)
+    content = '''<p>We received a request to reset your password for CommunityShare.</p>
     
-To reset your password please click on the following link and follow the instructions.
+<p>To reset your password please click on the following link and follow the instructions.</p>
     
-{BASEURL}/#/resetpassword?key={secret_key}
+<a href={url}>{url}</a>
     
-If you cannot click on the link copy it into the addressbar of your browser.
+<p>If you cannot click on the link copy it into the addressbar of your browser.</p>
 '''
-    content = content.format(BASEURL=config.BASEURL, secret_key=secret.key)
+    content = content.format(url=url)
     email = mail.Email(
         from_address=config.DONOTREPLY_EMAIL_ADDRESS,
         to_address=user.email,
