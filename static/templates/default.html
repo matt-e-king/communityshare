@@ -1,14 +1,14 @@
 <div cs-splash-wrapper>
-  <div class="col-xs-12 col-md-7 text-center value-prop">
+  <div class="col-xs-12 col-md-6 col-lg-7 text-center value-prop">
     <h1>Connect. Share. Inspire.</h1>
     <img class="img-responsive"
          src="https://communityshare_assets.s3.amazonaws.com/BETA_logo.png" alt="beta"
          />
   </div>
 
-  <div class="col-xs-12 col-md-4 well pull-right signup-div">
+  <div class="col-xs-12 col-md-6 col-lg-5 well pull-right signup-div">
 
-    <h2 class="text-center">Join CommunityShare</h2>
+    <h2>Join CommunityShare</h2>
     <form role="form" name="signUpForm">
 
       <div class="form-group" data-input-error-helper>
@@ -93,39 +93,48 @@
       </div>
       
       <div class="row signup-as-block">
-        <div class="col-xs-12 text-center">
-          <h2>Sign Up As</h2>
+        <div class="col-xs-12">
+          <h2>Sign Up As A</h2>
         </div>
 
-        <div class="col-xs-6">
+        <div class="col-xs-6 signup-radio-options">
           <label class="radio inline">
             <input type="radio" name="inLineRadioOptions"
                    ng-model="user_type.value"
                    class="signupRadio" value="educator">
-            <h4>K-12 Classroom Teacher<br><small>I am looking for expertise</small></h4>
+            <h4>
+              K-12 Teacher
+              <a class="clickable splash-link" ng-click="showEducatorText()">
+                <span class="glyphicon glyphicon-question-sign"></span>
+              </a>
+              <br>
+              <small>I am looking for expertise</small>
+            </h4>
           </label>
         </div>
 
-        <div class="col-xs-6">
+        <div class="col-xs-6 signup-radio-options">
           <label class="radio inline">
             <input type="radio" name="inLineRadioOptions"
                    ng-model="user_type.value"
                    class="signupRadio" value="communityPartner">
-            <h4>A Community Partner<br><small>I have expertise to share</small></h4>
+            <h4>
+              Community Partner
+              <a class="clickable splash-link" ng-click="showPartnerText()">
+                <span class="glyphicon glyphicon-question-sign"></span>
+              </a>
+              <br><small>I have expertise to share</small>
+            </h4>
           </label>
         </div>
+
         <div class="col-xs-12">
-          <a class="clickable splash-link" ng-click="showChoiceText()"><p>Not sure which to choose?</p></a>
-        </div>
-        
-        <div class="col-xs-12">
-          
           <p> By clicking Sign Up, you agree to our <a ng-click="showTerms()" class="clickable splash-link">
               Terms of Service</a> and <a ng-click="showPrivacy()" class="clickable splash-link"> Privacy Policy</a>.</p>
         </div>
 
-        <div class="col-xs-8 text-center">
-          <button type="submit" class="btn btn-primary btn-lg text-center signup-btn"
+        <div class="col-xs-12 text-center">
+          <button type="submit" class="btn btn-primary btn-lg btn-block text-center signup-btn"
                   ng-disabled="signUpForm.$invalid"
                   ng-click="completeSplash()">
             Sign Up
@@ -139,15 +148,15 @@
         <div class="col-xs-12 splashlogin">
           <p>Already have an account?</p>
         </div>
-        <div class="col-xs-8 text-center">
+        <div class="col-xs-12 text-center">
           <a href="/#/login">
-            <button type="submit" class="btn btn-primary btn-lg text-center">
+            <button type="submit" class="btn btn-primary btn-lg btn-block text-center">
               Login
             </button>
           </a>
-        </div>          
+        </div>
       </div>
-    </form>
 
+    </form>
   </div>
 </div>
