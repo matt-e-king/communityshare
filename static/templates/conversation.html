@@ -60,20 +60,19 @@
       </form>
       
       <div class="chat-button-area">
-        <div class="col-lg-6">
-          <div ng-if="conversation.otherUser">
-            <button class="btn btn-success" type="submit"
-                    ng-click="createNewShare()">
-              Create a New Share
-            </button>
-          </div>
-        </div>
-        <div class="col-lg-6">
+        <div class="row">
+
+          <button class="btn btn-success" type="submit"
+                  ng-click="createNewShare()">
+            Create a New Share
+          </button>
+
           <button class="btn btn-primary pull-right" type="submit"
                   ng-click="sendMessage()"
                   ng-disabled="newConversationForm.$invalid">
             Send Message
           </button>
+
         </div>
       </div>
       <div class="alert alert-danger" ng-show="errorMessage">
