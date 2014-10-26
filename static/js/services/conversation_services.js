@@ -160,7 +160,11 @@
         for (var key in data) {
           this[key] = data[key];
         }
-        this.date_created = new Date(this.date_created);
+        if (this.date_created) {
+          this.date_created = new Date(this.date_created);
+        } else {
+          this.date_created = new Date();
+        }
       };
       return Message;
     });
