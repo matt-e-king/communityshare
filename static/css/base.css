@@ -11,3 +11,11 @@
     background-image: linear-gradient(to bottom, #bbd697 57%, #aec98a 76%);
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#bbd697', endColorstr='#aec98a', GradientType=1)
 }
+
+.signup-radio-options {
+    padding-bottom: 25px;
+}
+
+h4 small {
+    color: #000000;
+}

@@ -1,9 +1,9 @@
 <div class="modal-content">
   <div class="modal-header">
-    <h4 class="modal-title">Share Details</h4>
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
             ng-click="cancel()">
       &times;</button>
+    <h4 class="modal-title">Share Details</h4>
   </div>
   <div class="modal-body">
     <form novalidate login-with-auto-fill
@@ -103,26 +103,6 @@
           <button class="btn btn-default" type="submit" ng-click="cancel()">
             Cancel
           </button>
-          {{shareForm.description.$error}}
-          {{shareForm.location.$error}}
-          {{shareForm.date.$error}}
-          {{shareForm.time_start.$error}}
-          {{shareForm.time_stop.$error}}
-          {{shareForm.$invalid}}
-          blah
-          <br/>
-          {{shareForm.$error.maxlength[0]}}
-          <br/>
-          <br/>
-          {{shareForm.$error.maxlength[1]}}
-          <br/>
-          <br/>
-          {{shareForm.$error.maxlength[2]}}
-          <br/>
-          <br/>
-          {{shareForm.$error.maxlength[3]}}
-          <br/>
-          <br/>
           <button class="btn btn-default" type="submit" ng-click="save()"
                   ng-disabled="shareForm.$invalid">
             Save
