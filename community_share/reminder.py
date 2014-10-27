@@ -23,8 +23,9 @@ def send_reminders():
             mail_actions.send_event_reminder_message(event)
 
     # Send review reminder one day after they finish.
+    send_review_reminders = False
     events = EventReminder.get_review_reminder_events()
-    if events:
+    if events and send_review_reminders:
         logger.info('Sending review reminders for {} events'.format(len(events)))
         event_reminders = [EventReminder(event_id=event.id, typ='review')
                            for event in events]
