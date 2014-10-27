@@ -2,6 +2,7 @@ import re
 import logging
 import hmac, hashlib
 
+import html2text
 import requests
 
 from community_share import config
@@ -49,7 +50,8 @@ class Email(object):
         data = {
             'recipient': self.to_address,
             'stripped-text': self.new_content,
-            'body-plain': self.content,
+            'body-plain': html2text.html2text(self.content),
+            'body-html': self.content,
             'sender': self.from_address,
             'subject': self.subject,
         }
@@ -105,7 +107,8 @@ class MailgunMailer(object):
                 'from': email.from_address,
                 'to': email.to_address,
                 'subject': email.subject,
-                'text': email.content
+                'text': html2text.html2text(email.content),
+                'html': email.content,
             }
             logger.info('Sending mail request to mailgun - {}'.format(payload))
             r = requests.post(

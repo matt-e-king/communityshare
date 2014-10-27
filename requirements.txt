@@ -7,6 +7,8 @@ Werkzeug==0.9.4
 aniso8601==0.82
 argparse==1.2.1
 gunicorn==18.0
+heroku==0.1.4
+html2text==2014.9.25
 itsdangerous==0.24
 mimerender==0.5.3
 passlib==1.6.2
