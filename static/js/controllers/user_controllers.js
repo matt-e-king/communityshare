@@ -99,8 +99,13 @@
     $scope.submit = function() {
       $scope.institutionMethods.form.submitted = true;
       $scope.submitted = true;
+      var isEducator = false;
+      if ((user.educator_profile_search) && (user.educator_profile_search.labels) &&
+          (user.educator_profile_search.labels.length > 0)) {
+        isEducator = true;
+      }
       if ($scope.enoughLabelsSelected() && ($scope.institutionMethods.isValid())
-         && (($scope.agreeToFollowHomePolicies.value) || (!user.educator_profile_search.labels))) {
+          && (($scope.agreeToFollowHomePolicies.value) || (!isEducator))) {
         // Save changes made to user.
         var userPromise = user.save();
         var allPromises = [userPromise];
