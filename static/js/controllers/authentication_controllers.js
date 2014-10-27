@@ -137,12 +137,28 @@
           controller: 'ModalController'
         });
       };
+
       $scope.showChoiceText = function() {
         $modal.open({
-          templateUrl: './static/templates/choice_modal.html',
+          templateUrl: './static/templates/choice_educator_modal.html',
           controller: 'ModalController'
         });
       };
+
+      $scope.showEducatorText = function() {
+        $modal.open({
+          templateUrl: './static/templates/choice_educator_modal.html',
+          controller: 'ModalController'
+        });
+      };
+
+      $scope.showPartnerText = function() {
+        $modal.open({
+          templateUrl: './static/templates/choice_partner_modal.html',
+          controller: 'ModalController'
+        });
+      };
+
       if (showModal == 'terms') {
         $scope.showTerms();
       }
