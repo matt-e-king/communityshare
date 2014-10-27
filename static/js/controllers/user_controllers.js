@@ -73,6 +73,9 @@
     $scope.support = support;
     $scope.search = search;
     $scope.institutionMethods = {};
+    $scope.agreeToFollowHomePolicies = {
+      value: false
+    };
 
     // Get questions to display during signup.
     $scope.questions = [];
@@ -97,7 +100,7 @@
       $scope.institutionMethods.form.submitted = true;
       $scope.submitted = true;
       if ($scope.enoughLabelsSelected() && ($scope.institutionMethods.isValid())
-         && (($scope.agreeToFollowHomePolicies) || (!user.educator_profile_search.labels))) {
+         && (($scope.agreeToFollowHomePolicies.value) || (!user.educator_profile_search.labels))) {
         // Save changes made to user.
         var userPromise = user.save();
         var allPromises = [userPromise];
