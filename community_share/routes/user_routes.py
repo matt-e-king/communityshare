@@ -89,7 +89,7 @@ def register_user_routes(app):
 
     @app.route('/api/requestresetpassword/<string:email>', methods=['GET'])
     def request_reset_password(email):
-        user = store.session.query(User).filter_by(email=email).first()
+        user = store.session.query(User).filter_by(email=email,active=True).first()
         if user is None:
             response = base_routes.make_not_found_response()
         else:
