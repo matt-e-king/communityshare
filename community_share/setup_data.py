@@ -62,7 +62,7 @@ def get_questions(creator):
             ]
         ),
         Question(
-            text='How did you hear about Community Share?',
+            text='How did you hear about CommunityShare?',
             creator=creator,
             question_type='signup',
             public=False,
@@ -91,7 +91,7 @@ def get_questions(creator):
             order=1
         ),
         Question(
-            text='Do you have any feedback for the Community Share administrators?',
+            text='Do you have any feedback for the CommunityShare administrators?',
             creator=creator,
             long_answer=True,
             question_type='post_event',

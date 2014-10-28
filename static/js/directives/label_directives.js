@@ -256,6 +256,7 @@
           gradeLevelsTitle: '@',
           engagementLevelsTitle: '@',
           subjectAreasTitle: '@',
+          subjectAreasLabel: '@',
           type: '@',
           onlyShowActive: '@'
         },
