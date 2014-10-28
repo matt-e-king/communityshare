@@ -18,16 +18,18 @@
           subjectAreas: {
             communityPartnerSuggested: [
               'Science', 'Technology', 'Engineering', 'Math',
-              'Visual Arts', 'Digital Media', 'Wildlife Biology', 'Literature',
-              'Performing Arts', 'History', 'PE/Sports', 'Foreign Languages',
-              'Government', 'Health', 'Journalism', 'Culinary Arts',
+              'Visual Arts', 'Digital Media', 'Wildlife Biology',
+              'English/Literature', 'Performing Arts', 'History',
+              'PE/Sports', 'Foreign Languages', 'Government',
+              'Health', 'Journalism', 'Culinary Arts',
               'Entrepreneurship'
             ],
             educatorSuggested: [
               'Science', 'Technology', 'Engineering', 'Math',
-              'Visual Arts', 'Digital Media', 'Wildlife Biology', 'Literature',
-              'Performing Arts', 'History', 'PE/Sports', 'Foreign Languages',
-              'Government', 'Health', 'Journalism', 'Culinary Arts',
+              'Visual Arts', 'Digital Media', 'Wildlife Biology',
+              'English/Literature', 'Performing Arts', 'History',
+              'PE/Sports', 'Foreign Languages', 'Government',
+              'Health', 'Journalism', 'Culinary Arts',
               'Entrepreneurship'
             ],
             other: []
