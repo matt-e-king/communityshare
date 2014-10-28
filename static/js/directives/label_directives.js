@@ -19,11 +19,16 @@
             communityPartnerSuggested: [
               'Science', 'Technology', 'Engineering', 'Math',
               'Visual Arts', 'Digital Media', 'Wildlife Biology', 'Literature',
-              'Performing Arts'
+              'Performing Arts', 'History', 'PE/Sports', 'Foreign Languages',
+              'Government', 'Health', 'Journalism', 'Culinary Arts',
+              'Entrepreneurship'
             ],
             educatorSuggested: [
-              'Social Studies', 'English/Language Arts', 'Foreign Languages', 'PE/Health/Sports',
-              'Mathematics', 'Goverment', 'Science'
+              'Science', 'Technology', 'Engineering', 'Math',
+              'Visual Arts', 'Digital Media', 'Wildlife Biology', 'Literature',
+              'Performing Arts', 'History', 'PE/Sports', 'Foreign Languages',
+              'Government', 'Health', 'Journalism', 'Culinary Arts',
+              'Entrepreneurship'
             ],
             other: []
           },
