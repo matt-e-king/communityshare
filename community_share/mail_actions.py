@@ -39,7 +39,7 @@ at <a href="mailto:{{admin_email}}">{{admin_email}}</a>.
 PARTNER_DELETION_TEMPLATE = jinja2.Template('''<p>{{canceled_user.name | e}} has just deleted their community share account.
 You have been notified because you have one upcoming event planned with them.</p>
 
-<p>To view your conversation with {canceled_user.name | e} go to <a href={{url}}>{{url}}</a>.</p>
+<p>To view your conversation with {{canceled_user.name | e}} go to <a href={{url}}>{{url}}</a>.</p>
 ''')
 
 SHARE_DELETION_TEMPLATE = jinja2.Template('''<p>{{editer.name | e}} has canceled the share '{{share.title | e}}'</p>.
@@ -61,7 +61,7 @@ Community Partner: {{share.community_partner.name | e}}<br/>
 
 <p>{{eventdetails}}</p>
 
-View the details at <a href={url}>{url}</a>.
+View the details at <a href={{url}}>{{url}}</a>.
 ''')
 
 SHARE_CREATION_TEMPLATE = jinja2.Template('''<p>{{editer.name | e}} has proposed a share with you.  The details are:</p>
