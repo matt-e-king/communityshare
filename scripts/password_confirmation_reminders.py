@@ -11,7 +11,7 @@ from community_share import mail_actions, config, store
 
 def send_reminders():
     users = store.session.query(User).filter_by(
-        active=True, email_confirmed=True).all()
+        active=True, email_confirmed=False).all()
     for user in users:
         template = mail_actions.CONFIRM_EMAIL_REMINDER_TEMPLATE
         subject = 'Please confirm email address.'
