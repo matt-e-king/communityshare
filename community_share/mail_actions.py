@@ -18,6 +18,19 @@ def append_conversation_link(content, conversation):
     content = '{content}<br/><br/>\nThe email is part of a Community Share Conversation.  Simply reply to this email to continue the conversation.  If you are ready to schedule an event or to view the entire conversation go to <a href={url}>{url}</a>'.format(content=content, url=conversation_url)
     return content
 
+CONFIRM_EMAIL_REMINDER_TEMPLATE = '''<p>
+You recently signed up for an account at CommunityShare, a
+website to connect educators with community partners.  You have not
+yet confirmed the email address that you signed up with.  Please
+click on the following link so that we can activate your account.
+<p>
+
+<p>
+<a href={url}>{url}</a>.
+<p>
+
+'''
+
 EVENT_REMINDER_TEMPLATE = jinja2.Template('''<p>You have a share soon with {{other_user.name | e}}.  The share details are:</p>
 
 Title: {{share.title | e}}<br/>
@@ -305,29 +318,32 @@ def send_conversation_message(message):
         error_message = mail.get_mailer().send(email)
     return error_message
 
-def request_signup_email_confirmation(user):
+def request_signup_email_confirmation(user, template=None, subject=None):
     secret_info = {
         'userId': user.id,
         'email': user.email,
         'action': 'email_confirmation',
     }
-    hours_duration = 48
+    hours_duration = 24*14
     secret = Secret.create_secret(secret_info, hours_duration)
     url = '{BASEURL}/#/confirmemail?key={secret_key}'.format(
         BASEURL=config.BASEURL, secret_key=secret.key)
-    content = '''<p>A community share account has been created and attached to this email address.<p>
+    if template is None:
+        template = '''<p>A community share account has been created and attached to this email address.<p>
 
-<p>To confirm that you created the account, please click on the following link.</p>
+        <p>To confirm that you created the account, please click on the following link.</p>
 
-<p><a href={url}>{url}</a></p>
+        <p><a href={url}>{url}</a></p>
 
-<p>If you did not create this account, simply ignore this email.</p>
+        <p>If you did not create this account, simply ignore this email.</p>
 '''
-    content = content.format(url=url)
+    content = template.format(url=url)
+    if subject is None:
+        subject = 'CommunityShare Account Creation'
     email = mail.Email(
         from_address=config.DONOTREPLY_EMAIL_ADDRESS,
         to_address=user.email,
-        subject='CommunityShare Account Creation',
+        subject=subject,
         content=content,
         new_content=content
     )
