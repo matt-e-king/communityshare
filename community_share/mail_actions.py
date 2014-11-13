@@ -19,10 +19,7 @@ def append_conversation_link(content, conversation):
     return content
 
 CONFIRM_EMAIL_REMINDER_TEMPLATE = '''<p>
-You recently signed up for an account at CommunityShare, a
-website to connect educators with community partners.  You have not
-yet confirmed the email address that you signed up with.  Please
-click on the following link so that we can activate your account.
+You recently signed up for an account with CommunityShare, a network connecting teachers and community partners. Please click on the following link so we can activate your account. Thank you!
 <p>
 
 <p>
