@@ -268,6 +268,16 @@
       }
     });
 
+    $routeProvider.when('/auth_redirect', {
+      templateUrl: './static/templates/auth_redirect.html',
+      controller: 'AuthRedirectController',
+      resolve: {
+        activeUser: function (activeUserLoader) {
+          return activeUserLoader();
+        }
+      }
+    });
+
     $routeProvider.otherwise({
       templateUrl: './static/templates/unknown.html'
     });

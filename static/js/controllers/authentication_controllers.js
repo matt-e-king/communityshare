@@ -168,22 +168,44 @@
     });
 
   module.controller(
+    'AuthRedirectController',
+    function ($scope, Authenticator, Messages) {
+      $scope.resendEmailConfirmation = function() {
+        var emailConfirmPromise = Authenticator.requestConfirmEmail();
+        emailConfirmPromise.then(
+          function() {
+            Messages.info('Sent email confirmation email.');
+          },
+          function(errorMessage) {
+            Messages.error(errorMessage);
+          });
+      };
+    }
+  );
+
+  module.controller(
     'LoginController',
-    function($scope, $location, Authenticator) {
+    function(Session, $scope, $location, Authenticator) {
       var nextLocation = $location.search().goto;
       $scope.email = {value: undefined};
       $scope.password = {value: undefined};
       $scope.errorMessage = '';
+
       $scope.login = function() {
         var userPromise = Authenticator.authenticateWithEmailAndPassword(
           $scope.email.value, $scope.password.value);
         userPromise.then(
           function() {
-            $location.search('goto', null);
-            if (nextLocation) {
-              $location.path(nextLocation);
+
+            if (!Session.activeUser.email_confirmed) {
+              $location.path("/auth_redirect");
             } else {
-              $location.path("/");
+              $location.search('goto', null);
+              if (nextLocation) {
+                $location.path(nextLocation);
+              } else {
+                $location.path("/");
+              }
             }
           },
           function(message) {
