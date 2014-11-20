@@ -19,3 +19,17 @@
 h4 small {
     color: #000000;
 }
+
+#chat-header {
+    padding: 10px;
+    margin-left: 25px;
+    margin-right: 25px;
+    width: 75%;
+    float: none;
+    margin: 0 auto;
+    font-weight: bold;
+}
+
+.chat-title {
+    margin-left: 25px;
+}

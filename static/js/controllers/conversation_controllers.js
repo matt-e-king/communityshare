@@ -59,7 +59,7 @@
       if ((conversation === undefined) || (Session.activeUser === undefined)) {
         return;
       }
-      
+
       var sharesPromise = Share.get_many({conversation_id: conversation.id});
       $scope.otherUser = undefined;
       $scope.conversation = conversation;

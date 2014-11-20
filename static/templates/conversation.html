@@ -22,6 +22,18 @@
         Don't forget to Create a Share.
       </div>
 
+      <div id="chat-header">
+        <div class="row">
+          <div class="col-lg-2">
+          </div>
+          <div class="col-lg-10">
+            <div class="chat-title">
+              <h2>{{ conversation.title }}</h2>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div id="chat-body">
         <div ng-repeat="message in conversation.messages" class="conversation-block">
           <div class="chat-unit">
@@ -50,7 +62,7 @@
 
         <div class="form-group">
           <div class="chat-box">
-            <textarea ng-model="newMessage.content" name="content" id="content" class="form-control" ng-class="Session.activeUser.id" type="text">
+            <textarea required="" ng-model="newMessage.content" name="content" id="content" class="form-control" ng-class="Session.activeUser.id" type="text">
             </textarea>
             <p ng-show="newConversationForm.content.$invalid && !newConversationForm.content.$pristine" class="help-block">
               A message is required.
@@ -60,8 +72,14 @@
 
         <div class="chat-button-area">
           <div class="row">
-            <button class="btn btn-success" type="submit" ng-click="createNewShare()">Create a New Share</button>
-            <button class="btn btn-primary pull-right" type="submit" ng-click="sendMessage()" ng-disabled="newConversationForm.$invalid">Send Message</button>
+            <button class="btn btn-success"
+                    type="submit"
+                    ng-click="createNewShare()">Create a New Share
+            </button>
+            <button class="btn btn-primary pull-right"
+                    type="submit" ng-click="sendMessage(); newConversationForm.$setPristine()"
+                    ng-disabled="newConversationForm.$invalid">Send Message
+            </button>
           </div>
         </div>
 
@@ -91,7 +109,7 @@
           <div>Starting: {{evnt.datetime_start | date : 'EEEE d MMMM yyyy, h:mm a'}}</div>
           <div>Stopping: {{evnt.datetime_stop | date : 'EEEE d MMMM yyyy, h:mm a'}}</div>
         </div>
-        
+
         <button class="btn btn-success" type="submit"
                 ng-click="editShare(share)">
           Edit Share Details
@@ -115,10 +133,10 @@
       <div class="alert alert-danger" ng-show="sharesErrorMessage">
         {{sharesErrorMessage}}
       </div>
-      
+
     </div>
   </div>
-                    
+
   <div class="panel panel-default" ng-show="pastShares.length > 0">
 
     <div class="gradient-header">
@@ -135,7 +153,7 @@
           <div>Stopping: {{evnt.datetime_stop | date : 'EEEE d MMMM yyyy, h:mm a'}}</div>
           <div>Now: {{now | date : 'EEEE d MMMM yyyy, h:mm a'}}</div>
         </div>
-        
+
         <button class="btn btn-success" type="submit"
                 ng-click="editShare(share)">
           Edit Share Details
@@ -155,10 +173,10 @@
           Confirmed
         </button>
       </div>
-      
+
     </div>
   </div>
-                    
+
 </div>
 
 </div>
