@@ -42,4 +42,3 @@ def register_search_routes(app):
                 else:
                     response = base_routes.make_forbidden_response()
         return response
-        

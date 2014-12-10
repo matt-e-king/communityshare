@@ -107,6 +107,9 @@
             }
           });
       };
+      $scope.pagination = function (search) {
+        console.log(search);
+      };
     });
 
   module.controller(
