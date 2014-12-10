@@ -9,7 +9,11 @@ def get_searches_ordered_by_label_matches(
         searcher_role,
         searching_for_role,
         offset_number=0,
-        max_number=20):
+        max_number=10):
+
+    if offset_number > 0:
+        offset_number *= max_number
+
     labelnames = [label.name.lower() for label in labels]
     query = store.session.query(Search, func.count(Label.id).label('matches'))
     query = query.join(Search.labels)
@@ -25,11 +29,12 @@ def get_searches_ordered_by_label_matches(
     searches = [sc[0] for sc in searches_and_count]
     return searches
 
-def find_matching_searches(search):
+def find_matching_searches(search, page):
     searches = get_searches_ordered_by_label_matches(
         search.labels,
         searcher_role=search.searching_for_role,
-        searching_for_role=search.searcher_role)
+        searching_for_role=search.searcher_role,
+        offset_number=page)
     return searches
     
 

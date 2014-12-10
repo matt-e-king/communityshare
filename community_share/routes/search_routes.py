@@ -19,8 +19,9 @@ def register_search_routes(app):
         response = jsonify(response_data)
         return response
 
-    @app.route(base_routes.API_SINGLE_FORMAT.format('search') + '/results', methods=['GET'])
-    def get_search_results(id):
+    @app.route(base_routes.API_PAGINATION_FORMAT.format('search') + '/results', methods=['GET'])
+    def get_search_results(id, page):
+        page = int(page)
         requester = get_requesting_user()
         if requester is None:
             response = base_routes.make_not_authorized_response()
@@ -32,7 +33,7 @@ def register_search_routes(app):
                 response = base_routes.make_not_found_response()
             else:
                 if search.has_admin_rights(requester):
-                    matching_searches = search_utils.find_matching_searches(search)
+                    matching_searches = search_utils.find_matching_searches(search, page)
 
                     serialized = [
                         search.serialize(requester, exclude=[])

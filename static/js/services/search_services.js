@@ -102,9 +102,10 @@
             (user.educator_profile_search.id === this.id));
         return isProfile;
       };
-      Search.getResults = function(searchId) {
+      Search.getResults = function(searchId, page) {
         var deferred = $q.defer();
-        var url = '/api/search/' + searchId + '/results';
+        if (typeof page === 'undefined') page = 0;
+        var url = '/api/search/' + searchId + '/' + page + '/results';
         var resultsPromise = $http({
           method: 'GET',
           url: url

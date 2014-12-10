@@ -107,8 +107,9 @@
             }
           });
       };
-      $scope.pagination = function (search) {
-        console.log(search);
+      $scope.pagination = function (search, page) {
+        var searchResults = Search.getResults(search.id, page);
+        console.log(searchResults);
       };
     });
 
