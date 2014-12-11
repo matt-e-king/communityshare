@@ -85,19 +85,17 @@
             </div>
           </div>
 
-          <div ng-show="search.matches.length > 0">
-            <nav>
-              <ul class="pagination">
-                <li><a href=""><span aria-hidden="true">&laquo;</span><span class="sr-only">Previous</span></a></li>
-                <li><a href="" ng-click="pagination(search,1)">1</a></li>
-                <li><a href="" ng-click="pagination(search,2)">2</a></li>
-                <li><a href="" ng-click="pagination(search,3)">3</a></li>
-                <li><a href="" ng-click="pagination(search,4)">4</a></li>
-                <li><a href="" ng-click="pagination(search,5)">5</a></li>
-                <li><a href=""><span aria-hidden="true">&raquo;</span><span class="sr-only">Next</span></a></li>
-              </ul>
-            </nav>
-          </div>
+          <nav>
+            <ul class="pagination">
+              <li><a href=""><span aria-hidden="true">&laquo;</span><span class="sr-only">Previous</span></a></li>
+
+              <li ng-repeat="x in paginationRange(5)">
+                <a href="" ng-click="goToPage(search,x)">{{ x }}</a>
+              </li>
+
+              <li><a href=""><span aria-hidden="true">&raquo;</span><span class="sr-only">Next</span></a></li>
+            </ul>
+          </nav>
 
         </div>
       </div>
