@@ -57,19 +57,21 @@
             };
             $scope.searches.sort(compareSearchDate);
             var gotSomeMatches = false;
+            $scope.page = 0;
+            var page = $scope.page;
             for (var i=0; i<$scope.searches.length; i++) {
               var search = $scope.searches[i];
               if ((!gotSomeMatches) && (search.labels.length > 0)) {
-                $scope.getMatches(search);
+                $scope.getMatches(search, page);
                 gotSomeMatches = true;
               }
             }
-          },
-          function() {
-          });
+          }
+        );
       }
-      $scope.getMatches = function(search) {
-        var matchesPromise = Search.getResults(search.id);
+      $scope.getMatches = function(search, page) {
+        $scope.page = page;
+        var matchesPromise = Search.getResults(search.id, page);
         search.show = true;
         search.infoMessage = 'Loading matches...';
         search.errorMessage = '';
@@ -106,6 +108,30 @@
                 });
             }
           });
+      };
+      $scope.goToPage = function (search, page) {
+        $scope.page = page;
+        $scope.getMatches(search, page);
+      };
+      $scope.paginationRange = function (max) {
+        var pages, min, i;
+        min = $scope.page;
+        pages = [];
+
+        if (min < 5) {
+          min = 0;
+          max = 5;
+        }
+
+        if (min >= 5) {
+          max = min + 2;
+          min -= 2;
+        }
+
+        for (i = min; i <= max; i++) {
+          pages.push(i);
+        }
+        return pages;
       };
     });
 

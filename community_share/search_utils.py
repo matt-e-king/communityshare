@@ -5,7 +5,15 @@ from community_share.models.user import User
 from community_share import store
 
 def get_searches_ordered_by_label_matches(
-        labels, searcher_role, searching_for_role, max_number=10):
+        labels,
+        searcher_role,
+        searching_for_role,
+        offset_number=0,
+        max_number=10):
+
+    if offset_number > 0:
+        offset_number *= max_number
+
     labelnames = [label.name.lower() for label in labels]
     query = store.session.query(Search, func.count(Label.id).label('matches'))
     query = query.join(Search.labels)
@@ -17,14 +25,16 @@ def get_searches_ordered_by_label_matches(
     query = query.filter(User.email_confirmed==True)
     query = query.group_by(Search.id)
     query = query.order_by('matches DESC')
-    searches_and_count = query.limit(max_number)
+    searches_and_count = query.offset(offset_number).limit(max_number)
     searches = [sc[0] for sc in searches_and_count]
     return searches
 
-def find_matching_searches(search):
+def find_matching_searches(search, page):
     searches = get_searches_ordered_by_label_matches(
-        search.labels, searcher_role=search.searching_for_role,
-        searching_for_role=search.searcher_role)
+        search.labels,
+        searcher_role=search.searching_for_role,
+        searching_for_role=search.searcher_role,
+        offset_number=page)
     return searches
     
 

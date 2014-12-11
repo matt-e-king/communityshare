@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 API_MANY_FORMAT = '/api/{0}'
 API_SINGLE_FORMAT = '/api/{0}/<id>'
+API_PAGINATION_FORMAT = '/api/{0}/<id>/<page>'
 
 def make_not_authorized_response():
     response_data = {'message': 'Authorization failed'}
