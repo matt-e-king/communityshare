@@ -1,18 +1,20 @@
 var supertest = require('supertest');
 
 describe('Community Share Error', function () {
-  var server;
+  var test;
 
   before(function (done) {
-    server = require('./index');
-    done();
+    require('./server')(function (err, server) {
+      if (err) throw err;
+      test = server;
+      done();
+    });
   });
 
   it('POST an error to the server and send email', function (done) {
-    var request = {};
-
-    server
-      .get('/error-log')
+    var request = {"a": "b"};
+    supertest(test)
+      .post('/error-log')
       .send(request)
       .expect(200, done)
     ;
