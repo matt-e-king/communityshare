@@ -1,6 +1,6 @@
 (function() {
   'use strict';
-  
+
   var module = angular.module(
     'communityshare.services.item',
     [
@@ -21,7 +21,7 @@
         Item.cache = {};
         Item.searchCache = {};
         Item.prototype.toData = function() {
-          var data = JSON.parse(JSON.stringify(this));          
+          var data = JSON.parse(JSON.stringify(this));
           return data;
         };
         Item.prototype.clone = function() {
@@ -53,7 +53,7 @@
           if ((item === undefined) || forceRefresh) {
             var dataPromise = $http({
               method: 'GET',
-              url: Item.makeUrl(id) 
+              url: Item.makeUrl(id)
             });
             dataPromise.then(
               function(data) {
@@ -75,7 +75,7 @@
           var searchHash = JSON.stringify(searchParams);
           var items = Item.searchCache[searchHash];
           if ((items === undefined) || forceRefresh) {
-          
+
             var dataPromise = $http({
               method: 'GET',
               url: Item.makeUrl(),
@@ -100,7 +100,7 @@
           } else {
             deferred.resolve(items);
           }
-          return deferred.promise;          
+          return deferred.promise;
         };
         Item.prototype._baseUpdateFromData = function(itemData) {
           for (var key in itemData) {
@@ -144,7 +144,7 @@
             }
           );
           return deferred.promise;
-          
+
         };
         Item.prototype.destroy = function() {
           var _this = this;
@@ -181,6 +181,6 @@
         return Item;
       };
       return itemFactory;
-    });  
+    });
 
 })();
