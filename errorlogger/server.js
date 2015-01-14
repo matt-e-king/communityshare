@@ -16,7 +16,6 @@ module.exports = function (callback) {
     };
 
     root.transporter.sendMail(mailOptions, function (err, info) {
-      console.log(err);
       if (err) return res.status(500).end();
       else return res.status(200).end();
     });
