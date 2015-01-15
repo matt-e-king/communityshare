@@ -1,6 +1,6 @@
 (function() {
   'use strict';
-  
+
   var module = angular.module(
     'communityshare.services.search',
     [
@@ -19,7 +19,7 @@
         });
         var deferred = $q.defer();
         labelsPromise.then(
-          function(response) {
+          function(respon) {
             var labels = response.data.data;
             deferred.resolve(labels);
           },

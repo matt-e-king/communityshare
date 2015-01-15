@@ -30,13 +30,14 @@
           var stackTrace = stacktraceService.print({ e: exception });
           $.ajax({
             type: 'POST',
-            url: './error-log',
+            url: 'http://localhost:3030/error-log',
             contentType: 'application/json',
             data: angular.toJson({
               errorUrl: $window.location.href,
               errorMessage: errorMessage,
               stackTrace: stackTrace,
-              cause: ( cause || '' )
+              cause: ( cause || '' ),
+              browser: navigator.userAgent
             })
           });
         }

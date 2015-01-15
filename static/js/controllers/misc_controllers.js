@@ -14,7 +14,7 @@
     'ModalController',
     function($scope, $modalInstance) {
       $scope.closeModal = function() {
-        $modalInstance.close();        
+        $modalInstance.close();
       };
     });
 
@@ -27,13 +27,13 @@
         $location.path('');
       };
     });
-  
+
   module.controller(
     'MainController',
     function($scope, Session) {
       $scope.Session = Session;
     });
-  
+
   module.controller(
     'AdminController',
     function(Session, $scope, $location, getStatistics) {
