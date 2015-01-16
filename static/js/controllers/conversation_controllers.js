@@ -1,6 +1,6 @@
 (function() {
   'use strict';
-  
+
   var module = angular.module(
     'communityshare.controllers.conversation',
     [
@@ -106,7 +106,7 @@
             var msg = combineMessages(baseMessage, message);
             $scope.sharesErrorMessage = msg;
           }
-        );      
+        );
       };
       conversation.markMessagesAsViewed();
       if (conversation.userA.id === Session.activeUser.id) {
@@ -182,7 +182,7 @@
           });
       };
     });
-  
+
   module.controller(
     'NewConversationController',
     function (Session, $scope, $modalInstance, userId, searchId, User,

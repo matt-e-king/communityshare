@@ -17,7 +17,7 @@ search_label_table = Table('search_label', Base.metadata,
 
 class Search(Base, Serializable):
     __tablename__ = 'search'
-    
+
     MANDATORY_FIELDS = [
         'searcher_user_id', 'searcher_role', 'searching_for_role', 'labels', 'zipcode']
     WRITEABLE_FIELDS = [
@@ -96,7 +96,7 @@ class Search(Base, Serializable):
     custom_deserializers = {
         'labels': deserialize_labels,
         }
-        
+
 
 class Label(Base, Serializable):
     __tablename__ = 'label'

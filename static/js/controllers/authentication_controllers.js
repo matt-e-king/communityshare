@@ -6,7 +6,7 @@
     [
       'communityshare.services.authentication'
     ]);
-  
+
   module.controller(
     'ResetPasswordController',
     function($scope, Authenticator, $routeParams, $location) {
@@ -89,11 +89,11 @@
         } else if (user.is_educator) {
           $location.path('matches');
         } else {
-          
+
           $location.path('messages');
         }
       }
-      
+
       var showModal = $location.search().showModal;
 
       $scope.newUser = new User();

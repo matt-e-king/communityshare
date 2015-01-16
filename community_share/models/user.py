@@ -51,7 +51,7 @@ class User(Base, Serializable):
         'standard_can_read_many': False,
         'admin_can_delete': True
     }
-    
+
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False)
     email = Column(String(50), nullable=False)
@@ -60,7 +60,7 @@ class User(Base, Serializable):
     password_hash = Column(String(120), nullable=True)
     date_created = Column(DateTime, nullable=False, default=datetime.utcnow)
     date_inactivated = Column(DateTime, nullable=True)
-    is_administrator = Column(Boolean, nullable=False, default=False) 
+    is_administrator = Column(Boolean, nullable=False, default=False)
     last_active = Column(DateTime)
     educator_profile_search_id = Column(Integer)
     community_partner_profile_search_id = Column(Integer)
@@ -97,7 +97,7 @@ class User(Base, Serializable):
         all__vary_rounds = 0.1,
         sha512_crypt__vary_rounds = 8000,
     )
-    
+
     def searches_as(self, role):
         searches = store.session.query(Search).filter_by(
             searcher_user_id=self.id, searcher_role=role).all()
@@ -109,7 +109,7 @@ class User(Base, Serializable):
         if self.email_confirmed:
             output = self.email
         return output
-        
+
     @property
     def is_educator(self):
         output = False
@@ -150,7 +150,7 @@ class User(Base, Serializable):
         return error_messages
 
     def __repr__(self):
-        output = "<User(email={email})>".format(email=self.email) 
+        output = "<User(email={email})>".format(email=self.email)
         return output
 
     @classmethod
@@ -202,7 +202,7 @@ class User(Base, Serializable):
         'educator_profile_search': serialize_educator_profile_search,
         'community_partner_profile_search': serialize_community_partner_profile_search,
     }
-         
+
     def deserialize_bio(self, bio):
         BIO_LIMIT = 1000
         if bio != None:
@@ -238,7 +238,7 @@ class User(Base, Serializable):
                 profile_search_id = None
             data['id'] = profile_search_id
             self.community_partner_profile_search = Search.admin_deserialize(data)
-            
+
     custom_deserializers = {
         'institution_associations': deserialize_institution_associations,
         'educator_profile_search': deserialize_educator_profile_search,
@@ -253,7 +253,7 @@ class User(Base, Serializable):
         }
         secret = Secret.create_secret(info=secret_data, hours_duration=24)
         return secret
-        
+
     @classmethod
     def from_api_key(self, key):
         secret = Secret.lookup_secret(key)
@@ -304,7 +304,9 @@ class User(Base, Serializable):
             name_condition = User.name.ilike('%'+search_text+'%')
             email_condition = User.email.ilike('%'+search_text+'%')
             institution_condition = Institution.name.ilike('%'+search_text+'%')
-            query = query.filter(or_(name_condition, email_condition, institution_condition))
+            biography_condition = User.bio.ilike('%'+search_text+'%')
+            query = query.filter(or_(name_condition, email_condition, \
+                institution_condition, biography_condition))
         if date_created_greaterthan:
             query = query.filter(User.date_created > date_created_greaterthan)
         if date_created_lessthan:
@@ -315,7 +317,7 @@ class User(Base, Serializable):
 
 class UserReview(Base, Serializable):
     __tablename__ = 'userreview'
-    
+
     MANDATORY_FIELDS = [
         'user_id', 'rating', 'creator_user_id', 'event_id']
     WRITEABLE_FIELDS = [
@@ -332,7 +334,7 @@ class UserReview(Base, Serializable):
         'standard_can_read_many': False,
         'admin_can_delete': False
     }
-    
+
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
     event_id = Column(Integer, ForeignKey('event.id'))

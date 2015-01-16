@@ -1,6 +1,6 @@
 (function() {
   'use strict';
-  
+
   var module = angular.module(
     'communityshare.services.search',
     [

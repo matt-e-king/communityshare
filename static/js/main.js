@@ -8,6 +8,7 @@
     'ngRoute',
     'ui.bootstrap',
     'communityshare.directives.mainview',
+    'communityshare.services.stacktrace',
     'communityshare.controllers.authentication',
     'communityshare.controllers.misc',
     'communityshare.controllers.user',
@@ -24,7 +25,7 @@
   }
 
   app = angular.module('communityshare', requirements);
-  
+
   app.config(function($routeProvider) {
 
     $routeProvider.when('/', {
@@ -180,7 +181,7 @@
         }
       }
     });
-      
+
 
     $routeProvider.when('/search/:searchId/results', {
       templateUrl: './static/templates/search_results.html',
@@ -287,7 +288,7 @@
   app.config(['$httpProvider', function($httpProvider) {
     //initialize get if not there
     if (!$httpProvider.defaults.headers.get) {
-      $httpProvider.defaults.headers.get = {};    
+      $httpProvider.defaults.headers.get = {};
     }
     //disable IE ajax request caching
     $httpProvider.defaults.headers.get['If-Modified-Since'] = '0';
