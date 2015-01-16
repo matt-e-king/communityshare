@@ -19,7 +19,7 @@
         });
         var deferred = $q.defer();
         labelsPromise.then(
-          function(respon) {
+          function(response) {
             var labels = response.data.data;
             deferred.resolve(labels);
           },

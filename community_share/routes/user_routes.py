@@ -171,8 +171,8 @@ def register_user_routes(app):
                 }
                 response = jsonify(response_data)
         return response
-        
-        
+
+
 
     ALLOWED_EXTENSIONS = set(['.txt', '.pdf', '.png', '.jpg', '.jpeg', '.gif'])
 
@@ -196,7 +196,7 @@ def register_user_routes(app):
         users = User.search(search_text, date_created_greaterthan, date_created_lessthan)
         response = base_routes.make_many_response(requester, users)
         return response
-        
+
     @app.route('/api/user/<int:user_id>/picture', methods=['PUT', 'POST', 'PATCH'])
     def post_picture(user_id):
         requester = get_requesting_user()
