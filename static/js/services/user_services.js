@@ -1,6 +1,6 @@
 (function() {
   'use strict';
-  
+
   var module = angular.module(
     'communityshare.services.user',
     [
@@ -78,7 +78,7 @@
         return deferred.promise;
       };
     });
-    
+
 
   module.factory(
     'User',
@@ -220,7 +220,7 @@
         );
         return deferred.promise;
       };
-      
+
       UserBase.prototype.getSearches = function() {
         var searchParams = {
           'searcher_user_id': this.id,

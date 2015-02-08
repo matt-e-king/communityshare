@@ -45,7 +45,7 @@ class Email(object):
         new_email = Email(new_from_address, new_to_address, self.subject,
                           combined_content, new_content)
         return new_email
-        
+
     def make_mailgun_data(self):
         data = {
             'recipient': self.to_address,

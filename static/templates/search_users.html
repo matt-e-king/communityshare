@@ -7,13 +7,13 @@
 
     <div class="panel panel-default">
       <div class="gradient-header">
-        <h1>Searched for "{{prevSearchText}}"</h1>
+        <h1>Searched for "{{ prevSearchText }}"</h1>
       </div>
       <div class="panel-body">
 
         <form novalidate login-with-auto-fill
               action="" role="form" name="form" class="form-horizontal">
-          
+
           <div class="form-group">
             <label for="searchText"
                    class="control-label cs-form-label">Email/Name/Institution</label>
@@ -24,34 +24,34 @@
                      class="form-control"
                      type="text"/>
             </div>
+            <button class="btn btn-default" ng-click="newSearch()">
+              Search
+            </button>
           </div>
-          <button class="btn btn-default cs-form-button" ng-click="newSearch()">
-            Search
-          </button>
-    
+
         </form>
-    
+
         <div ng-show="infoMessage" class="alert alert-info">
           {{infoMessage}}
         </div>
-        
+
         <div ng-show="errorMessage" class="alert alert-danger">
           {{errorMessage}}
         </div>
-    
+
         <div ng-show="(users !== undefined) && (users.length === 0)"
              class="alert alert-warning"
              >
           No matching users found.
         </div>
-        
+
         <div ng-repeat = "user in users" class="row">
           <hr/>
           <div class="col-sm-3 col-xs-5 ">
             <img ng-src="{{user.picture_url}}"
                  class="img-responsive img-circle profile-img centered" />
             <img ng-show="!user.picture_url"
-                 src="https://communityshare_assets.s3.amazonaws.com/default_avatar.png" 
+                 src="https://communityshare_assets.s3.amazonaws.com/default_avatar.png"
                  class="img-responsive img-circle centered profile-img"/>
             <div class="text-center">
               <button class="btn primary-btn match-message-btn btn-lg"

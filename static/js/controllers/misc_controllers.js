@@ -52,6 +52,9 @@
         };
         $location.path('/searchusers').search(searchParams);
       };
+      $scope.activateEmails = function () {
+        console.log('here');
+      };
       var statisticsPromise = getStatistics();
       $scope.statistics = [];
       statisticsPromise.then(function(statistics) {

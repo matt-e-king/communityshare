@@ -16,31 +16,6 @@
 
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h5 class="panel-title">Search for a User</h5>
-          </div>
-          <div class="panel-body">
-            <form novalidate login-with-auto-fill
-                  action="" role="form" name="form" class="form-horizontal">
-              <div class="form-group">
-                <label for="searchText"
-                       class="control-label cs-form-label">Email or Name</label>
-                <div class="cs-form-control">
-                  <input ng-model="searchText.value"
-                         name="searchText"
-                         id="searchText"
-                         class="form-control"
-                         type="text"/>
-                </div>
-                <button class="btn" ng-click="searchForUsers()">
-                  Search
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-
-        <div class="panel panel-default">
-          <div class="panel-heading">
             <h5 class="panel-title">Edit User Information</h5>
           </div>
           <div class="panel-body">
@@ -85,6 +60,7 @@
                 <td>{{eventsIn7Days}}</td></tr>
               <tr><th><a href="/#/events?start={{daysAgo30 | date: 'yyyyMMdd'}}&stop={{tomorrow | date: 'yyyyMMdd'}}">
                     Events in last 30 days</th></a><td>{{eventsIn30Days}}</td></tr>
+              <tr><th><a href="/#/admin" ng-click="activateEmails()">Activate Emails</a></th></tr>
             </table>
           </div>
         </div>
