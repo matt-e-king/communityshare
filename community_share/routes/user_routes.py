@@ -222,3 +222,7 @@ def register_user_routes(app):
         else:
             response = base.routes.make_forbidden_response()
         return response
+
+    @app.route('/api/activate_email', methods=['POST'])
+    def activate_email():
+        User.activate_email()

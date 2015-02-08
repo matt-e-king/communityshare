@@ -1,7 +1,8 @@
 from datetime import datetime
 import logging
 
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, and_, or_
+from sqlalchemy import Column, Integer, String, DateTime, \
+    Boolean, and_, or_, update
 from sqlalchemy import ForeignKey, CheckConstraint
 from sqlalchemy.orm import relationship, backref
 
@@ -314,6 +315,16 @@ class User(Base, Serializable):
         query = query.filter(User.active==True)
         users = query.all()
         return users
+
+    @classmethod
+    def activate_email(cls, user=None):
+        if not user:
+            store.session \
+                .query(User) \
+                .filter(User.active==True) \
+                .filter(User.email_confirmed==False) \
+                .update({'email_confirmed': True})
+            store.session.commit()
 
 class UserReview(Base, Serializable):
     __tablename__ = 'userreview'
