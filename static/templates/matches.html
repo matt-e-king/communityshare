@@ -58,8 +58,8 @@
               <img ng-src="{{match.searcher_user.picture_url}}"
                    class="img-responsive img-circle profile-img centered" />
               <img ng-show="!match.searcher_user.picture_url"
-                   src="https://communityshare_assets.s3.amazonaws.com/default_avatar.png" 
-                   class="img-responsive img-circle profile-img centered" />                   
+                   src="https://communityshare_assets.s3.amazonaws.com/default_avatar.png"
+                   class="img-responsive img-circle profile-img centered" />
               <div class="text-center">
                 <button class="btn primary-btn match-message-btn btn-lg"
                         ng-click="startConversation(Session.activeUser, match.searcher_user, match, false)">
@@ -91,7 +91,7 @@
               <ul class="pagination">
                 <li><a href=""><span aria-hidden="true">&laquo;</span><span class="sr-only">Previous</span></a></li>
                 <li ng-repeat="x in paginationRange(5)">
-                  <a href="" ng-click="goToPage(search,x)">{{ x }}</a>
+                  <a href="" ng-click="goToPage(search,x)">{{ x + 1 }}</a>
                 </li>
                 <li><a href=""><span aria-hidden="true">&raquo;</span><span class="sr-only">Next</span></a></li>
               </ul>

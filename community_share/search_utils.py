@@ -36,6 +36,6 @@ def find_matching_searches(search, page):
         searching_for_role=search.searcher_role,
         offset_number=page)
     return searches
-    
+
 
 

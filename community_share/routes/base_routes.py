@@ -98,7 +98,7 @@ def make_blueprint(Item, resourceName):
             response = make_not_authorized_response()
         else:
             if requester is None or not requester.is_administrator:
-                if (Item.PERMISSIONS.get('standard_can_read_many', False) or 
+                if (Item.PERMISSIONS.get('standard_can_read_many', False) or
                     Item.PERMISSIONS.get('all_can_read_many', False)):
                     try:
                         query = Item.args_to_query(request.args, requester)
@@ -172,7 +172,7 @@ def make_blueprint(Item, resourceName):
                     message = ''
                 response = make_bad_request_response(message)
         return response
-        
+
     @api.route(API_SINGLE_FORMAT.format(resourceName), methods=['PATCH', 'PUT'])
     def edit_item(id):
         requester = get_requesting_user()
@@ -228,6 +228,6 @@ def make_blueprint(Item, resourceName):
                 else:
                     response = make_forbidden_response()
         return response
-        
+
     return api
 
