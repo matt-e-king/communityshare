@@ -11,7 +11,7 @@
     ]);
 
   // User Views
-  
+
   module.controller(
     'UserController',
     function($scope, $routeParams, User, Session, Question, Conversation,
@@ -149,7 +149,7 @@
       };
       $scope.showTutorial();
     });
-  
+
   module.controller(
     'SignupPersonalController',
     function($scope, Session, $fileUploader, $http, $location, support) {
@@ -177,7 +177,7 @@
           }
         };
         $scope.validImage = true;
-        
+
         if (support.fileUploader) {
           var uploader = $scope.uploader = $fileUploader.create({
             scope: $scope,
@@ -192,7 +192,7 @@
               }
             ]
           });
-          
+
           // Make sure we only have one file in the uploader queue
           uploader.bind('afteraddingfile', function () {
             if (uploader.queue.length > 1) {
@@ -242,8 +242,8 @@
       $scope.institutionMethods = {};
 
       var onLocationChange = function(event, newUrl) {
-        if (!justSaved && (($scope.personalSettingsForm && $scope.personalSettingsForm.$dirty) || 
-            ($scope.accountSettingsForm && $scope.accountSettingsForm.$dirty) || 
+        if (!justSaved && (($scope.personalSettingsForm && $scope.personalSettingsForm.$dirty) ||
+            ($scope.accountSettingsForm && $scope.accountSettingsForm.$dirty) ||
             ($scope.user.community_partner_profile_search &&
              $scope.user.community_partner_profile_search.dirty) ||
             ($scope.user.educator_profile_search &&
@@ -371,7 +371,7 @@
             $location.path('/');
           });
       };
-      
+
     });
 
 })();

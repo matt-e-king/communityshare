@@ -16,7 +16,7 @@ class Serializable(object):
     """
     Doesn't implement a necessary 'get' method.
     """
-    
+
     MANDATORY_FIELDS = []
     WRITEABLE_ONCE_FIELDS = []
     WRITEABLE_FIELDS = []
@@ -47,7 +47,7 @@ class Serializable(object):
         if requester is not None:
             if requester.is_administrator:
                 has_rights = True
-            elif (self.PERMISSIONS['admin_can_delete'] and 
+            elif (self.PERMISSIONS['admin_can_delete'] and
                   self.has_admin_rights(requester)):
                 has_rights = True
         return has_rights
@@ -57,7 +57,7 @@ class Serializable(object):
     def _base_serialize(self, requester, exclude=[]):
         d = {}
         if self.has_admin_rights(requester):
-            fieldnames = self.ADMIN_READABLE_FIELDS 
+            fieldnames = self.ADMIN_READABLE_FIELDS
         elif self.has_standard_rights(requester):
             fieldnames = self.STANDARD_READABLE_FIELDS
         else:
@@ -128,7 +128,7 @@ class Serializable(object):
                     logger.debug('{0} - changing attr from {1} to {2}'.format(
                         fieldname, current, data[fieldname]))
                     setattr(self, fieldname, data[fieldname])
-            
+
     @classmethod
     def admin_deserialize(cls, data):
         item_id = data.get('id', None)

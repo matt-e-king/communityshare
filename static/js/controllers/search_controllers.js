@@ -180,7 +180,7 @@
             $scope.errorMessage = 'Failed to find matches' + msg;
           });
       }
-    });      
+    });
 
   module.controller(
     'SearchEditController',
@@ -225,7 +225,7 @@
             Messages.error(message);
           });
       };
-      
+
       $scope.searchText = {value: ''};
       $scope.userSearch = function() {
         if ($scope.searchText.value) {

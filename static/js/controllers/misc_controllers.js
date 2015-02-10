@@ -36,7 +36,7 @@
 
   module.controller(
     'AdminController',
-    function(Session, $scope, $location, getStatistics) {
+    function(Session, $scope, $location, $http, getStatistics) {
       $scope.Session = Session;
       $scope.searchText = {value: ''};
       $scope.now = new Date();
@@ -51,6 +51,12 @@
           'searchText': $scope.searchText.value
         };
         $location.path('/searchusers').search(searchParams);
+      };
+      $scope.activateEmails = function () {
+        $http({
+          method: 'POST',
+          url: '/api/activate_email'
+        })
       };
       var statisticsPromise = getStatistics();
       $scope.statistics = [];
