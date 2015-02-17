@@ -58,6 +58,18 @@
           url: '/api/activate_email'
         })
       };
+      $scope.outputUserData = function () {
+        $http({
+          method: 'GET',
+          url: '/api/dump_csv'
+        })
+        .success(function (data, status, headers, config) {
+          console.log(data);
+        })
+        .error(function (data, status, headers, config) {
+          console.log(status);
+        })
+      };
       var statisticsPromise = getStatistics();
       $scope.statistics = [];
       statisticsPromise.then(function(statistics) {
