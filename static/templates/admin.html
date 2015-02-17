@@ -61,6 +61,7 @@
               <tr><th><a href="/#/events?start={{daysAgo30 | date: 'yyyyMMdd'}}&stop={{tomorrow | date: 'yyyyMMdd'}}">
                     Events in last 30 days</th></a><td>{{eventsIn30Days}}</td></tr>
               <tr><th><a href="/#/admin" ng-click="activateEmails()">Activate Emails</a></th></tr>
+              <tr><th><a href="/#/admin" target="_blank" ng-click="outputUserData()">Output User Data to CSV</a></th></tr>
             </table>
           </div>
         </div>

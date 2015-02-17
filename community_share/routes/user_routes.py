@@ -2,7 +2,7 @@ import logging
 import os
 
 import tinys3
-from flask import request, jsonify, send_from_directory
+from flask import request, jsonify, send_from_directory, make_response
 from werkzeug.utils import secure_filename
 
 from community_share.models.user import User, UserReview
@@ -226,3 +226,11 @@ def register_user_routes(app):
     @app.route('/api/activate_email', methods=['POST'])
     def activate_email():
         User.activate_email()
+
+    @app.route('/api/dump_csv', methods=['GET'])
+    def dump_csv():
+        csv_obj = User.dump_csv()
+        response = make_response(csv_obj.getvalue())
+        response.headers["Content-Type"] = "text/csv"
+        response.headers["Content-Disposition"] = "attachment; filename=communityshare.csv"
+        return response

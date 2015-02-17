@@ -1,5 +1,7 @@
 from datetime import datetime
 import logging
+import csv
+import io
 
 from sqlalchemy import Column, Integer, String, DateTime, \
     Boolean, and_, or_, update
@@ -325,6 +327,18 @@ class User(Base, Serializable):
                 .filter(User.email_confirmed==False) \
                 .update({'email_confirmed': True})
             store.session.commit()
+
+    @classmethod
+    def dump_csv(cls):
+        query = store.session.query(User).all()
+        dest = io.StringIO()
+        writer = csv.writer(dest)
+        header = ['username', 'email']
+        writer.writerow(header)
+        for user in query:
+            row = [user.name, user.email]
+            writer.writerow(row)
+        return dest
 
 class UserReview(Base, Serializable):
     __tablename__ = 'userreview'
