@@ -1,6 +1,6 @@
 (function() {
   'use strict';
-  
+
   var module = angular.module('communityshare.directives.institutions', [
     'communityshare.services.user'
   ]);
@@ -87,5 +87,5 @@
         }
       };
     });
-  
+
 })();

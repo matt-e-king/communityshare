@@ -13,20 +13,6 @@
       <div alert alert-info ng-show="infoMessage">{{infoMessage}}</div>
       <div alert alert-danger ng-show="errorMessage">{{errorMessage}}</div>
 
-      <div  ng-if="Session.activeUser.is_educator" cs-labels search="search"
-           grade-levels-title="What grade levels would the community partner be working with?"
-           engagement-levels-title="In which ways would they be involved?"
-           subject-areas-title="What areas of expertise are you looking for (click all that apply)?"
-           type="communityPartner"
-           ></div>
-
-      <div ng-if="!Session.activeUser.is_educator" cs-labels search="search"
-           grade-levels-title="Which grade levels are you interested in working with?"
-           engagement-levels-title="In what ways are you interested in volunteering (click all that apply)?"
-           subject-areas-title="What skills, experiences or expertise do you have to share? Think about all your life experiences, past and present job skills, serious hobbies, passions, etc. Maybe your day job is as an engineer or waitress, your night job is teaching yoga, you are in a punk band on weekends, and you know a lot about your neighborhood’s history."
-           type="communityPartnerAndEducator"
-           ></div>
-
       <div class="text-center">
         <button class="primary-btn btn-lg search-btn"
                 ng-disabled="properties.educatorSearchSettingsForm.$invalid"
@@ -50,7 +36,15 @@
       </div>
     </div>
 
+    <div  ng-if="Session.activeUser.is_educator" cs-expertise-labels search="search"
+         subject-areas-title="What areas of expertise are you looking for (click all that apply)?"
+         type="communityPartner"
+         ></div>
 
+    <div ng-if="!Session.activeUser.is_educator" cs-expertise-labels search="search"
+         subject-areas-title="What skills, experiences or expertise do you have to share? Think about all your life experiences, past and present job skills, serious hobbies, passions, etc. Maybe your day job is as an engineer or waitress, your night job is teaching yoga, you are in a punk band on weekends, and you know a lot about your neighborhood’s history."
+         type="communityPartnerAndEducator"
+         ></div>
 
   </div>
 </div>

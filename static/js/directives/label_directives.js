@@ -1,6 +1,6 @@
 (function() {
   'use strict';
-  
+
   var module = angular.module('communityshare.directives.labels', [
     'communityshare.services.search'
   ]);
@@ -73,7 +73,7 @@
             labels.subjectAreas.educatorSuggested)
         };
 
-        
+
         return {'educatorSuggested': educatorSuggestedLabels,
                 'communityPartnerSuggested': communityPartnerSuggestedLabels,
                 'communityPartnerAndEducatorSuggested': communityPartnerAndEducatorSuggestedLabels,
@@ -123,7 +123,7 @@
   module.factory(
     'LabelDisplay',
     function(makeBaseLabels, labelMapping) {
-      var LabelDisplay = function(search, type) {
+      var LabelDisplay = function(search, type, category) {
         this.search = search;
         var baseLabels = makeBaseLabels();
         this.all = {};
@@ -132,6 +132,10 @@
           this.all = baseLabels.educatorSuggested;
         } else {
           this.all = baseLabels.communityPartnerSuggested;
+        }
+        if (category == 'expertise') {
+          delete this.all.gradeLevels;
+          delete this.all.engagementLevels;
         }
         for (var i=0; i<search.labels.length; i++) {
           var label = search.labels[i];
@@ -240,6 +244,51 @@
     };
   };
 
+  var ExpertiseLabelsController = function($scope, LabelDisplay, getAllLabels) {
+    // Problem with search getting overridden.
+    $scope.display = new LabelDisplay($scope.search, $scope.type, 'expertise');
+    $scope.newLabel = {
+      name: ''
+    };
+    var labelsPromise = getAllLabels();
+    $scope.allLabels = [];
+    labelsPromise.then(
+      function(labels) {
+        $scope.allLabels = labels;
+      },
+      function(){});
+    $scope.typeaheadSelect = function() {
+      $scope.newLabelMethods.onUpdate();
+    };
+    $scope.newLabelMethods = {
+      onUpdate: function() {
+        var splitNames
+          , newLabelName
+          , i
+          , index
+          ;
+
+        splitNames = $scope.newLabel.name.split(',');
+        for (i = 0; i < splitNames.length; i++) {
+          newLabelName = splitNames[i].trim().toLowerCase();
+          if (newLabelName) {
+            index = $scope.display.all.subjectAreas.indexOf(newLabelName);
+            if (index < 0) {
+              $scope.display.all.subjectAreas.push(newLabelName);
+            }
+            $scope.display.setSelected(newLabelName);
+          }
+        }
+        $scope.newLabel.name = '';
+      }
+    };
+    $scope.toggleLabel = function(label) {
+      if (!$scope.onlyShowActive) {
+        $scope.display.toggle(label);
+      }
+    };
+  };
+
 /*
  - list of labels.
 
@@ -269,6 +318,22 @@
         },
         templateUrl: './static/templates/labels.html',
         controller: LabelsController
+      };
+    });
+
+  module.directive(
+    'csExpertiseLabels',
+    function() {
+      return {
+        scope: {
+          search: '=',
+          subjectAreasTitle: '@',
+          subjectAreasLabel: '@',
+          type: '@',
+          onlyShowActive: '@'
+        },
+        templateUrl: './static/templates/labels.html',
+        controller: ExpertiseLabelsController
       };
     });
 

@@ -232,6 +232,11 @@
           $location.path('/searchusers/' + $scope.searchText.value);
         }
       };
+
+      $scope.fullSearch = function () {
+
+      };
+
     });
 
   module.controller(
