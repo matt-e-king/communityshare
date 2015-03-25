@@ -1,10 +1,12 @@
+from nltk.stem.lancaster import LancasterStemmer
+import nltk
 from datetime import datetime
 import logging
 import csv
 import io
 
 from sqlalchemy import Column, Integer, String, DateTime, \
-    Boolean, and_, or_, update
+    Boolean, and_, or_, update, Table, UniqueConstraint
 from sqlalchemy import ForeignKey, CheckConstraint
 from sqlalchemy.orm import relationship, backref
 
@@ -17,8 +19,14 @@ from community_share.models.secret import Secret
 from community_share.models.search import Search
 from community_share.models.institution import InstitutionAssociation, Institution
 
+stemmer = LancasterStemmer()
 
 logger = logging.getLogger(__name__)
+
+user_label_table = Table('user_label', Base.metadata,
+    Column('user_id', Integer, ForeignKey('user.id')),
+    Column('typed_label_id', Integer, ForeignKey('typed_label.id'))
+)
 
 class User(Base, Serializable):
     __tablename__ = 'user'
@@ -29,7 +37,7 @@ class User(Base, Serializable):
         'zipcode', 'website', 'twitter_handle', 'linkedin_link',
         'year_of_birth', 'gender', 'ethnicity', 'bio', 'phonenumber',
         'educator_profile_search', 'community_partner_profile_search',
-        'wants_update_emails',
+        'wants_update_emails', 'labels',
     ]
     STANDARD_READABLE_FIELDS = [
         'id', 'name', 'is_administrator', 'last_active', 'is_educator',
@@ -37,7 +45,7 @@ class User(Base, Serializable):
         'zipcode', 'website', 'twitter_handle', 'linkedin_link',
         'year_of_birth', 'gender', 'ethnicity', 'bio', 'picture_url',
         'email_confirmed', 'active', 'educator_profile_search',
-        'community_partner_profile_search']
+        'community_partner_profile_search', 'labels']
 
     ADMIN_READABLE_FIELDS = [
         'id', 'name', 'email' , 'date_created', 'last_active',
@@ -47,6 +55,7 @@ class User(Base, Serializable):
         'year_of_birth', 'gender', 'ethnicity', 'bio', 'picture_url',
         'email_confirmed', 'active', 'educator_profile_search',
         'community_partner_profile_search', 'wants_update_emails',
+        'labels',
     ]
 
     PERMISSIONS = {
@@ -64,6 +73,8 @@ class User(Base, Serializable):
     date_created = Column(DateTime, nullable=False, default=datetime.utcnow)
     date_inactivated = Column(DateTime, nullable=True)
     is_administrator = Column(Boolean, nullable=False, default=False)
+    is_educator = Column(Boolean, nullable=False, default=False)
+    is_community_partner = Column(Boolean, nullable=False, default=False)
     last_active = Column(DateTime)
     educator_profile_search_id = Column(Integer)
     community_partner_profile_search_id = Column(Integer)
@@ -71,6 +82,7 @@ class User(Base, Serializable):
 
     picture_filename = Column(String(100))
     bio = Column(String(1000))
+    search_text = Column(String(2000))
     zipcode = Column(String(50))
     phonenumber = Column(String(50))
     website = Column(String(100))
@@ -79,6 +91,8 @@ class User(Base, Serializable):
     year_of_birth = Column(Integer)
     gender = Column(String(100))
     ethnicity = Column(String(100))
+
+    labels = relationship('TypedLabel', secondary=user_label_table)
 
     searches = relationship(
         "Search",
@@ -111,22 +125,6 @@ class User(Base, Serializable):
         output = None
         if self.email_confirmed:
             output = self.email
-        return output
-
-    @property
-    def is_educator(self):
-        output = False
-        search = self.educator_profile_search
-        if (search and search.active):
-            output = (len(search.labels) > 0)
-        return output
-
-    @property
-    def is_community_partner(self):
-        output = False
-        search = self.community_partner_profile_search
-        if (search and search.active):
-            output = (len(search.labels) > 0)
         return output
 
     def is_password_correct(self, password):
@@ -339,6 +337,28 @@ class User(Base, Serializable):
             row = [user.name, user.email]
             writer.writerow(row)
         return dest
+
+    def update_search_text(self):
+        raw_string = self.bio
+        if raw_string is None:
+            raw_string = ''
+        if self.is_community_partner:
+            expertise_labels = [l.name for l in self.labels if l.typ == 'expertise']
+            raw_string += ' ' + ' '.join(expertise_labels)
+        words = nltk.word_tokenize(raw_string)
+        stems = [stemmer.stem(word) for word in words]
+        self.search_text = ' '.join(stems)
+
+class TypedLabel(Base, Serializable):
+    __tablename__ = 'typed_label'
+    __table_args__ = (UniqueConstraint('name', 'typ'),)
+    
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50), nullable=False, unique=True)
+    typ = Column(String(20), nullable=False)
+    active = Column(Boolean, default=True)
+
+    
 
 class UserReview(Base, Serializable):
     __tablename__ = 'userreview'
