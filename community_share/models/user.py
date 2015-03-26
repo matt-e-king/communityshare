@@ -1,10 +1,12 @@
 from nltk.stem.lancaster import LancasterStemmer
+from nltk.corpus import stopwords
 import nltk
 from datetime import datetime
 import logging
 import csv
 import io
 
+import sqlalchemy
 from sqlalchemy import Column, Integer, String, DateTime, \
     Boolean, and_, or_, update, Table, UniqueConstraint
 from sqlalchemy import ForeignKey, CheckConstraint
@@ -19,9 +21,15 @@ from community_share.models.secret import Secret
 from community_share.models.search import Search
 from community_share.models.institution import InstitutionAssociation, Institution
 
-stemmer = LancasterStemmer()
 
 logger = logging.getLogger(__name__)
+
+stemmer = LancasterStemmer()
+stopwords = set(stopwords.words('english'))
+def munch_text(text):
+    words = [w for w in nltk.word_tokenize(text) if w not in stopwords]
+    stems = [stemmer.stem(word) for word in words]
+    return stems
 
 user_label_table = Table('user_label', Base.metadata,
     Column('user_id', Integer, ForeignKey('user.id')),
@@ -197,7 +205,11 @@ class User(Base, Serializable):
             url = config.UPLOAD_LOCATION + self.picture_filename
         return url
 
+    def serialize_labels(self, requester):
+        return [(l.name, l.typ) for l in self.labels]
+
     custom_serializers = {
+        'labels': serialize_labels,
         'institution_associations': serialize_institution_associations,
         'picture_url': serialize_picture_url,
         'educator_profile_search': serialize_educator_profile_search,
@@ -240,7 +252,13 @@ class User(Base, Serializable):
             data['id'] = profile_search_id
             self.community_partner_profile_search = Search.admin_deserialize(data)
 
+    def deserialize_labels(self, labeltuples):
+        if labelnames is None:
+            labelnames = []
+        self.labels = TypedLabel.tuple_list_to_object_list(labeltuples)
+
     custom_deserializers = {
+        'labels': deserialize_labels,
         'institution_associations': deserialize_institution_associations,
         'educator_profile_search': deserialize_educator_profile_search,
         'community_partner_profile_search': deserialize_community_partner_profile_search,
@@ -338,6 +356,19 @@ class User(Base, Serializable):
             writer.writerow(row)
         return dest
 
+    @classmethod
+    def text_search(cls, text, limit=20):
+        stems = munch_text(text)
+        query_text =  ' | '.join(stems)
+        print(query_text)
+        sql = '''
+select *, ts_rank_cd(st, q) as rank from "user", to_tsvector('english', search_text) st, to_tsquery('english', :query_text) q where st @@ q and active = 't' order by rank desc limit :limit;
+'''
+        users = store.session.query(cls).from_statement(
+            sqlalchemy.text(sql)).params(query_text=query_text, limit=limit).all()
+        return users
+        
+
     def update_search_text(self):
         raw_string = self.bio
         if raw_string is None:
@@ -345,8 +376,10 @@ class User(Base, Serializable):
         if self.is_community_partner:
             expertise_labels = [l.name for l in self.labels if l.typ == 'expertise']
             raw_string += ' ' + ' '.join(expertise_labels)
-        words = nltk.word_tokenize(raw_string)
-        stems = [stemmer.stem(word) for word in words]
+        raw_string += self.name
+        for ia in self.institution_associations:
+            raw_string += ' ' + ia.role + ' ' + ia.institution.name + ' ' + ia.institution.institution_type
+        stems = munch_text(raw_string)
         self.search_text = ' '.join(stems)
 
 class TypedLabel(Base, Serializable):
@@ -358,67 +391,88 @@ class TypedLabel(Base, Serializable):
     typ = Column(String(20), nullable=False)
     active = Column(Boolean, default=True)
 
-    
-
-class UserReview(Base, Serializable):
-    __tablename__ = 'userreview'
-
-    MANDATORY_FIELDS = [
-        'user_id', 'rating', 'creator_user_id', 'event_id']
-    WRITEABLE_FIELDS = [
-        'review']
-    STANDARD_READABLE_FIELDS = [
-        'id', 'user_id', 'rating', 'review'
-    ]
-    ADMIN_READABLE_FIELDS = [
-        'id', 'user_id', 'rating', 'review'
-    ]
-
-    PERMISSIONS = {
-        'all_can_read_many': False,
-        'standard_can_read_many': False,
-        'admin_can_delete': False
-    }
-
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
-    event_id = Column(Integer, ForeignKey('event.id'))
-    rating = Column(Integer, nullable=False)
-    active = Column(Boolean, nullable=False, default=True)
-    date_created = Column(DateTime, nullable=False, default=datetime.utcnow)
-    creator_user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
-    review = Column(String(5000))
-
-    __table_args__ = (
-        CheckConstraint('rating>=0', 'Rating is negative'),
-        CheckConstraint('rating<=5', 'Rating is greater than 5'),
-    )
-
-    event = relationship('Event')
-    user = relationship('User', primaryjoin='UserReview.user_id == User.id')
-    creator_user = relationship('User', primaryjoin='UserReview.creator_user_id == User.id')
-
-
     @classmethod
-    def has_add_rights(cls, data, requester):
-        from community_share.models.share import Event
-        has_rights = False
-        data['creator_user_id'] = requester.id
-        event_id = int(data.get('event_id', -1))
-        user_id = int(data.get('user_id', -1))
-        event = store.session.query(Event).filter(Event.id==event_id).first()
-        now = datetime.utcnow()
-        if event.active and event.datetime_start < now:
-            event_users = set([event.share.educator_user_id,
-                               event.share.community_partner_user_id])
-            request_users = set([requester.id, user_id])
-            if event_users == request_users:
-                already_exists = store.session.query(UserReview).filter(and_(
-                    UserReview.user_id==user_id,
-                    UserReview.creator_user_id==requester.id,
-                    UserReview.event_id==event_id)).count()
-                total = store.session.query(UserReview).count()
-                logger.debug('Review already existing = {} total={}'.format(already_exists, total))
-                if not already_exists:
-                    has_rights = True
-        return has_rights
+    def tuple_list_to_object_list(cls, tuples):
+        names = [t[0] for t in tuples]
+        typs = {}
+        for t in tuples:
+            if t[0] not in typs:
+                typs[t[0]] = set([])
+            typs[t[0]].add(t[1])
+                
+        labels = store.session.query(TypedLabel).filter(Label.name.in_(names)).all()
+        matching_labels = []
+        for label in labels:
+            if label.typ in typs[label.name]:
+                matching_labels.append(label)
+                
+        missing_tuples = set(tuples)
+        for label in exiting_labels:
+            missing_tuples.remove((label.name, label.typ))
+        for name, typ in missing_tuples:
+            new_label = TypedLabel(name=name, typ=typ)
+            matching_labels.append(new_label)
+        return matching_labels
+
+# class UserReview(Base, Serializable):
+#     __tablename__ = 'userreview'
+
+#     MANDATORY_FIELDS = [
+#         'user_id', 'rating', 'creator_user_id', 'event_id']
+#     WRITEABLE_FIELDS = [
+#         'review']
+#     STANDARD_READABLE_FIELDS = [
+#         'id', 'user_id', 'rating', 'review'
+#     ]
+#     ADMIN_READABLE_FIELDS = [
+#         'id', 'user_id', 'rating', 'review'
+#     ]
+
+#     PERMISSIONS = {
+#         'all_can_read_many': False,
+#         'standard_can_read_many': False,
+#         'admin_can_delete': False
+#     }
+
+#     id = Column(Integer, primary_key=True)
+#     user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+#     event_id = Column(Integer, ForeignKey('event.id'))
+#     rating = Column(Integer, nullable=False)
+#     active = Column(Boolean, nullable=False, default=True)
+#     date_created = Column(DateTime, nullable=False, default=datetime.utcnow)
+#     creator_user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+#     review = Column(String(5000))
+
+#     __table_args__ = (
+#         CheckConstraint('rating>=0', 'Rating is negative'),
+#         CheckConstraint('rating<=5', 'Rating is greater than 5'),
+#     )
+
+#     event = relationship('Event')
+#     user = relationship('User', primaryjoin='UserReview.user_id == User.id')
+#     creator_user = relationship('User', primaryjoin='UserReview.creator_user_id == User.id')
+
+
+#     @classmethod
+#     def has_add_rights(cls, data, requester):
+#         from community_share.models.share import Event
+#         has_rights = False
+#         data['creator_user_id'] = requester.id
+#         event_id = int(data.get('event_id', -1))
+#         user_id = int(data.get('user_id', -1))
+#         event = store.session.query(Event).filter(Event.id==event_id).first()
+#         now = datetime.utcnow()
+#         if event.active and event.datetime_start < now:
+#             event_users = set([event.share.educator_user_id,
+#                                event.share.community_partner_user_id])
+#             request_users = set([requester.id, user_id])
+#             if event_users == request_users:
+#                 already_exists = store.session.query(UserReview).filter(and_(
+#                     UserReview.user_id==user_id,
+#                     UserReview.creator_user_id==requester.id,
+#                     UserReview.event_id==event_id)).count()
+#                 total = store.session.query(UserReview).count()
+#                 logger.debug('Review already existing = {} total={}'.format(already_exists, total))
+#                 if not already_exists:
+#                     has_rights = True
+#         return has_rights

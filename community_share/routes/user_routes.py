@@ -5,7 +5,7 @@ import tinys3
 from flask import request, jsonify, send_from_directory, make_response
 from werkzeug.utils import secure_filename
 
-from community_share.models.user import User, UserReview
+from community_share.models.user import User #, UserReview
 from community_share.models.institution import Institution
 from community_share.authorization import get_requesting_user
 from community_share import mail_actions
@@ -20,8 +20,8 @@ def register_user_routes(app):
     user_blueprint = base_routes.make_blueprint(User, 'user')
     app.register_blueprint(user_blueprint)
 
-    user_review_blueprint = base_routes.make_blueprint(UserReview, 'user_review')
-    app.register_blueprint(user_review_blueprint)
+    #user_review_blueprint = base_routes.make_blueprint(UserReview, 'user_review')
+    #app.register_blueprint(user_review_blueprint)
 
     institution_blueprint = base_routes.make_blueprint(Institution, 'institution')
     app.register_blueprint(institution_blueprint)
@@ -194,6 +194,14 @@ def register_user_routes(app):
         date_created_greaterthan = request.args.get('date_created.greaterthan', None)
         date_created_lessthan = request.args.get('date_created.lessthan', None)
         users = User.search(search_text, date_created_greaterthan, date_created_lessthan)
+        response = base_routes.make_many_response(requester, users)
+        return response
+
+    @app.route('/api/usertextsearch', methods=['GET'])
+    def text_search():
+        requester = get_requesting_user()
+        search_text = request.args.get('search_text', None)
+        users = User.text_search(search_text)
         response = base_routes.make_many_response(requester, users)
         return response
 

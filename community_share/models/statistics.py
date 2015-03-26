@@ -6,7 +6,7 @@ import logging
 from sqlalchemy import Column, Integer, String, Date, Float, or_
 
 from community_share import Base, store
-from community_share.models.user import User, UserReview
+from community_share.models.user import User#, UserReview
 from community_share.models.conversation import Conversation
 from community_share.models.share import Share, Event
 
@@ -160,18 +160,18 @@ class Statistic(Base):
         n_users_did_event = query.count()        
         return n_users_did_event
 
-    @staticmethod
-    def calculate_n_users_reviewed_event(date):
-        start_of_period = datetime.datetime.combine(date, datetime.time())
-        end_of_period = start_of_period + datetime.timedelta(days=1)
-        # Number of users who reviewed an event
-        query = store.session.query(User)
-        query = query.join(
-            UserReview, UserReview.creator_user_id==User.id)
-        query = query.filter(UserReview.date_created > start_of_period,
-                             UserReview.date_created < end_of_period)
-        n_users_reviewed_event = query.count()
-        return n_users_reviewed_event
+    # @staticmethod
+    # def calculate_n_users_reviewed_event(date):
+    #     start_of_period = datetime.datetime.combine(date, datetime.time())
+    #     end_of_period = start_of_period + datetime.timedelta(days=1)
+    #     # Number of users who reviewed an event
+    #     query = store.session.query(User)
+    #     query = query.join(
+    #         UserReview, UserReview.creator_user_id==User.id)
+    #     query = query.filter(UserReview.date_created > start_of_period,
+    #                          UserReview.date_created < end_of_period)
+    #     n_users_reviewed_event = query.count()
+    #     return n_users_reviewed_event
 
     @staticmethod
     def calculate_n_events_done(date):
