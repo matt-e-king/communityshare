@@ -1,3 +1,10 @@
+import os
+import sys
+
+# Put communityshare in sys
+this_directory = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.abspath(os.path.join(this_directory, '..')))
+
 from community_share import config, store, Base
 from community_share.models.user import User, TypedLabel
 from community_share.models.search import Label
@@ -20,7 +27,7 @@ engagement_labels = set((
 ))
 
 if __name__ == '__main__':
-    config.load_from_environment()
+    config.load_from_file()
     Base.metadata.create_all(store.engine)
     users = store.session.query(User).all()
     # Update the is_community_partner and is_educator in the user table.
