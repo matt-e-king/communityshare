@@ -1,7 +1,5 @@
-user { 'communityshare':}
-
-exec { 'apt-get update':
-  path => '/usr/bin',
+user { 'communityshare':
+  password => 'communityshare',
   }
 
 package { 'emacs':
@@ -76,4 +74,4 @@ file { '/var/log/community_share':
   }
 
 
-include db, nginx, gunicorn
+include nginx, gunicorn, cs_worker
