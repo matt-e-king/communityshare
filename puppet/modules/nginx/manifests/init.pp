@@ -10,7 +10,6 @@ class nginx {
   # Install the nginx package. This relies on apt-get update
   package { 'nginx':
     ensure => 'present',
-    require => Exec['apt-get update'],
   }
 
   # Make sure that the nginx service is running

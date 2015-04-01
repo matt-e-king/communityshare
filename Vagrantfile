@@ -16,6 +16,7 @@ Vagrant.configure(2) do |config|
 
   config.vm.provision :shell do |shell|
       shell.inline = "
+apt-get install puppet -y
 #puppet --configprint modulepath
 mkdir -p /etc/puppet/modules;
 if [ ! -d /etc/puppet/modules/stdlib ];
@@ -28,6 +29,20 @@ if [ ! -d /etc/puppet/modules/postgresql ];
  then puppet module install puppetlabs/postgresql;
 fi;
 "
+  end
+
+  config.vm.provider :aws do |aws, override|
+    aws.access_key_id = ENV['AWS_ACCESS_KEY_ID']
+    aws.secret_access_key = ENV['AWS_SECRET_ACCESS_KEY']
+    aws.session_token = ENV['AWS_SESSION_TOKEN']
+    aws.keypair_name = ENV['AWS_KEYPAIR_NAME']
+    aws.region = 'us-west-1'
+    aws.ami = 'ami-5c120b19'
+    aws.instance_type = 't2.small'
+    override.vm.box = "dummy"
+    override.ssh.username = "ubuntu"
+    aws.security_groups = "webserver"
+    override.ssh.private_key_path = ENV['AWS_PRIVATE_KEY_PATH']
   end
   
   # Disable automatic box update checking. If you disable this, then
