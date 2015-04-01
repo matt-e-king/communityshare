@@ -201,7 +201,10 @@ def register_user_routes(app):
     def text_search():
         requester = get_requesting_user()
         search_text = request.args.get('search_text', None)
-        users = User.text_search(search_text)
+        date_created_greaterthan = request.args.get('date_created.greaterthan', None)
+        date_created_lessthan = request.args.get('date_created.lessthan', None)
+        users = User.text_search(search_text, date_created_greaterthan,
+                                 date_created_lessthan)
         response = base_routes.make_many_response(requester, users)
         return response
 

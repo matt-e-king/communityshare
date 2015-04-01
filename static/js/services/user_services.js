@@ -106,6 +106,58 @@
         return deferred.promise;
       };
 
+      UserBase.textSearch = function(searchParams) {
+        var deferred = $q.defer();
+        var dataPromise = $http({
+          method: 'GET',
+          url: '/api/usertextsearch',
+          params: searchParams
+        });
+        dataPromise.then(
+          function(response) {
+            var users = [];
+            for (var i=0; i<response.data.data.length; i++) {
+              users.push(UserBase.make(response.data.data[i]));
+            }
+            deferred.resolve(users);
+          },
+          function(response) {
+            deferred.reject(response.message);
+          }
+        );
+        return deferred.promise;
+      };
+
+      UserBase.combinedSearch = function(searchParams) {
+        var deferred = $q.defer();
+        var plainPromise = UserBase.search(searchParams);
+        var textPromise = UserBase.textSearch(searchParams);
+        var combinedPromise = $q.all([plainPromise, textPromise]);
+        combinedPromise.then(
+          function(response) {
+            console.log(response);
+            var plain_users = response[0];
+            var text_users = response[1];
+            var combined_users = plain_users.concat(text_users);
+            var unique_users = [];
+            var ids = {};
+            console.log(combined_users);
+            for (var i=0; i<combined_users.length; i++) {
+              var user = combined_users[i];
+              if (!(user.id in ids)) {
+                unique_users.push(user);
+                ids[user.id] = true;
+              }
+            }
+            console.log(unique_users);
+            deferred.resolve(unique_users);
+          },
+          function(response) {
+            deferred.reject(response);
+          });
+        return deferred.promise;
+      };
+
       UserBase.prototype.cleanInstitutionAssociations = function() {
         // Remove any insitutions with no names
         var filteredInstitutionAssociations = [];

@@ -183,6 +183,20 @@
     });
 
   module.controller(
+    'SearchController',
+    function(Session, $location, $scope, $routeParams, Search, Messages) {
+      $scope.Session = Session;
+      $scope.searchText = {value: ''};
+      $scope.userTextSearch = function() {
+        if ($scope.searchText.value) {
+          $location.path('/textsearchusers/' + $scope.searchText.value);
+        }
+      };
+
+    }
+  );
+  
+  module.controller(
     'SearchEditController',
     function(Session, $location, $scope, $routeParams, Search, Messages) {
       $scope.Session = Session;
@@ -260,37 +274,10 @@
           'date_created.lessthan': stop,
           'search_text': $routeParams.searchText
         };
-        var searchPromise = User.search(searchParams);
+        var searchPromise = User.combinedSearch(searchParams);
         searchPromise.then(
-          function(results) {
-            var addedIds = {};
-            var uniqueUsers = [];
-            var users;
-            if (results.byName === undefined) {
-              users = results;
-            } else {
-              users = results.byName.concat(results.byEmail);
-            }
-            for (var i=0; i<users.length; i++) {
-              var user = users[i];
-              if (!(user.id in addedIds)) {
-                uniqueUsers.push(user);
-                addedIds[user.id] = true;
-              }
-            }
-            var compare = function(a, b) {
-              var aUC = a.name.toUpperCase();
-              var bUC = b.name.toUpperCase();
-              if (aUC > bUC) {
-                return 1;
-              } else if (aUC < bUC) {
-                return -1;
-              } else {
-                return 0;
-              }
-            };
-            uniqueUsers.sort(compare);
-            $scope.users = uniqueUsers;
+          function(users) {
+            $scope.users = users;
             $scope.infoMessage = '';
             $scope.errorMessage = '';
           },
@@ -308,6 +295,5 @@
         $location.path('/searchusers/' + $scope.searchText.value);
       };
     });
-
 
 })();

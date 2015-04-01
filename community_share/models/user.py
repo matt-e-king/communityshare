@@ -323,9 +323,8 @@ class User(Base, Serializable):
             name_condition = User.name.ilike('%'+search_text+'%')
             email_condition = User.email.ilike('%'+search_text+'%')
             institution_condition = Institution.name.ilike('%'+search_text+'%')
-            biography_condition = User.bio.ilike('%'+search_text+'%')
             query = query.filter(or_(name_condition, email_condition, \
-                institution_condition, biography_condition))
+                institution_condition))
         if date_created_greaterthan:
             query = query.filter(User.date_created > date_created_greaterthan)
         if date_created_lessthan:
@@ -357,15 +356,26 @@ class User(Base, Serializable):
         return dest
 
     @classmethod
-    def text_search(cls, text, limit=20):
+    def text_search(cls, text, date_created_greaterthan, date_created_lessthan, limit=20):
         stems = munch_text(text)
         query_text =  ' | '.join(stems)
         print(query_text)
+        date_conditions = ''
+        if date_created_greaterthan is not None:
+            date_conditions += ' and date_created > :date_created_greaterthan'
+        if date_created_lessthan is not None:
+            date_conditions += ' and date_created < :date_created_lessthan'
         sql = '''
-select *, ts_rank_cd(st, q) as rank from "user", to_tsvector('english', search_text) st, to_tsquery('english', :query_text) q where st @@ q and active = 't' order by rank desc limit :limit;
-'''
+select *, ts_rank_cd(st, q) as rank from "user", to_tsvector('english', search_text) st, to_tsquery('english', :query_text) q where st @@ q and active = 't' {} order by rank desc limit :limit
+'''.format(date_conditions)
+        params = {
+            'query_text': query_text,
+            'limit': limit,
+            'date_created_greaterthan': date_created_greaterthan,
+            'date_created_lessthan': date_created_lessthan,
+        }
         users = store.session.query(cls).from_statement(
-            sqlalchemy.text(sql)).params(query_text=query_text, limit=limit).all()
+            sqlalchemy.text(sql)).params(**params).all()
         return users
         
 
@@ -376,9 +386,6 @@ select *, ts_rank_cd(st, q) as rank from "user", to_tsvector('english', search_t
         if self.is_community_partner:
             expertise_labels = [l.name for l in self.labels if l.typ == 'expertise']
             raw_string += ' ' + ' '.join(expertise_labels)
-        raw_string += self.name
-        for ia in self.institution_associations:
-            raw_string += ' ' + ia.role + ' ' + ia.institution.name + ' ' + ia.institution.institution_type
         stems = munch_text(raw_string)
         self.search_text = ' '.join(stems)
 
