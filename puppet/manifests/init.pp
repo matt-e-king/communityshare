@@ -67,7 +67,13 @@ exec { "nltk-install-B":
   logoutput => on_failure,
 }
 
-file { '/var/log/community_share':
+file { '/var/log/communityshare':
+  ensure => 'directory',
+  group => 'adm',
+  owner => 'www-data',
+  }
+
+file { '/var/log/gunicorn':
   ensure => 'directory',
   group => 'adm',
   owner => 'www-data',

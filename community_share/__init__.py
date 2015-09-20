@@ -36,6 +36,7 @@ def setup_logging(level, location):
         logger = logging.getLogger(package)
         logger.addHandler(ch)
         logger.setLevel(logging.WARNING)
+    logger.debug('Finished setting up logging.')
     
 class Store(object):
 
@@ -81,10 +82,10 @@ class Config(object):
     )
     def load_from_dict(self, d):
         if set(d.keys()) != set(self.NAMES):
-            print('Missing keys are {0} and extra keys are {1}'.format(
+            error = 'Missing keys are {0} and extra keys are {1}'.format(
                 set(self.NAMES) - set(d.keys()),
-                set(d.keys()) - set(self.NAMES)))
-            raise ValueError("Bad config.")
+                set(d.keys()) - set(self.NAMES))
+            raise ValueError("Bad config. : " + error)
         for key, value in d.items():
             setattr(self, key, value)
         setup_logging(self.LOGGING_LEVEL, self.LOGGING_LOCATION)
