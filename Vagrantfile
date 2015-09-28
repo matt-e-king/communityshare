@@ -31,18 +31,20 @@ fi;
 "
   end
 
-  config.vm.provider :aws do |aws, override|
-    aws.access_key_id = ENV['AWS_ACCESS_KEY_ID']
-    aws.secret_access_key = ENV['AWS_SECRET_ACCESS_KEY']
-    aws.session_token = ENV['AWS_SESSION_TOKEN']
-    aws.keypair_name = ENV['AWS_KEYPAIR_NAME']
-    aws.region = 'us-west-1'
-    aws.ami = 'ami-5c120b19'
-    aws.instance_type = 't2.small'
-    override.vm.box = "dummy"
-    override.ssh.username = "ubuntu"
-    aws.security_groups = "webserver"
-    override.ssh.private_key_path = ENV['AWS_PRIVATE_KEY_PATH']
+  config.vm.define "aws", autostart: false do |aws_vm|
+    aws_vm.vm.box = "dummy"
+    aws_vm.vm.provider :aws do |aws, override|
+      aws.access_key_id = ENV['AWS_ACCESS_KEY_ID']
+      aws.secret_access_key = ENV['AWS_SECRET_ACCESS_KEY']
+      aws.session_token = ENV['AWS_SESSION_TOKEN']
+      aws.keypair_name = ENV['AWS_KEYPAIR_NAME']
+      aws.region = 'us-west-1'
+      aws.ami = 'ami-5c120b19'
+      aws.instance_type = 't2.small'
+      override.ssh.username = "ubuntu"
+      aws.security_groups = "webserver"
+      override.ssh.private_key_path = ENV['AWS_PRIVATE_KEY_PATH']
+    end
   end
   
   # Disable automatic box update checking. If you disable this, then
