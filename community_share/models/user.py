@@ -6,13 +6,13 @@ import io
 from sqlalchemy import Column, Integer, String, DateTime, \
     Boolean, and_, or_, update
 from sqlalchemy import ForeignKey, CheckConstraint
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship, backref, validates
 
 import passlib
 from passlib import context
 
 from community_share import store, Base, config
-from community_share.models.base import Serializable
+from community_share.models.base import Serializable, ValidationException
 from community_share.models.secret import Secret
 from community_share.models.search import Search
 from community_share.models.institution import InstitutionAssociation, Institution
@@ -25,7 +25,7 @@ class User(Base, Serializable):
 
     MANDATORY_FIELDS = ['name', 'email']
     WRITEABLE_FIELDS = [
-        'name', 'is_administrator', 'institution_associations',
+        'email', 'name', 'is_administrator', 'institution_associations',
         'zipcode', 'website', 'twitter_handle', 'linkedin_link',
         'year_of_birth', 'gender', 'ethnicity', 'bio', 'phonenumber',
         'educator_profile_search', 'community_partner_profile_search',
@@ -100,6 +100,15 @@ class User(Base, Serializable):
         all__vary_rounds = 0.1,
         sha512_crypt__vary_rounds = 8000,
     )
+
+    @validates('email')
+    def validate_email(self, key, email):
+        my_id = self.id
+        # Check if the email is being used by any active users.
+        users = store.session.query(User).filter_by(email=email, active=True).filter(id != my_id)
+        if users.count() > 0:
+            raise ValidationException('That email is already being used.')
+        return email
 
     def searches_as(self, role):
         searches = store.session.query(Search).filter_by(
