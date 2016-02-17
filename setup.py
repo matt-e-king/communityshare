@@ -298,7 +298,7 @@ def setup(n_random_users=100):
     
 if __name__ == '__main__':
     logger.info('Loading settings from environment')    
-    config.load_from_environment()
+    config.load_from_file()
     logger.info('Finished loading settings')
     setup(n_random_users=0)
               
