@@ -5,7 +5,7 @@ We're working on creating an application to connect educators with community par
 See http://www.communityshare.us/ for more details.
 
 
-## Installation Instructions
+##  Development Environment Setup
 
 ### Get the code & install dependencies
 
