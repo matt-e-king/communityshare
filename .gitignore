@@ -4,3 +4,5 @@
 *.pyc
 *node_modules*
 *bower_components*
+*config.json*
+*.log
