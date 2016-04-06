@@ -6293,9 +6293,12 @@ body {
 }
 .message-container {
   position: fixed;
-  top: 10px;
+  top: 60px;
   left: 10px;
-  z-index: 99;
+  z-index: 1000;
+  color: #a94442;
+  border-color: #a94442;
+  background-color: #f2dede;
 }
 .cs-form-label {
   position: relative;
