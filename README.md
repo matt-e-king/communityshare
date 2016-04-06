@@ -47,6 +47,12 @@ Create a new communityshare user
  # CREATE USER communityshare;
 ```
 
+Set the communityshare user password (Set it to "communityshare", otherwise you will need to edit config.json)
+
+```
+\password communityshare
+```
+
 Create a new communityshare database
 
 ```
