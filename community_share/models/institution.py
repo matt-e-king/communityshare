@@ -5,7 +5,7 @@ from sqlalchemy import ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship
 
 from community_share import Base, store
-from community_share.models.base import Serializable
+from community_share.models.base import Serializable, ValidationException
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +34,10 @@ class InstitutionAssociation(Base, Serializable):
         if name:
             self.institution = store.session.query(Institution).filter_by(name=name).first()
         if not self.institution:
-            self.institution = Institution.admin_deserialize_add(data)
+            if len(name) > INSTITUTION_NAME_LENGTH:
+                raise ValidationException('Institution name must be less than {} characters.'.format(INSTITUTION_NAME_LENGTH))
+            else:
+                self.institution = Institution.admin_deserialize_add(data)
         else:
             self.institution.institution_type = institution_type
             
@@ -51,7 +54,7 @@ class InstitutionAssociation(Base, Serializable):
     }
 
 
-    
+INSTITUTION_NAME_LENGTH = 50    
         
 class Institution(Base, Serializable):
     __tablename__ = 'institution'
@@ -67,7 +70,7 @@ class Institution(Base, Serializable):
     }
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(50), nullable=False, unique=True)
+    name = Column(String(INSTITUTION_NAME_LENGTH), nullable=False, unique=True)
     institution_type = Column(String(50), nullable=True)
     active = Column(Boolean, default=True)
     description = Column(String)
