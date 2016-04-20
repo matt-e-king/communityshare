@@ -114,8 +114,8 @@
           if (institution_association.institution && institution_association.institution.name) {
             filteredInstitutionAssociations.push(institution_association);
           }
-          this.institution_associations = filteredInstitutionAssociations;
         }
+        this.institution_associations = filteredInstitutionAssociations;
       };
 
       UserBase.prototype.addInstitutionAssociationRemoveMethod = function(ia) {
