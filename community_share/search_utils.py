@@ -23,6 +23,7 @@ def get_searches_ordered_by_label_matches(
     query = query.filter(Search.searching_for_role==searching_for_role)
     query = query.join(Search.searcher_user)
     query = query.filter(User.email_confirmed==True)
+    query = query.filter(User.active==True)
     query = query.group_by(Search.id)
     query = query.order_by('matches DESC')
     searches_and_count = query.offset(offset_number).limit(max_number)
