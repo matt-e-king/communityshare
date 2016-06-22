@@ -1,5 +1,6 @@
 import os
 import logging
+import json
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
@@ -11,9 +12,14 @@ Base = declarative_base()
 
 logger = logging.getLogger(__name__)
 
-def setup_logging(level):
+def setup_logging(level, location):
     "Utility function for setting up logging."
-    ch = logging.StreamHandler()
+    if not os.path.exists(location):
+        os.makedirs(location)
+    logging_fn = os.path.join(location, 'community_share.log')
+    if not os.path.exists(logging_fn):
+        open(logging_fn, 'a').close()
+    ch = logging.FileHandler(logging_fn)
     ch.setLevel(level)
     formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     ch.setFormatter(formatter)
@@ -30,6 +36,7 @@ def setup_logging(level):
         logger = logging.getLogger(package)
         logger.addHandler(ch)
         logger.setLevel(logging.WARNING)
+    logger.debug('Finished setting up logging.')
     
 class Store(object):
 
@@ -63,7 +70,7 @@ class Config(object):
         # Location
         'BASEURL',
         # Logging
-        'LOGGING_LEVEL',
+        'LOGGING_LEVEL', 'LOGGING_LOCATION',
         # S3 bucket
         'S3_BUCKETNAME', 'S3_KEY', 'S3_USERNAME', 'UPLOAD_LOCATION',
         # Version
@@ -75,13 +82,13 @@ class Config(object):
     )
     def load_from_dict(self, d):
         if set(d.keys()) != set(self.NAMES):
-            print('Missing keys are {0} and extra keys are {1}'.format(
+            error = 'Missing keys are {0} and extra keys are {1}'.format(
                 set(self.NAMES) - set(d.keys()),
-                set(d.keys()) - set(self.NAMES)))
-            raise ValueError("Bad config.")
+                set(d.keys()) - set(self.NAMES))
+            raise ValueError("Bad config. : " + error)
         for key, value in d.items():
             setattr(self, key, value)
-        setup_logging(self.LOGGING_LEVEL)
+        setup_logging(self.LOGGING_LEVEL, self.LOGGING_LOCATION)
         logger.info('Setup logging with level {0}'.format(self.LOGGING_LEVEL))
         store.set_config(self)
         self.crypt_helper = CryptHelper(config.ENCRYPTION_KEY)
@@ -109,5 +116,25 @@ class Config(object):
             'SSL': os.environ.get('COMMUNITYSHARE_SSL', 'FORCE_SSL'),
         }
         self.load_from_dict(data)
+
+    def config_filename(self):
+        directory = os.path.dirname(os.path.realpath(__file__))
+        fn = os.path.join(directory, '..', 'config.json')
+        return fn
+        
+    def load_from_file(self):
+        fn = self.config_filename()
+        with open(fn, 'r') as f:
+            config_data = json.load(f)
+            self.load_from_dict(config_data)
+
+    def write_file(self):
+        d = {}
+        for name in self.NAMES:
+            d[name] = getattr(self, name)
+        fn = self.config_filename()
+        with open(fn, 'w') as f:
+            json.dump(d, f, sort_keys=True, indent=4, separators=(',', ': '))
+            
 
 config = Config()
