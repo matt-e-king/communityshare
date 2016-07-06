@@ -1,9 +1,12 @@
-FROM ubuntu:14.04
+FROM python:3-alpine
 
 ADD . /communityshare
 WORKDIR /communityshare
 
-RUN apt-get update && apt-get -y install python3 python3-pip libpq-dev python-dev python3-all-dev && pip3 install -r /communityshare/requirements.txt
+RUN \
+    apk update && \
+    apk add build-base postgresql-dev py-psycopg2 && \
+    pip3 install -r /communityshare/requirements.txt
 
 EXPOSE 5000
 CMD /communityshare/start_dev.sh
