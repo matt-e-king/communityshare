@@ -10,4 +10,4 @@ logger.info('Making application')
 app = app.make_app()
 app.debug = True
 logger.info('Debug={0}'.format(app.debug))
-app.run()
+app.run(host='0.0.0.0',port=5000)

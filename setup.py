@@ -204,7 +204,7 @@ def make_random_user():
         new_user.community_partner_profile_search = search
     store.session.add(new_user)
     store.session.commit()
-        
+
 def make_labels():
     all_labels = labels['GradeLevels'] + labels['SubjectAreas'] + labels['LevelOfEngagement']
     for name in all_labels:
@@ -247,12 +247,12 @@ def init_db():
     logger.info('Dropping all tables.')
     Base.metadata.drop_all(store.engine);
     logger.info('Creating all tables.')
-    Base.metadata.create_all(store.engine);    
+    Base.metadata.create_all(store.engine);
 
 def update_db():
     Base.metadata.reflect(store.engine)
     logger.info('Creating all tables.')
-    Base.metadata.create_all(store.engine, checkfirst=True);    
+    Base.metadata.create_all(store.engine, checkfirst=True);
     logger.info('Created all tables.')
 
 def get_creator():
@@ -295,10 +295,9 @@ def setup(n_random_users=100):
     questions = setup_data.get_questions(creator)
     update_questions(questions)
     store.session.commit()
-    
+
 if __name__ == '__main__':
-    logger.info('Loading settings from environment')    
+    logger.info('Loading settings from environment')
     config.load_from_file()
     logger.info('Finished loading settings')
     setup(n_random_users=40)
-              
