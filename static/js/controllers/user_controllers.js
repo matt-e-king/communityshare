@@ -15,7 +15,7 @@
   module.controller(
     'UserController',
     function($scope, $routeParams, User, Session, Question, Conversation,
-             Evnt, startConversation) {
+             Evnt, startConversation, makeDialog) {
       $scope.Session = Session;
       var userId = $routeParams.userId;
       var userPromise = User.get(userId);
@@ -63,6 +63,26 @@
             }
           }
         });
+
+      $scope.deleteUser = function() {
+        var title = 'Delete User';
+        var msg = 'Do you really want to delete the account of "' + $scope.user.name + '"?';
+        var btns = [{result:'yes', label: 'Yes'},
+                    {result:'no', label: 'No', cssClass: 'btn-primary'}];
+        var d = makeDialog(title, msg, btns);
+        d.result.then(
+          function(result) {
+            if (result === 'yes') {
+              var deletePromise = $scope.user.destroy();
+              deletePromise.then(
+                function() {
+                },
+                function(message) {
+                    Messages.error(message);
+                });
+            }
+          });
+      };
     });
 
   // User Signups

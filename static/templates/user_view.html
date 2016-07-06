@@ -24,6 +24,11 @@
             Message</button>
           <!--<button class="btn profile-share-btn btn-warning btn-lg profile-btns">
             View Shares</button>-->
+          <button
+             ng-show="(Session.activeUser.id !== user.id) && Session.activeUser.is_administrator"
+             class="btn primary-btn btn-lg profile-btns"
+             ng-click="deleteUser();">
+             Delete User</button>
         </div>
       </div>
 
