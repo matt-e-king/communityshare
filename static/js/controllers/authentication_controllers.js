@@ -97,6 +97,7 @@
       var showModal = $location.search().showModal;
 
       $scope.newUser = new User();
+      $scope.emailRegex = /.+@.+\..+/i;
       $scope.passwordMethods = {};
       $scope.pg = 'default';
       $scope.user_type = {value: ''};
