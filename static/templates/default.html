@@ -49,7 +49,8 @@
                id="email"
                placeholder="Email"
                class="form-control input-lg signup-form"
-               type="email"/>
+               type="email"
+               ng-pattern="emailRegex"/>
         <p ng-show="signUpForm.email.$invalid && signUpForm.email.$dirty" class="help-block">
           Please enter a valid email.
         </p>
