@@ -1,8 +1,23 @@
+# Editors
+.idea
+.vscode
+
+# OSX properties
+.DS_Store
+
+# Python
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Flask
+instance/
+.webassets-cache
+
 \#*
 \.\#*
 *__pycache__*
 *.pyc
-*node_modules*
-*bower_components*
-*config.json*
-*.log
+node_modules
+bower_components
+config.json
+.log
