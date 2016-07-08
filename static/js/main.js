@@ -316,11 +316,10 @@
     };
   }
 
-  // Path .trim() for IE8
-  // https://stackoverflow.com/questions/2308134/trim-in-javascript-not-working-in-ie
+  // Provide String.trim() poly-fill for IE8
   if (typeof String.prototype.trim !== 'function') {
     String.prototype.trim = function() {
-      return this.replace(/^\s+|\s+$/g, '');
+      return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
     }
   }
 
