@@ -1,91 +1,37 @@
-#CommunityShare
+# Community Share
 
 We're working on creating an application to connect educators with community partners.
 
-See http://www.communityshare.us/ for more details.
+See [communityshare.us](http://www.communityshare.us) for more details.
 
 
-##  Development Environment Setup
+## Contributing
 
-### Get the code & install dependencies
+We currently develop community share locally by means of a Docker image. The image will boot up and load the current app, letting you make code changes without rebuilding the container. **The first step is thus to install [Docker](https://www.docker.com) on your computer**. Please consult the Docker project or guides online for issues installing and running Docker.
 
-First, clone the repo locally into your workspace:
+> Note that for OSX and Windows users you might need to enroll in the [Docker Private Beta program](https://beta.docker.com) in order to get the newer and more integrated native Docker clients.
 
-```
- $ git clone https://github.com/benreynwar/communityshare.git
-```
+### Running a local development environment
 
-Install python3 if you don't already have it, using homebrew or your package manager of choice:
+Clone the reposity…
 
-```
- $ brew install python3
+```bash
+git clone https://github.com/communityshare/communityshare.git
 ```
 
-Install postgres as your database
+…and then start the Docker containers.
 
-```
- $ brew install postgres
-```
-
-Install dependencies
-
-```
- $ pip3 install -r requirements.txt
+```bash
+cd communityshare
+docker-compose up
 ```
 
-### Set up Your Database
+After this you should be able to see the servers initialize. You should be able to open up a browser to [http://localhost:5000](http://localhost:5000) and see the CommunityShare site.
 
-Start your postgres server
+If you experience any issues getting CommunityShare running locally, please [file an issue](https://github.com/communityshare/communityshare/issues/new) and describe the problems you encountered.
 
+Should you have need to inspect the running logs, they can be found mounted at `/communitysharelogs` within the Docker container. While the server is running, you can login to the container and explore:
+
+```bash
+docker-container exec server sh
 ```
- $ psql
-```
-
-Create a new communityshare user
-
-```
- # CREATE USER communityshare;
-```
-
-Set the communityshare user password (Set it to "communityshare", otherwise you will need to edit config.json)
-
-```
-\password communityshare
-```
-
-Create a new communityshare database
-
-```
- # CREATE DATABASE communityshare;
-```
-
-Grant communityshare database privileges to the communityshare user
-
-```
- # grant all privileges on database communityshare to communityshare;
-```
-
-### Populate your Database
-
-To populate your database, run
-
-```
- $ python3 setup.py
-```
-  
-*Note 1: Make sure to check your setup.py file to create a number of random users greater than 0*
-
-*setup(n_random_users=40)*
-
-*Note 2: Running this command will reset your database.*
- 
- 
-### Start your app
-
-Run
-
-```
- $ python3 community_share_local_app.py 
-```
- 
-Open in your browser at http://127.0.0.1:5000/
