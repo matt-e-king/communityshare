@@ -23,7 +23,7 @@ sample_userA = {
     'name': 'Charles',
     'bio': 'I am Charles.',
     'zipcode' :'12345',
-    'email': "charlies@notarealemail.com",
+    'email': "charlies@example.com",
     'password': 'booooooo'
 }
 
@@ -32,7 +32,7 @@ sample_userB = {
     'name': 'Rob',
     'bio': 'I am Rob.',
     'zipcode' :'12345',
-    'email': "rob@notarealemail.com",
+    'email': "rob@example.com",
     'password': 'oiuh298n[;w',
 }
 
@@ -41,7 +41,7 @@ sample_userC = {
     'name': 'Charlie',
     'bio': 'AAAAAAAAAAAAAhhhhhhhhhhh!!!!',
     'zipcode' :'12345',
-    'email': "charlie@notarealemail.com",
+    'email': "charlie@example.com",
     'password': 'oiuh298n[;wbosijdfkow',
 }
 

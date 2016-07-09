@@ -15,7 +15,7 @@ from community_share import store, Base, config, setup_data
 logger = logging.getLogger(__name__)
 
 def make_email(first_name, last_name):
-    email = '{0}.{1}@notarealemail.com'.format(first_name, last_name)
+    email = '{0}.{1}@example.com'.format(first_name, last_name)
     return email
 
 skills = ['cooking', 'meterology', 'paleontology', 'dinosaurs', 'biology', 'fish',
@@ -269,20 +269,18 @@ def get_creator():
 def setup(n_random_users=100):
     logger.info('Starting setup script.')
     init_db()
-    first_admin = None
     logger.info('Making labels.')
     make_labels()
-    import os
     from community_share.models.secret import Secret
+
+    logger.info('Making Admin Users')
+    make_admin_user('admin@example.com', 'admin@example.com', 'admin')
     admin_emails = config.ADMIN_EMAIL_ADDRESSES.split(',')
     admin_emails = [x.strip() for x in admin_emails]
     logger.info('admin_emails is {0}'.format(admin_emails))
-    logger.info('Making Admin Users')
     for email in admin_emails:
-        if email:
-            user = make_admin_user(email, email, Secret.make_key(20))
-            if user is not None and first_admin is None:
-                first_admin = user
+        make_admin_user(email, email, Secret.make_key(20))
+
     logger.info('Making {0} random users'.format(n_random_users))
     for i in range(n_random_users):
         make_random_user()
